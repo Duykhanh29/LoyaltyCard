@@ -1,0 +1,159 @@
+// converted by version 1.3
+// on Sat Dec 07 16:43:50 ICT 2024
+
+.package loyaltycard {
+	.aid 0x11:0x22:0x33:0x44:0x55:0x66;
+	.version 1.0;
+
+	.imports {
+		0xA0:0x0:0x0:0x0:0x62:0x0:0x1 1.0;		//java/lang
+		0xA0:0x0:0x0:0x0:0x62:0x1:0x1 1.3;		//javacard/framework
+	}
+
+	.applet {
+		0x11:0x22:0x33:0x44:0x55:0x66:0x0 loyaltycard;
+	}
+
+	.constantPool {
+		// 0
+		instanceFieldRef byte AppletConstants/INS_SETUP;
+		// 1
+		instanceFieldRef byte AppletConstants/INS_UNLOCK;
+		// 2
+		instanceFieldRef byte AppletConstants/INS_AUTHENTICATE;
+		// 3
+		instanceFieldRef byte AppletConstants/INS_CHANGE_PIN;
+		// 4
+		instanceFieldRef byte AppletConstants/INS_PIN_VALIDATED;
+		// 5
+		staticMethodRef 0.0.0()V;		// java/lang/Object.<init>()V
+		// 6
+		staticMethodRef 1.3.0()V;		// javacard/framework/Applet.<init>()V
+		// 7
+		classRef loyaltycard;
+		// 8
+		staticMethodRef loyaltycard/<init>()V;
+		// 9
+		virtualMethodRef 1.3.2([BSB)V;		// register([BSB)V
+		// 10
+		virtualMethodRef 1.3.3()Z;		// selectingApplet()Z
+		// 11
+		virtualMethodRef 1.10.1()[B;		// getBuffer()[B
+		// 12
+		staticMethodRef 1.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
+	}
+
+	.class public AppletConstants 0 extends 0.0 {		// extends java/lang/Object
+
+		.fields {
+			 byte INS_SETUP 0;		// B
+			 byte INS_UNLOCK 1;		// B
+			 byte INS_AUTHENTICATE 2;		// B
+			 byte INS_CHANGE_PIN 3;		// B
+			 byte INS_PIN_VALIDATED 4;		// B
+			public static final byte PIN_RETRIES = 3;		// B
+			private static final byte MAX_PIN_SIZE = 6;		// B
+		}
+
+		.publicMethodTable 1 {
+			equals(Ljava/lang/Object;)Z;
+		}
+
+		.packageMethodTable 0 {
+		}
+
+		.method public <init>()V 0 {
+			.stack 2;
+			.locals 0;
+
+				L0:	aload_0;
+					invokespecial 5;		// java/lang/Object.<init>()V
+					aload_0;
+					sconst_2;
+					putfield_b 0;		// byte loyaltycard/AppletConstants.INS_SETUP
+					aload_0;
+					sconst_4;
+					putfield_b 1;		// byte loyaltycard/AppletConstants.INS_UNLOCK
+					aload_0;
+					bspush 6;
+					putfield_b 2;		// byte loyaltycard/AppletConstants.INS_AUTHENTICATE
+					aload_0;
+					bspush 8;
+					putfield_b 3;		// byte loyaltycard/AppletConstants.INS_CHANGE_PIN
+					aload_0;
+					bspush 10;
+					putfield_b 4;		// byte loyaltycard/AppletConstants.INS_PIN_VALIDATED
+					return;
+		}
+
+	}
+
+	.class public loyaltycard 1 extends 1.3 {		// extends javacard/framework/Applet
+
+		.publicMethodTable 7 {
+			equals(Ljava/lang/Object;)Z;
+			register()V;
+			register([BSB)V;
+			selectingApplet()Z;
+			deselect()V;
+			getShareableInterfaceObject(Ljavacard/framework/AID;B)Ljavacard/framework/Shareable;;
+			select()Z;
+			process(Ljavacard/framework/APDU;)V;
+		}
+
+		.packageMethodTable 0 {
+		}
+
+		.method public <init>()V 0 {
+			.stack 1;
+			.locals 0;
+
+				L0:	aload_0;
+					invokespecial 6;		// javacard/framework/Applet.<init>()V
+					return;
+		}
+
+		.method public static install([BSB)V 1 {
+			.stack 5;
+			.locals 0;
+
+				L0:	new 7;		// loyaltycard/loyaltycard
+					dup;
+					invokespecial 8;		// loyaltycard/loyaltycard.<init>()V
+					aload_0;
+					sload_1;
+					sconst_1;
+					sadd;
+					aload_0;
+					sload_1;
+					baload;
+					invokevirtual 9;		// register([BSB)V
+					return;
+		}
+
+		.method public process(Ljavacard/framework/APDU;)V 7 {
+			.stack 2;
+			.locals 1;
+
+			.descriptor	Ljavacard/framework/APDU;	1.10;
+
+				L0:	aload_0;
+					invokevirtual 10;		// selectingApplet()Z
+					ifeq L2;
+				L1:	return;
+				L2:	aload_1;
+					invokevirtual 11;		// getBuffer()[B
+					astore_2;
+				L3:	aload_2;
+					sconst_1;
+					baload;
+					slookupswitch L5 1 0 L4;
+				L4:	goto L6;
+				L5:	sspush 27904;
+					invokestatic 12;		// javacard/framework/ISOException.throwIt(S)V
+				L6:	return;
+		}
+
+	}
+
+}
