@@ -2,10 +2,12 @@ package loyaltycard;
 
 import javacard.framework.*;
 
+
 public class loyaltycard extends Applet
 {
 	
-	private OwnerPIN pin;
+	private static OwnerPIN pin;
+	private static byte[] userData = new byte[1024];
 
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
@@ -61,48 +63,57 @@ public class loyaltycard extends Applet
     }
 
     private void readData(APDU apdu) {
-    // Check if PIN is validated, throw exception if not
+    // Check if the PIN is validated, throw an exception if not
     if (!pin.isValidated()) {
         ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
     }
 
+    // Check if the length of userData exceeds the maximum size for short
+    if (userData.length > Short.MAX_VALUE) {
+        ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+    }
+
     // Get the total length of user data to send
     short totalLength = (short) userData.length;
-    short bytesRead = 0;  // Track the number of bytes read
+    short bytesRead = 0; // Track the number of bytes read
 
     // Set the outgoing mode to send data
     apdu.setOutgoing();
 
     // Loop to send data in chunks
     while (bytesRead < totalLength) {
-        // Calculate the chunk size (up to 255 bytes, but no more than remaining data)
-        short chunkSize = (short) Math.min(255, totalLength - bytesRead);
-        
+        // Calculate the chunk size (up to 255 bytes, but no more than the remaining data)
+        short chunkSize = (short) (totalLength - bytesRead); // Default to the remaining data
+        if (chunkSize > 255) {
+            chunkSize = 255; // Limit the chunk size to 255 bytes
+        }
+
         // Set the outgoing length to the chunk size
         apdu.setOutgoingLength(chunkSize);
-        
+
         // Send the chunk of data
         apdu.sendBytesLong(userData, bytesRead, chunkSize);
 
         // Update the number of bytes read
         bytesRead += chunkSize;
 
-        // If there is more data to read, throw SW=0x6310 to indicate more data is available
+        // If there is more data to send, throw SW=0x6310 to indicate that more data is available
         if (bytesRead < totalLength) {
-            ISOException.throwIt((short) 0x6310);  // More data, continue reading
+            ISOException.throwIt((short) 0x6310); //  continue reading
         }
     }
 
-    // If all data has been sent, return SW=0x9000 to indicate success
-    ISOException.throwIt((short) 0x9000);  // Success, all data read
+ 
+    ISOException.throwIt((short) 0x9000); // Success, all data read
 }
+
 
 
 
 
 	private void changePin(APDU apdu, byte[] buffer) {
 		if (!pin.isValidated()) {
-			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			 ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
 		}
 
 		byte pin_size = buffer[ISO7816.OFFSET_LC];

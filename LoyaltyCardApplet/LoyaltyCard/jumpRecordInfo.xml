@@ -2,6 +2,22 @@
 <prevNodes>
 <jnode>
 <fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
+<line>12</line>
+</jnode>
+<jnode>
+<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
+<line>70</line>
+</jnode>
+<jnode>
+<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
+<line>80</line>
+</jnode>
+<jnode>
+<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
+<line>107</line>
+</jnode>
+<jnode>
+<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
 <line>117</line>
 </jnode>
 <jnode>
@@ -15,8 +31,8 @@
 </prevNodes>
 <nextRecord>
 <jnode>
-<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\loyaltycard.java</fileName>
-<line>107</line>
+<fileName>E:\Local Disk\Java cards\Java Swing project\LoyaltyCard\LoyaltyCardApplet\LoyaltyCard\src\loyaltycard\AppletConstants.java</fileName>
+<line>7</line>
 </jnode>
 </nextRecord>
 </jumpRecord>
