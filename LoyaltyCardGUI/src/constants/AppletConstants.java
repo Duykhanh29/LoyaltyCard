@@ -10,5 +10,5 @@ package constants;
  */
 public class AppletConstants {
         public final static byte PIN_RETRIES = 3;
-        private static final byte MAX_PIN_SIZE = 6;
+        public final static  byte MAX_PIN_SIZE = 6;
 }

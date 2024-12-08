@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Sat Dec 07 23:36:18 ICT 2024
+// on Sun Dec 08 22:39:55 ICT 2024
 
 .package loyaltycard {
 	.aid 0x11:0x22:0x33:0x44:0x55:0x66;
@@ -26,51 +26,59 @@
 		// 4
 		staticFieldRef 1.9 loyaltycard/pin;
 		// 5
-		classRef loyaltycard;
+		virtualMethodRef 1.9.8([BSB)V;		// javacard/framework/OwnerPIN.update([BSB)V
 		// 6
-		staticMethodRef loyaltycard/<init>()V;
+		classRef loyaltycard;
 		// 7
-		virtualMethodRef 1.3.2([BSB)V;		// javacard/framework/Applet.register([BSB)V
+		staticMethodRef loyaltycard/<init>()V;
 		// 8
-		virtualMethodRef 1.3.3()Z;		// javacard/framework/Applet.selectingApplet()Z
+		virtualMethodRef 1.3.2([BSB)V;		// javacard/framework/Applet.register([BSB)V
 		// 9
-		virtualMethodRef 1.10.1()[B;		// javacard/framework/APDU.getBuffer()[B
+		virtualMethodRef 1.3.3()Z;		// javacard/framework/Applet.selectingApplet()Z
 		// 10
+		virtualMethodRef 1.10.1()[B;		// javacard/framework/APDU.getBuffer()[B
+		// 11
 		staticMethodRef loyaltycard/verifyPIN(Ljavacard/framework/APDU;)V;
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
-		// 11
+		// 12
 		staticMethodRef loyaltycard/readData(Ljavacard/framework/APDU;)V;
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
-		// 12
+		// 13
 		staticMethodRef loyaltycard/writeData(Ljavacard/framework/APDU;)V;
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
-		// 13
-		staticMethodRef 1.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
 		// 14
-		virtualMethodRef 1.9.1([BSB)Z;		// javacard/framework/OwnerPIN.check([BSB)Z
+		staticMethodRef loyaltycard/changePin(Ljavacard/framework/APDU;)V;
+			.descriptor	Ljavacard/framework/APDU;	1.10;
+
 		// 15
-		virtualMethodRef 1.9.4()Z;		// javacard/framework/OwnerPIN.isValidated()Z
+		staticMethodRef loyaltycard/createPIN(Ljavacard/framework/APDU;)V;
+			.descriptor	Ljavacard/framework/APDU;	1.10;
+
 		// 16
-		staticFieldRef byte[] loyaltycard/userData;
+		staticMethodRef 1.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
 		// 17
-		staticMethodRef 1.16.1([BS[BSS)S;		// javacard/framework/Util.arrayCopy([BS[BSS)S
+		virtualMethodRef 1.9.4()Z;		// javacard/framework/OwnerPIN.isValidated()Z
 		// 18
-		virtualMethodRef 1.10.7()S;		// javacard/framework/APDU.setOutgoing()S
+		staticFieldRef byte[] loyaltycard/userData;
 		// 19
-		virtualMethodRef 1.10.9(S)V;		// javacard/framework/APDU.setOutgoingLength(S)V
+		staticMethodRef 1.16.1([BS[BSS)S;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 		// 20
-		virtualMethodRef 1.10.5([BSS)V;		// javacard/framework/APDU.sendBytesLong([BSS)V
+		virtualMethodRef 1.10.7()S;		// javacard/framework/APDU.setOutgoing()S
 		// 21
-		virtualMethodRef 1.10.6()S;		// javacard/framework/APDU.setIncomingAndReceive()S
+		virtualMethodRef 1.10.9(S)V;		// javacard/framework/APDU.setOutgoingLength(S)V
 		// 22
-		virtualMethodRef 1.9.8([BSB)V;		// javacard/framework/OwnerPIN.update([BSB)V
+		virtualMethodRef 1.10.5([BSS)V;		// javacard/framework/APDU.sendBytesLong([BSS)V
 		// 23
-		virtualMethodRef 1.9.5()V;		// javacard/framework/OwnerPIN.reset()V
+		virtualMethodRef 1.10.6()S;		// javacard/framework/APDU.setIncomingAndReceive()S
 		// 24
 		virtualMethodRef 1.9.2()B;		// javacard/framework/OwnerPIN.getTriesRemaining()B
+		// 25
+		virtualMethodRef 1.9.1([BSB)Z;		// javacard/framework/OwnerPIN.check([BSB)Z
+		// 26
+		virtualMethodRef 1.9.5()V;		// javacard/framework/OwnerPIN.reset()V
 	}
 
 	.class public AppletConstants 0 extends 0.0 {		// extends java/lang/Object
@@ -78,6 +86,8 @@
 		.fields {
 			public static final byte PIN_RETRIES = 3;		// B
 			public static final byte MAX_PIN_SIZE = 6;		// B
+			public static final byte NUMBER_ZERO = 48;		// B
+			public static final byte NUMBER_NINE = 57;		// B
 		}
 
 		.publicMethodTable 1 {
@@ -104,7 +114,8 @@
 			public static final byte INS_VERIFY_PIN = 0;		// B
 			public static final byte INS_WRITE_USER_DATA = 1;		// B
 			public static final byte INS_READ_USER_PIN = 2;		// B
-			public static final byte INS_CHANGE_PIN = 4;		// B
+			public static final byte INS_CHANGE_PIN = 3;		// B
+			public static final byte INS_SET_PIN = 4;		// B
 		}
 
 		.publicMethodTable 1 {
@@ -157,7 +168,7 @@
 
 		.method public static install([BSB)V 1 {
 			.stack 5;
-			.locals 0;
+			.locals 1;
 
 				L0:	new 2;		// javacard/framework/OwnerPIN
 					dup;
@@ -165,9 +176,43 @@
 					bspush 6;
 					invokespecial 3;		// javacard/framework/OwnerPIN.<init>(BB)V
 					putstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					new 5;		// loyaltycard/loyaltycard
+					bspush 6;
+					newarray 11;
 					dup;
-					invokespecial 6;		// loyaltycard/loyaltycard.<init>()V
+					sconst_0;
+					sconst_1;
+					bastore;
+					dup;
+					sconst_1;
+					sconst_2;
+					bastore;
+					dup;
+					sconst_2;
+					sconst_3;
+					bastore;
+					dup;
+					sconst_3;
+					sconst_4;
+					bastore;
+					dup;
+					sconst_4;
+					sconst_5;
+					bastore;
+					dup;
+					sconst_5;
+					bspush 6;
+					bastore;
+					astore_3;
+				L1:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					aload_3;
+					sconst_0;
+					aload_3;
+					arraylength;
+					s2b;
+					invokevirtual 5;		// javacard/framework/OwnerPIN.update([BSB)V
+					new 6;		// loyaltycard/loyaltycard
+					dup;
+					invokespecial 7;		// loyaltycard/loyaltycard.<init>()V
 					aload_0;
 					sload_1;
 					sconst_1;
@@ -175,7 +220,7 @@
 					aload_0;
 					sload_1;
 					baload;
-					invokevirtual 7;		// javacard/framework/Applet.register([BSB)V
+					invokevirtual 8;		// javacard/framework/Applet.register([BSB)V
 					return;
 		}
 
@@ -186,58 +231,41 @@
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
 				L0:	aload_0;
-					invokevirtual 8;		// javacard/framework/Applet.selectingApplet()Z
+					invokevirtual 9;		// javacard/framework/Applet.selectingApplet()Z
 					ifeq L2;
 				L1:	return;
 				L2:	aload_1;
-					invokevirtual 9;		// javacard/framework/APDU.getBuffer()[B
+					invokevirtual 10;		// javacard/framework/APDU.getBuffer()[B
 					astore_2;
 				L3:	aload_2;
 					sconst_1;
 					baload;
 					sstore_3;
 				L4:	sload_3;
-					stableswitch L8 0 2 L5 L7 L6;
+					stableswitch L10 0 4 L5 L7 L6 L8 L9;
 				L5:	aload_0;
 					aload_1;
-					invokespecial 10;		// loyaltycard/loyaltycard.verifyPIN(Ljavacard/framework/APDU;)V
-					goto L9;
+					invokespecial 11;		// loyaltycard/loyaltycard.verifyPIN(Ljavacard/framework/APDU;)V
+					goto L11;
 				L6:	aload_0;
 					aload_1;
-					invokespecial 11;		// loyaltycard/loyaltycard.readData(Ljavacard/framework/APDU;)V
-					goto L9;
+					invokespecial 12;		// loyaltycard/loyaltycard.readData(Ljavacard/framework/APDU;)V
+					goto L11;
 				L7:	aload_0;
 					aload_1;
-					invokespecial 12;		// loyaltycard/loyaltycard.writeData(Ljavacard/framework/APDU;)V
-					goto L9;
-				L8:	sspush 27904;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-				L9:	return;
-		}
-
-		.method private verifyPIN(Ljavacard/framework/APDU;)V {
-			.stack 4;
-			.locals 2;
-
-			.descriptor	Ljavacard/framework/APDU;	1.10;
-
-				L0:	aload_1;
-					invokevirtual 9;		// javacard/framework/APDU.getBuffer()[B
-					astore_2;
-				L1:	aload_2;
-					sconst_4;
-					baload;
-					sstore_3;
-				L2:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					aload_2;
-					sconst_5;
-					sload_3;
-					invokevirtual 14;		// javacard/framework/OwnerPIN.check([BSB)Z
-					ifeq L4;
-				L3:	return;
-				L4:	sspush 27010;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-					return;
+					invokespecial 13;		// loyaltycard/loyaltycard.writeData(Ljavacard/framework/APDU;)V
+					goto L11;
+				L8:	aload_0;
+					aload_1;
+					invokespecial 14;		// loyaltycard/loyaltycard.changePin(Ljavacard/framework/APDU;)V
+					goto L11;
+				L9:	aload_0;
+					aload_1;
+					invokespecial 15;		// loyaltycard/loyaltycard.createPIN(Ljavacard/framework/APDU;)V
+					goto L11;
+				L10:	sspush 27904;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L11:	return;
 		}
 
 		.method private writeData(Ljavacard/framework/APDU;)V {
@@ -247,12 +275,12 @@
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
 				L0:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 15;		// javacard/framework/OwnerPIN.isValidated()Z
+					invokevirtual 17;		// javacard/framework/OwnerPIN.isValidated()Z
 					ifne L2;
 				L1:	sspush 27010;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
 				L2:	aload_1;
-					invokevirtual 9;		// javacard/framework/APDU.getBuffer()[B
+					invokevirtual 10;		// javacard/framework/APDU.getBuffer()[B
 					astore_2;
 				L3:	aload_2;
 					sconst_4;
@@ -262,10 +290,10 @@
 					sstore_3;
 				L4:	aload_2;
 					sconst_5;
-					getstatic_a 16;		// reference loyaltycard/loyaltycard.userData
+					getstatic_a 18;		// reference loyaltycard/loyaltycard.userData
 					sconst_0;
 					sload_3;
-					invokestatic 17;		// javacard/framework/Util.arrayCopy([BS[BSS)S
+					invokestatic 19;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
 					return;
 		}
@@ -277,23 +305,23 @@
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
 				L0:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 15;		// javacard/framework/OwnerPIN.isValidated()Z
+					invokevirtual 17;		// javacard/framework/OwnerPIN.isValidated()Z
 					ifne L2;
 				L1:	sspush 27010;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-				L2:	getstatic_a 16;		// reference loyaltycard/loyaltycard.userData
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L2:	getstatic_a 18;		// reference loyaltycard/loyaltycard.userData
 					arraylength;
 					sspush 32767;
 					if_scmple L4;
 				L3:	sspush 27012;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-				L4:	getstatic_a 16;		// reference loyaltycard/loyaltycard.userData
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L4:	getstatic_a 18;		// reference loyaltycard/loyaltycard.userData
 					arraylength;
 					sstore_2;
 				L5:	sconst_0;
 					sstore_3;
 				L6:	aload_1;
-					invokevirtual 18;		// javacard/framework/APDU.setOutgoing()S
+					invokevirtual 20;		// javacard/framework/APDU.setOutgoing()S
 					pop;
 				L7:	sload_3;
 					sload_2;
@@ -309,12 +337,12 @@
 					sstore 4;
 				L11:	aload_1;
 					sload 4;
-					invokevirtual 19;		// javacard/framework/APDU.setOutgoingLength(S)V
+					invokevirtual 21;		// javacard/framework/APDU.setOutgoingLength(S)V
 					aload_1;
-					getstatic_a 16;		// reference loyaltycard/loyaltycard.userData
+					getstatic_a 18;		// reference loyaltycard/loyaltycard.userData
 					sload_3;
 					sload 4;
-					invokevirtual 20;		// javacard/framework/APDU.sendBytesLong([BSS)V
+					invokevirtual 22;		// javacard/framework/APDU.sendBytesLong([BSS)V
 					sload_3;
 					sload 4;
 					sadd;
@@ -323,45 +351,179 @@
 					sload_2;
 					if_scmpge L13;
 				L12:	sspush 25360;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
 				L13:	goto L7;
 				L14:	sspush -28672;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
 					return;
 		}
 
-		.method private changePin(Ljavacard/framework/APDU;[B)V {
+		.method private verifyPIN(Ljavacard/framework/APDU;)V {
 			.stack 4;
-			.locals 1;
+			.locals 3;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
-				L0:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 15;		// javacard/framework/OwnerPIN.isValidated()Z
-					ifne L2;
-				L1:	sspush 27010;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-				L2:	aload_2;
+				L0:	aload_1;
+					invokevirtual 10;		// javacard/framework/APDU.getBuffer()[B
+					astore_2;
+				L1:	aload_2;
 					sconst_4;
 					baload;
 					sstore_3;
+				L2:	sload_3;
+					ifle L4;
 				L3:	sload_3;
 					bspush 6;
 					if_scmple L5;
 				L4:	sspush 26368;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
 				L5:	aload_1;
-					invokevirtual 21;		// javacard/framework/APDU.setIncomingAndReceive()S
-					ifne L7;
-				L6:	sspush 27012;
-					invokestatic 13;		// javacard/framework/ISOException.throwIt(S)V
-				L7:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 23;		// javacard/framework/APDU.setIncomingAndReceive()S
+					sstore 4;
+				L6:	sload 4;
+					sload_3;
+					if_scmpeq L8;
+				L7:	sspush 26368;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L8:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 24;		// javacard/framework/OwnerPIN.getTriesRemaining()B
+					ifne L10;
+				L9:	sspush 27011;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+				L10:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
 					aload_2;
 					sconst_5;
 					sload_3;
-					invokevirtual 22;		// javacard/framework/OwnerPIN.update([BSB)V
+					invokevirtual 25;		// javacard/framework/OwnerPIN.check([BSB)Z
+					sconst_1;
+					if_scmpne L12;
+				L11:	return;
+				L12:	sspush 27010;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+		}
+
+		.method private changePin(Ljavacard/framework/APDU;)V {
+			.stack 4;
+			.locals 5;
+
+			.descriptor	Ljavacard/framework/APDU;	1.10;
+
+				L0:	aload_1;
+					invokevirtual 10;		// javacard/framework/APDU.getBuffer()[B
+					astore_2;
+				L1:	aload_1;
+					invokevirtual 23;		// javacard/framework/APDU.setIncomingAndReceive()S
+					sstore_3;
+				L2:	sconst_5;
+					sstore 4;
+				L3:	bspush 12;
+					sstore 5;
+				L4:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 17;		// javacard/framework/OwnerPIN.isValidated()Z
+					ifne L6;
+				L5:	sspush 27010;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+				L6:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 24;		// javacard/framework/OwnerPIN.getTriesRemaining()B
+					ifne L8;
+				L7:	sspush 24832;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+				L8:	sload_3;
+					sload 5;
+					if_scmpeq L10;
+				L9:	sspush 26368;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L10:	sconst_0;
+					sstore 6;
+				L11:	sload 6;
+					sload 5;
+					if_scmpge L16;
+				L12:	aload_2;
+					sload 6;
+					sload 4;
+					sadd;
+					baload;
+					bspush 48;
+					if_scmplt L14;
+				L13:	aload_2;
+					sload 6;
+					sload 4;
+					sadd;
+					baload;
+					bspush 57;
+					if_scmple L15;
+				L14:	sspush 27264;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L15:	sinc 6 1;
+					goto L11;
+				L16:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					aload_2;
+					sload 4;
+					bspush 6;
+					invokevirtual 25;		// javacard/framework/OwnerPIN.check([BSB)Z
+					ifne L19;
+				L17:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 24;		// javacard/framework/OwnerPIN.getTriesRemaining()B
+					sstore 6;
+				L18:	sspush 27010;
+					sload 6;
+					sor;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L19:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					aload_2;
+					sload 4;
+					bspush 6;
+					sadd;
+					bspush 6;
+					invokevirtual 5;		// javacard/framework/OwnerPIN.update([BSB)V
 					getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 23;		// javacard/framework/OwnerPIN.reset()V
+					invokevirtual 26;		// javacard/framework/OwnerPIN.reset()V
+					return;
+		}
+
+		.method private createPIN(Ljavacard/framework/APDU;)V {
+			.stack 4;
+			.locals 4;
+
+			.descriptor	Ljavacard/framework/APDU;	1.10;
+
+				L0:	aload_1;
+					invokevirtual 10;		// javacard/framework/APDU.getBuffer()[B
+					astore_2;
+				L1:	aload_2;
+					sconst_4;
+					baload;
+					sspush 255;
+					sand;
+					sstore_3;
+				L2:	sload_3;
+					ifeq L4;
+				L3:	sload_3;
+					bspush 6;
+					if_scmple L5;
+				L4:	sspush 26368;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L5:	aload_1;
+					invokevirtual 23;		// javacard/framework/APDU.setIncomingAndReceive()S
+					sstore 4;
+				L6:	sload 4;
+					sload_3;
+					if_scmpeq L8;
+				L7:	sspush 26368;
+					invokestatic 16;		// javacard/framework/ISOException.throwIt(S)V
+				L8:	sconst_5;
+					sstore 5;
+				L9:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
+					aload_2;
+					sload 5;
+					sload_3;
+					s2b;
+					invokevirtual 5;		// javacard/framework/OwnerPIN.update([BSB)V
 					return;
 		}
 
@@ -388,7 +550,7 @@
 			.locals 0;
 
 				L0:	getstatic_a 4;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 23;		// javacard/framework/OwnerPIN.reset()V
+					invokevirtual 26;		// javacard/framework/OwnerPIN.reset()V
 					return;
 		}
 
