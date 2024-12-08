@@ -4,6 +4,12 @@
  */
 package Views;
 
+import Controllers.PinController;
+import Controllers.SmartCardConnection;
+import java.util.Arrays;
+import javax.swing.JOptionPane;
+import utils.ErrorHandleUtils;
+
 /**
  *
  * @author Admin
@@ -13,9 +19,14 @@ public class RegisterCard extends javax.swing.JFrame {
     /**
      * Creates new form RegisterCard
      */
+    
+    PinController pinController;
+    SmartCardConnection smartCardConnection;
     public RegisterCard() {
         initComponents();
         this.setLocationRelativeTo(null);
+        smartCardConnection=SmartCardConnection.getInstance();
+        pinController= new PinController(smartCardConnection);
     }
 
     /**
@@ -45,6 +56,7 @@ public class RegisterCard extends javax.swing.JFrame {
         pinTextField = new javax.swing.JPasswordField();
         confirmPinTextField = new javax.swing.JPasswordField();
         confirmButton = new javax.swing.JButton();
+        setPinButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,13 +102,25 @@ public class RegisterCard extends javax.swing.JFrame {
 
         confirmButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         confirmButton.setText("Xác nhận");
+        confirmButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmButtonActionPerformed(evt);
+            }
+        });
+
+        setPinButton.setText("Đặt mã PIN ( temp)");
+        setPinButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setPinButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -137,7 +161,9 @@ public class RegisterCard extends javax.swing.JFrame {
                                     .addComponent(confirmPinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(253, 253, 253)
-                        .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(55, 55, 55)
+                        .addComponent(setPinButton)))
                 .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -177,8 +203,10 @@ public class RegisterCard extends javax.swing.JFrame {
                             .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(confirmPinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(38, 38, 38)
-                .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(setPinButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(56, Short.MAX_VALUE))
         );
 
         pack();
@@ -187,6 +215,34 @@ public class RegisterCard extends javax.swing.JFrame {
     private void pickAvatarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickAvatarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pickAvatarButtonActionPerformed
+
+    
+//    just temporary
+    private void setPinButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setPinButtonActionPerformed
+        // TODO add your handling code here:
+        try {
+            char[] pinChars = pinTextField.getPassword();
+            char[] pinConfirmChars = confirmPinTextField.getPassword();
+            String pin = new String(pinChars);
+            String confirmPin = new String(pinConfirmChars);
+            if(!pin.equals(confirmPin)){
+                JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
+            }else{
+                pinController.setPin(pin);
+                this.dispose();
+                MainView mainView=new MainView();
+                mainView.setVisible(true);
+            }
+        } catch (Exception e) {
+            ErrorHandleUtils.handleErrorWithException(this, e, "");
+        } finally {
+        }
+    }//GEN-LAST:event_setPinButtonActionPerformed
+
+    private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_confirmButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -242,5 +298,6 @@ public class RegisterCard extends javax.swing.JFrame {
     private javax.swing.JTextField nameTextField;
     private javax.swing.JButton pickAvatarButton;
     private javax.swing.JPasswordField pinTextField;
+    private javax.swing.JButton setPinButton;
     // End of variables declaration//GEN-END:variables
 }
