@@ -12,8 +12,8 @@ public class loyaltycard extends Applet
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
 		pin = new OwnerPIN(AppletConstants.PIN_RETRIES, AppletConstants.MAX_PIN_SIZE);
-		
-		pin.update(pinArr, (short) 0, (byte)pinArr.length);
+		// byte[] pinArr = {1,2,3,4,5,6};
+		// pin.update(pinArr, (short) 0, (byte)pinArr.length);
 		new loyaltycard().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 	}
 
