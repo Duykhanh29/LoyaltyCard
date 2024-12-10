@@ -12,6 +12,8 @@ public class loyaltycard extends Applet
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
 		pin = new OwnerPIN(AppletConstants.PIN_RETRIES, AppletConstants.MAX_PIN_SIZE);
+		// byte[] pinArr = {1,2,3,4,5,6};
+		// pin.update(pinArr, (short) 0, (byte)pinArr.length);
 		new loyaltycard().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 	}
 
@@ -35,22 +37,19 @@ public class loyaltycard extends Applet
 		case AppletInsConstants.INS_WRITE_USER_DATA:
 			writeData(apdu);
 			break;
+		case AppletInsConstants.INS_CHANGE_PIN:
+			changePin(apdu);
+			break;
+		case AppletInsConstants.INS_SET_PIN:
+			createPIN(apdu);
+			break;
 		
 		default:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
 	}
 	
-	 private void verifyPIN(APDU apdu) {
-        byte[] buffer = apdu.getBuffer();
-        byte pinLength = buffer[ISO7816.OFFSET_LC];
-
-        if (pin.check(buffer, ISO7816.OFFSET_CDATA, pinLength)) {
-            return;
-        } else {
-            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-        }
-    }
+	 
     
      private void writeData(APDU apdu) {
         if (!pin.isValidated()) {
@@ -107,27 +106,91 @@ public class loyaltycard extends Applet
     ISOException.throwIt((short) 0x9000); // Success, all data read
 }
 
+	
+	
+	// PIN 
+	private void verifyPIN(APDU apdu) {	
+        byte[] buffer = apdu.getBuffer();
+		byte pinLength = buffer[ISO7816.OFFSET_LC];
 
-
-
-
-	private void changePin(APDU apdu, byte[] buffer) {
-		if (!pin.isValidated()) {
-			 ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-		}
-
-		byte pin_size = buffer[ISO7816.OFFSET_LC];
-
-		if ( pin_size > AppletConstants.MAX_PIN_SIZE) {
+		if (pinLength <= 0 || pinLength > AppletConstants.MAX_PIN_SIZE) {
 			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
 
-		if (apdu.setIncomingAndReceive() == 0) {
-			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		short receivedLength = apdu.setIncomingAndReceive();
+		if (receivedLength != pinLength) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
 
-		pin.update(buffer, (short) (ISO7816.OFFSET_CDATA), pin_size);
+
+		if (pin.getTriesRemaining() == (byte) 0x00) {
+			ISOException.throwIt((short) 0x6983); 
+			return;
+		}
+
+
+		if (pin.check(buffer, ISO7816.OFFSET_CDATA, pinLength)==true) {
+			return;
+		} else {
+			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+		}
+    }
+
+
+
+	private void changePin(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = apdu.setIncomingAndReceive();
+        short off = ISO7816.OFFSET_CDATA;
+        short expectedLength = (short) (AppletConstants.MAX_PIN_SIZE * 2);
+		if (!pin.isValidated()) {
+			 ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			 return;
+		}
+		if(pin.getTriesRemaining()==0){
+			ISOException.throwIt(ISO7816.SW_BYTES_REMAINING_00);
+			return;
+		}
+		
+		if (lc != expectedLength) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+		
+		// check if bytes are numbers from 0 to 9 
+		 for (short i = 0; i < expectedLength ; i++) {
+            if (((buffer[(short) (i + off)] < AppletConstants.NUMBER_ZERO)
+                    || (buffer[(short) (i + off)] > AppletConstants.NUMBER_NINE))) {
+                ISOException.throwIt(ISO7816.SW_WRONG_DATA);
+            }
+        }
+			
+		// offset from 0 to MAX_PIN_SIZE is data of current PIN
+        if (!pin.check(buffer, off, (byte) AppletConstants.MAX_PIN_SIZE)) {
+            
+            short triesRemaining = (short) pin.getTriesRemaining();
+            ISOException.throwIt((short) (ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED | triesRemaining));
+        }
+		
+		
+        pin.update(buffer, (short) (off + AppletConstants.MAX_PIN_SIZE), (byte) AppletConstants.MAX_PIN_SIZE);
 		pin.reset();
+	}
+	
+	private void createPIN(APDU apdu){
+		byte[] buffer = apdu.getBuffer(); 
+		short dataLength = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		if (dataLength == 0 || dataLength > AppletConstants.MAX_PIN_SIZE) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+		
+		short receivedLength = apdu.setIncomingAndReceive();
+		if (receivedLength != dataLength) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+		
+		short dataOffset = ISO7816.OFFSET_CDATA;
+		pin.update(buffer, dataOffset, (byte) dataLength);
+		
 	}
 
     
