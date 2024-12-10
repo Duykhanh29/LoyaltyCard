@@ -35,12 +35,13 @@ public class HomePage extends javax.swing.JFrame {
         jButton10 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(243, 243, 243));
 
         jLabel1.setFont(new java.awt.Font("Cambria", 1, 28)); // NOI18N
         jLabel1.setText("HỆ THỐNG TÍCH ĐIỂM");
 
-        jButton1.setBackground(new java.awt.Color(0, 104, 56));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton1.setBackground(new java.awt.Color(0, 135, 70));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Xem thông tin");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -49,8 +50,8 @@ public class HomePage extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setBackground(new java.awt.Color(0, 104, 56));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton2.setBackground(new java.awt.Color(0, 135, 70));
+        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Sửa thông tin");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -59,8 +60,8 @@ public class HomePage extends javax.swing.JFrame {
             }
         });
 
-        jButton7.setBackground(new java.awt.Color(0, 104, 56));
-        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton7.setBackground(new java.awt.Color(0, 135, 70));
+        jButton7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setText("Đổi mã PIN");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -69,8 +70,8 @@ public class HomePage extends javax.swing.JFrame {
             }
         });
 
-        jButton8.setBackground(new java.awt.Color(0, 104, 56));
-        jButton8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton8.setBackground(new java.awt.Color(0, 135, 70));
+        jButton8.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton8.setForeground(new java.awt.Color(255, 255, 255));
         jButton8.setText("Tích lũy điểm");
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -79,8 +80,8 @@ public class HomePage extends javax.swing.JFrame {
             }
         });
 
-        jButton9.setBackground(new java.awt.Color(0, 104, 56));
-        jButton9.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton9.setBackground(new java.awt.Color(0, 135, 70));
+        jButton9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton9.setForeground(new java.awt.Color(255, 255, 255));
         jButton9.setText("Đổi điểm");
         jButton9.addActionListener(new java.awt.event.ActionListener() {
@@ -89,8 +90,8 @@ public class HomePage extends javax.swing.JFrame {
             }
         });
 
-        jButton10.setBackground(new java.awt.Color(0, 104, 56));
-        jButton10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton10.setBackground(new java.awt.Color(0, 135, 70));
+        jButton10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton10.setForeground(new java.awt.Color(255, 255, 255));
         jButton10.setText("Thoát");
         jButton10.addActionListener(new java.awt.event.ActionListener() {
