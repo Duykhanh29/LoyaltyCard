@@ -26,54 +26,67 @@ public class UserDataController {
     }
 
     // Ghép thông tin người dùng thành một mảng byte để lưu vào thẻ
-    public byte[] buildUserData(String name, String address, String birthday, byte[] imageData, String pin) throws Exception {
+    public byte[] buildUserData(String firstName, String lastName, String phone, String cccd, String birthday,boolean isMale, String pin) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        // name 
-        baos.write(name.getBytes(StandardCharsets.UTF_8));
+        // firstName 
+        baos.write(firstName.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
 
-        // address 
-        baos.write(address.getBytes(StandardCharsets.UTF_8));
+        // lastName 
+        baos.write(lastName.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
-
-        baos.write(imageData);
+        
+         // phone 
+        baos.write(phone.getBytes(StandardCharsets.UTF_8));
+        baos.write('|');
+        
+//        baos.write(imageData);
+//        baos.write('|');
+        
+        // cccd
+        baos.write(cccd.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
 
         // birthday
         baos.write(birthday.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
+        
+        // birthday
+        baos.write(isMale ? 1 : 0);
+        baos.write('|');
 
         // pin
         baos.write(pin.getBytes(StandardCharsets.UTF_8));
-        baos.write('|');
+//        baos.write('|');
 
         return baos.toByteArray();
     }
 
     // Gửi dữ liệu người dùng lên thẻ thông minh
-    public void writeUserData(String name, String address, String birthday, byte[] imageData, String pin) throws Exception {
-        byte[] userData = buildUserData(name, address, birthday, imageData, pin);
+    public boolean writeUserData(String firstName, String lastName, String phone, String cccd, String birthday,boolean isMale, String pin) throws Exception {
+        byte[] userData = buildUserData(firstName, lastName, phone, cccd, birthday,isMale,pin);
         byte[] command = buildWriteAPDU(userData);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
             throw new Exception("Failed to write user data.");
         }
+        return isSuccess(response.getBytes());
     }
 
     // Đọc thông tin người dùng từ thẻ thông minh
     public UserData readUserData() throws Exception {
         List<Byte> fullData = new ArrayList<>();
         short offset = 0; // Start from the first position
-        byte le = (byte) 255; // Read up to 255 bytes at a time
-
+        byte le = (byte) 0xFF; // Read up to 255 bytes at a time
+   
         while (true) {
-
             byte[] apdu = buildReadAPDU(offset, le);
             ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(apdu));
 
             // Add data to the list
             byte[] responseData = response.getData();
+            byte[] dataWithoutSW = Arrays.copyOfRange(responseData, 0, responseData.length - 2);
             for (byte b : responseData) {
                 fullData.add(b);
             }
@@ -105,14 +118,25 @@ public class UserDataController {
         String dataString = new String(userData, StandardCharsets.UTF_8);
         String[] fields = dataString.split("\\|");
 
-        String name = fields[0];
-        String address = fields[1];
-
-        byte[] imageData = Arrays.copyOfRange(userData, dataString.indexOf(fields[2]), dataString.lastIndexOf(fields[2]));
-        String pin = fields[3];
+        String firstName = fields[0];
+        String lastName = fields[1];
+        String phone = fields[2];
+        String identification = fields[3];
         String birthday = fields[4];
 
-        return new UserData(name, address, imageData, pin, birthday);
+        boolean isMale=true;
+        String genderData = fields[fields.length-1];
+        if(genderData.contains("\u0001")){
+            isMale = true;
+        }else if(genderData.contains("\u0000")){
+            isMale =false;
+        }
+        
+//        byte[] imageData = Arrays.copyOfRange(userData, dataString.indexOf(fields[2]), dataString.lastIndexOf(fields[2]));
+//        String pin = fields[3];
+       
+           
+        return new UserData(firstName, lastName, phone, identification, birthday,isMale);
     }
 
     // Xây dựng APDU để ghi dữ liệu lên thẻ
@@ -137,6 +161,28 @@ public class UserDataController {
             le // Le
         };
     }
+    
+    private short getTotalUserDataLength() throws CardException {
+    byte[] apdu = buildGetLengthAPDU();
+    ResponseAPDU response =  smartCardConnection.getChannel().transmit(new CommandAPDU(apdu));
+    byte[] lengthData = response.getData();
+    return (short) ((lengthData[0] & 0xFF) << 8 | (lengthData[1] & 0xFF)); // Chuyển từ 2 byte sang short
+}
+    
+    private byte[] buildGetLengthAPDU(){
+         return new byte[]{
+            (byte) 0x00, // CLA
+            (byte) AppletInsConstants.INS_GET_USER_DATA_LENGTH, // INS
+            (byte) 0x00,
+            (byte) 0x00, 
+        };
+    }
+    
+    
+    
+//    public boolean setImage(byte[] imageData){
+//        
+//    }
 
     private boolean isSuccess(byte[] responseBytes) {
         return responseBytes[0] == (byte) 0x90 && responseBytes[1] == (byte) 0x00;

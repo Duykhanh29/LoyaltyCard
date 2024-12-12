@@ -8,7 +8,8 @@ public class loyaltycard extends Applet
 	
 	private static OwnerPIN pin;
 	private static byte[] userData = new byte[1024];
-
+	private short userDataLength = 0;
+ 
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
 		pin = new OwnerPIN(AppletConstants.PIN_RETRIES, AppletConstants.MAX_PIN_SIZE);
@@ -44,6 +45,7 @@ public class loyaltycard extends Applet
 			createPIN(apdu);
 			break;
 		
+		
 		default:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
@@ -52,59 +54,81 @@ public class loyaltycard extends Applet
 	 
     
      private void writeData(APDU apdu) {
-        if (!pin.isValidated()) {
-            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-        }
+        // if (!pin.isValidated()) {
+            // ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+        // }
 
         byte[] buffer = apdu.getBuffer();
         short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-        Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, lc);
+		short bytesRead = apdu.setIncomingAndReceive();
+    
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+        // Check if sending data exceeds memory capacity
+        if ( lc > userData.length) {
+			ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		}
+		
+		// Split the last 6 bytes to call the setPIN function
+		short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+		byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
+		Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
+		setPIN(pinData);
+		
+		userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+        
+        Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
     }
 
     private void readData(APDU apdu) {
-    // Check if the PIN is validated, throw an exception if not
-    if (!pin.isValidated()) {
-        ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-    }
+		// Check if the PIN is validated, throw an exception if not
+		if (!pin.isValidated()) {
+			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+		}
 
-    // Check if the length of userData exceeds the maximum size for short
-    if (userData.length > Short.MAX_VALUE) {
-        ISOException.throwIt(ISO7816.SW_DATA_INVALID);
-    }
+		// Check if the length of userData exceeds the maximum size for short
+		if (userDataLength > Short.MAX_VALUE) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
 
-    // Get the total length of user data to send
-    short totalLength = (short) userData.length;
-    short bytesRead = 0; // Track the number of bytes read
+		// Get the total length of user data to send
+ 		short totalLength = (short) userDataLength;
+		short bytesRead = 0; // Track the number of bytes read
 
-    // Set the outgoing mode to send data
-    apdu.setOutgoing();
+		// Set the outgoing mode to send data
+		apdu.setOutgoing();
+		
+		byte[] tempData = new byte[1024];
+		Util.arrayCopy(userData,(short)0,tempData,(short)0,totalLength);
+		byte test = tempData[0];
+		
+		// Loop to send data in chunks
+		while (bytesRead < totalLength) {
+			// Calculate the chunk size (up to 255 bytes, but no more than the remaining data)
+			short chunkSize = (short) (totalLength - bytesRead); // Default to the remaining data
+			if (chunkSize > AppletConstants.MAX_CHUNK_SIZE) {
+				chunkSize = AppletConstants.MAX_CHUNK_SIZE; // Limit the chunk size to 255 bytes
+			}
 
-    // Loop to send data in chunks
-    while (bytesRead < totalLength) {
-        // Calculate the chunk size (up to 255 bytes, but no more than the remaining data)
-        short chunkSize = (short) (totalLength - bytesRead); // Default to the remaining data
-        if (chunkSize > 255) {
-            chunkSize = 255; // Limit the chunk size to 255 bytes
-        }
+			// Set the outgoing length to the chunk size
+			apdu.setOutgoingLength(chunkSize);
 
-        // Set the outgoing length to the chunk size
-        apdu.setOutgoingLength(chunkSize);
+			// Send the chunk of data
+			apdu.sendBytesLong(userData, bytesRead, chunkSize);
 
-        // Send the chunk of data
-        apdu.sendBytesLong(userData, bytesRead, chunkSize);
+			// Update the number of bytes read
+			bytesRead += chunkSize;
 
-        // Update the number of bytes read
-        bytesRead += chunkSize;
-
-        // If there is more data to send, throw SW=0x6310 to indicate that more data is available
-        if (bytesRead < totalLength) {
-            ISOException.throwIt((short) 0x6310); //  continue reading
-        }
-    }
+			// If there is more data to send, throw SW=0x6310 to indicate that more data is available
+			if (bytesRead < totalLength) {
+				ISOException.throwIt((short) 0x6310); //  continue reading
+			}
+		}
 
  
-    ISOException.throwIt((short) 0x9000); // Success, all data read
-}
+		ISOException.throwIt((short) 0x9000); // Success, all data read
+	}
 
 	
 	
@@ -176,6 +200,11 @@ public class loyaltycard extends Applet
 		pin.reset();
 	}
 	
+
+	
+	
+	
+	
 	private void createPIN(APDU apdu){
 		byte[] buffer = apdu.getBuffer(); 
 		short dataLength = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
@@ -192,8 +221,18 @@ public class loyaltycard extends Applet
 		pin.update(buffer, dataOffset, (byte) dataLength);
 		
 	}
+	
+	private void setPIN(byte[] pinData){
+		short dataLength = (short) pinData.length;
+		if (dataLength == 0 || dataLength > AppletConstants.MAX_PIN_SIZE) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+		pin.update(pinData, (short) 0, (byte) dataLength);
+	}
 
     
+    
+	// 
     public boolean select(){
 	    if ( pin.getTriesRemaining() == 0 )
 			return false;

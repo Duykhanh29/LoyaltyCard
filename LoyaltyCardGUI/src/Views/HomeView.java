@@ -4,6 +4,11 @@
  */
 package Views;
 
+import Controllers.SmartCardConnection;
+import Controllers.UserDataController;
+import Models.UserData;
+import utils.ErrorHandleUtils;
+
 /**
  *
  * @author Admin
@@ -13,9 +18,14 @@ public class HomeView extends javax.swing.JFrame {
     /**
      * Creates new form HomeView
      */
+    
+    UserDataController userDataController;
+    SmartCardConnection smartCardConnection;
     public HomeView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        smartCardConnection = SmartCardConnection.getInstance();
+        userDataController = new UserDataController(smartCardConnection);
     }
 
     /**
@@ -34,9 +44,9 @@ public class HomeView extends javax.swing.JFrame {
         userInfoButton = new javax.swing.JButton();
         changePINButton = new javax.swing.JButton();
         redeemPointButton = new javax.swing.JButton();
-        deleteCardButton = new javax.swing.JButton();
         transactionHistoryButton = new javax.swing.JButton();
         disconnectButton = new javax.swing.JButton();
+        chargePointButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -103,11 +113,11 @@ public class HomeView extends javax.swing.JFrame {
         redeemPointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         redeemPointButton.setForeground(new java.awt.Color(0, 51, 51));
         redeemPointButton.setText("Đổi điểm");
-
-        deleteCardButton.setBackground(new java.awt.Color(255, 102, 102));
-        deleteCardButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        deleteCardButton.setForeground(new java.awt.Color(51, 0, 0));
-        deleteCardButton.setText("Xóa thẻ");
+        redeemPointButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                redeemPointButtonActionPerformed(evt);
+            }
+        });
 
         transactionHistoryButton.setBackground(new java.awt.Color(153, 153, 255));
         transactionHistoryButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -123,6 +133,21 @@ public class HomeView extends javax.swing.JFrame {
         disconnectButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         disconnectButton.setForeground(new java.awt.Color(153, 0, 0));
         disconnectButton.setText("Ngắt kết nối");
+        disconnectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                disconnectButtonActionPerformed(evt);
+            }
+        });
+
+        chargePointButton.setBackground(new java.awt.Color(153, 153, 255));
+        chargePointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        chargePointButton.setForeground(new java.awt.Color(0, 51, 51));
+        chargePointButton.setText("Tích điểm");
+        chargePointButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chargePointButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -137,8 +162,8 @@ public class HomeView extends javax.swing.JFrame {
                         .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(redeemPointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(deleteCardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(disconnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(disconnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chargePointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
@@ -159,15 +184,18 @@ public class HomeView extends javax.swing.JFrame {
                     .addComponent(redeemPointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addComponent(transactionHistoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(67, 67, 67)
-                        .addComponent(deleteCardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(7, 7, 7)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(69, 69, 69)
+                                .addComponent(transactionHistoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(chargePointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(67, 67, 67)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(changePINButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(disconnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -191,7 +219,39 @@ public class HomeView extends javax.swing.JFrame {
 
     private void userInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userInfoButtonActionPerformed
         // TODO add your handling code here:
+        try {
+//           UserData userData = userDataController.readUserData();
+            this.dispose();
+            UserInfo userInfoView = new UserInfo();
+            userInfoView.setVisible(true);
+           
+        } catch (Exception e) {
+            ErrorHandleUtils.handleErrorWithException(this, e, "Lỗi ko đọc được thông tin 1");
+        } finally {
+        }
     }//GEN-LAST:event_userInfoButtonActionPerformed
+
+    private void disconnectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectButtonActionPerformed
+        // TODO add your handling code here:
+        smartCardConnection.disconnect();
+        this.dispose();
+        ConnectionForm connectionForm = new ConnectionForm();
+        connectionForm.setVisible(true);
+    }//GEN-LAST:event_disconnectButtonActionPerformed
+
+    private void chargePointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargePointButtonActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        AccummulatePoints accummulatePoints = new AccummulatePoints();
+        accummulatePoints.setVisible(true);
+    }//GEN-LAST:event_chargePointButtonActionPerformed
+
+    private void redeemPointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redeemPointButtonActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        ExchangePoints exchangePoints = new ExchangePoints();
+        exchangePoints.setVisible(true);
+    }//GEN-LAST:event_redeemPointButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -230,7 +290,7 @@ public class HomeView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton changePINButton;
-    private javax.swing.JButton deleteCardButton;
+    private javax.swing.JButton chargePointButton;
     private javax.swing.JButton disconnectButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

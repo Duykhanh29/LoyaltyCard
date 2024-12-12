@@ -171,8 +171,10 @@ public class ChangePINCode extends javax.swing.JFrame {
             }else{
                 boolean isSuccess = pinController.changePIN(pin,newPin);
                 if(isSuccess){
-                    UserInfo userInfoView = new UserInfo();
-                    userInfoView.setVisible(true);
+//                    UserInfo userInfoView = new UserInfo();
+//                    userInfoView.setVisible(true);
+                    HomeView homeView = new HomeView();
+                    homeView.setVisible(true);
                     this.dispose();
                 }else{
                     JOptionPane.showMessageDialog(this, "Đổi mã PIN không thành công");

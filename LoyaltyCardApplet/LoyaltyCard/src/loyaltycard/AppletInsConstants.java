@@ -10,4 +10,5 @@ public class AppletInsConstants {
 	public final static byte INS_CHANGE_PIN = (byte) 0x03;
 	
 	public final static byte INS_SET_PIN = (byte) 0x04;
+	
 }
