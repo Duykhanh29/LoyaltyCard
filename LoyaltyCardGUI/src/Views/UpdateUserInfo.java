@@ -9,6 +9,10 @@ import Controllers.UserDataController;
 import Models.UserData;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JOptionPane;
+import utils.ErrorHandleUtils;
+import utils.DateTimeUtils;
+import utils.TextUtils;
 
 /**
  *
@@ -22,6 +26,11 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     UserData userData;
     SmartCardConnection smartCardConnection;
     UserDataController userDataController;
+    String initLastName;
+    String initFirstName;
+    String initPhone;
+    String initBirthday;
+
     public UpdateUserInfo(UserData userData) {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -33,17 +42,24 @@ public class UpdateUserInfo extends javax.swing.JFrame {
 
     private UpdateUserInfo() {
     }
-    private void initView(UserData userData){
-        lastNameTextField.setText(userData.getLastName());
-        firstNameTextField.setText(userData.getFirstName());
-        phoneTextField.setText(userData.getPhone());
+
+    private void initView(UserData userData) {
+        initLastName = userData.getLastName();
+        initFirstName = userData.getFirstName();
+        initPhone = userData.getPhone();
+        initBirthday = userData.getBirthday();
+
+        lastNameTextField.setText(initLastName);
+        firstNameTextField.setText(initFirstName);
+        phoneTextField.setText(initPhone);
         setBirthday(userData);
     }
-    private void setBirthday(UserData userData){
-         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+    private void setBirthday(UserData userData) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         try {
-            Date date = dateFormat.parse(userData.getBirthday()); 
-            birthdayChooser.setDate(date); 
+            Date date = dateFormat.parse(userData.getBirthday());
+            birthdayChooser.setDate(date);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,8 +186,81 @@ public class UpdateUserInfo extends javax.swing.JFrame {
 
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         // TODO add your handling code here:
+        try {
+            String phone = phoneTextField.getText();
+            String firstName = firstNameTextField.getText();
+            String lastName = lastNameTextField.getText();
+            Date date = birthdayChooser.getDate();
+
+            boolean isValid = validation(firstName, lastName, phone, date);
+            if (isValid) {
+                String birthday = DateTimeUtils.convertDateToString(date);
+                boolean isSucess = true;
+                if (!phone.equals(initPhone)) {
+                    userDataController.updatePhone(phone);
+                }
+                if (!lastName.equals(initLastName)) {
+                    userDataController.updateLastName(lastName);
+                }
+                if (!firstName.equals(initFirstName)) {
+                    userDataController.updateFirstName(firstName);
+                }
+                if (!birthday.equals(initBirthday)) {
+                    userDataController.updateBirthday(birthday);
+                }
+                if(isSucess)
+                {
+                    JOptionPane.showMessageDialog(null, "Cập nhật thành công");
+                    this.dispose();
+                    UserInfo userInfoView = new UserInfo();
+                    userInfoView.setVisible(true);
+                }
+            }
+
+        } catch (Exception e) {
+            ErrorHandleUtils.handleErrorWithException(this, e, "");
+        } finally {
+        }
     }//GEN-LAST:event_confirmButtonActionPerformed
 
+    private boolean validation(String firstName, String lastName, String phone, Date date) {
+        if (date == null) {
+            JOptionPane.showMessageDialog(null, "Ngày sinh không được để trống");
+            birthdayChooser.requestFocus();
+            return false;
+        }
+        if (firstName.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Tên không được để trống");
+            firstNameTextField.requestFocus();
+            return false;
+        }
+
+        if (lastName.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Họ không được để trống");
+            lastNameTextField.requestFocus();
+            return false;
+        }
+
+        if (phone.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Số điện thoại không được để trống");
+            phoneTextField.requestFocus();
+            return false;
+        }
+
+        String birthday = DateTimeUtils.convertDateToString(date);
+        if (birthday == null) {
+            JOptionPane.showMessageDialog(null, "Ngày sinh không hợp lệ");
+            birthdayChooser.requestFocus();
+            return false;
+        }
+
+        if (!TextUtils.isValidPhone(phone)) {
+            JOptionPane.showMessageDialog(null, "Số điện thoại không đúng định dạng");
+            phoneTextField.requestFocus();
+            return false;
+        }
+        return true;
+    }
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
         this.dispose();

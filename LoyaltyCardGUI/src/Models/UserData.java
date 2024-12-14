@@ -19,6 +19,7 @@ public class UserData {
 //    private String pin;
     private String birthday;
     private String phone;
+    private byte[] image;
 
     public UserData(String firstName, String lastName,String phone,String identification, String birthday , boolean isMale) {
         this.firstName = firstName;
@@ -80,6 +81,16 @@ public class UserData {
     public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+    
+    
     
     
     

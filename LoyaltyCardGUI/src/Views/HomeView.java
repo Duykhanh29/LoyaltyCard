@@ -90,7 +90,7 @@ public class HomeView extends javax.swing.JFrame {
         );
 
         userInfoButton.setBackground(new java.awt.Color(153, 153, 255));
-        userInfoButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        userInfoButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         userInfoButton.setForeground(new java.awt.Color(0, 51, 51));
         userInfoButton.setText("Thông tin cá nhân");
         userInfoButton.addActionListener(new java.awt.event.ActionListener() {
@@ -100,7 +100,7 @@ public class HomeView extends javax.swing.JFrame {
         });
 
         changePINButton.setBackground(new java.awt.Color(153, 153, 255));
-        changePINButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        changePINButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         changePINButton.setForeground(new java.awt.Color(0, 0, 51));
         changePINButton.setText("Đổi PIN");
         changePINButton.addActionListener(new java.awt.event.ActionListener() {
@@ -110,7 +110,7 @@ public class HomeView extends javax.swing.JFrame {
         });
 
         redeemPointButton.setBackground(new java.awt.Color(153, 153, 255));
-        redeemPointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        redeemPointButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         redeemPointButton.setForeground(new java.awt.Color(0, 51, 51));
         redeemPointButton.setText("Đổi điểm");
         redeemPointButton.addActionListener(new java.awt.event.ActionListener() {
@@ -120,7 +120,7 @@ public class HomeView extends javax.swing.JFrame {
         });
 
         transactionHistoryButton.setBackground(new java.awt.Color(153, 153, 255));
-        transactionHistoryButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        transactionHistoryButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         transactionHistoryButton.setForeground(new java.awt.Color(0, 51, 51));
         transactionHistoryButton.setText("Lịch sử giao dịch");
         transactionHistoryButton.addActionListener(new java.awt.event.ActionListener() {
@@ -130,7 +130,7 @@ public class HomeView extends javax.swing.JFrame {
         });
 
         disconnectButton.setBackground(new java.awt.Color(255, 204, 204));
-        disconnectButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        disconnectButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         disconnectButton.setForeground(new java.awt.Color(153, 0, 0));
         disconnectButton.setText("Ngắt kết nối");
         disconnectButton.addActionListener(new java.awt.event.ActionListener() {
@@ -140,7 +140,7 @@ public class HomeView extends javax.swing.JFrame {
         });
 
         chargePointButton.setBackground(new java.awt.Color(153, 153, 255));
-        chargePointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        chargePointButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         chargePointButton.setForeground(new java.awt.Color(0, 51, 51));
         chargePointButton.setText("Tích điểm");
         chargePointButton.addActionListener(new java.awt.event.ActionListener() {
