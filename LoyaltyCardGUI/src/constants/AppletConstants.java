@@ -11,4 +11,8 @@ package constants;
 public class AppletConstants {
         public final static byte PIN_RETRIES = 3;
         public final static  byte MAX_PIN_SIZE = 6;
+        
+        public static final short NO_EXIST_DATA = (short) 0x6A88;
+        
+        public static final byte[] DEFAUL_PIN = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
 }

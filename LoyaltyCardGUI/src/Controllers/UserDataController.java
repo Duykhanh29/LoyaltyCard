@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import javax.smartcardio.*;
 import java.util.Arrays; 
 import Models.UserData;
+import constants.AppletConstants;
 import constants.AppletInsConstants;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +67,16 @@ public class UserDataController {
 //        baos.write('|');
 
         return baos.toByteArray();
+    }
+    
+    public boolean checkExistedData() throws Exception
+    {
+        byte[] command = buildCheckExistedAPDU();
+        ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
+        if(isNoData(response.getBytes())){
+            return false;
+        }
+        return isSuccess(response.getBytes());
     }
 
     public boolean writeUserData( String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
@@ -196,7 +207,15 @@ public class UserDataController {
         return -1; // Nếu không tìm thấy, trả về -1
     }
 
-    // Xây dựng APDU để ghi dữ liệu lên thẻ
+    private byte[] buildCheckExistedAPDU() {
+        return new byte[]{
+            (byte) 0x00, // CLA
+            (byte) AppletInsConstants.INS_CHECK_INIT, // INS
+            (byte) 0x00, 
+            (byte) 0x00, 
+        };
+    }
+    
     private byte[] buildWriteAPDU(byte[] userData) {
         byte[] apduCommand = new byte[5 + userData.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -208,7 +227,7 @@ public class UserDataController {
         return apduCommand;
     }
 
-    // Xây dựng APDU để đọc dữ liệu từ thẻ
+   
     private byte[] buildReadAPDU(short offset, byte le) {
         return new byte[]{
             (byte) 0x00, // CLA
@@ -280,5 +299,9 @@ public class UserDataController {
 //    }
     private boolean isSuccess(byte[] responseBytes) {
         return responseBytes[0] == (byte) 0x90 && responseBytes[1] == (byte) 0x00;
+    }
+    
+    private boolean isNoData(byte[] responseBytes) {
+        return responseBytes[0] == (byte)0x6A && responseBytes[1] == (byte) 0x88;
     }
 }

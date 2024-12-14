@@ -27,5 +27,7 @@ public class AppletInsConstants {
 	public final static byte INS_UPDATE_BIRTHDAY = (byte) 0x07;
 	
 	public final static byte INS_UPDATE_PHONE = (byte) 0x08;
+        
+        public final static byte INS_CHECK_INIT = (byte) 0x09;
 	
 }

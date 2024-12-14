@@ -14,9 +14,9 @@ public class loyaltycard extends Applet
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
 		pin = new OwnerPIN(AppletConstants.PIN_RETRIES, AppletConstants.MAX_PIN_SIZE);
-		 user = new User();
-		// byte[] pinArr = {1,2,3,4,5,6};
-		// pin.update(pinArr, (short) 0, (byte)pinArr.length);
+		user = new User();
+		byte[] pinArr = AppletConstants.DEFAUL_PIN;
+		pin.update(pinArr, (short) 0, (byte)pinArr.length);
 		new loyaltycard().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 	}
 
@@ -58,6 +58,9 @@ public class loyaltycard extends Applet
 			break;
 		case AppletInsConstants.INS_UPDATE_PHONE:
 			updatePhone(apdu);
+			break;
+		case AppletInsConstants.INS_CHECK_INIT:
+			checkCardHasData(apdu);
 			break;
 		
 		
@@ -184,223 +187,235 @@ public class loyaltycard extends Applet
 	// user data 
 	
 	private void writeUserData(APDU apdu) {
-    byte[] buffer = apdu.getBuffer();
-    short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-	short bytesRead = apdu.setIncomingAndReceive();
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
 
-    if (bytesRead != lc) {
-			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-		}
-        // Check if sending data exceeds memory capacity
-        if ( lc > userData.length) {
-			ISOException.throwIt(ISO7816.SW_FILE_FULL);
-		}
+		if (bytesRead != lc) {
+				ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+			}
+			// Check if sending data exceeds memory capacity
+			if ( lc > userData.length) {
+				ISOException.throwIt(ISO7816.SW_FILE_FULL);
+			}
+			
+			// Split the last 6 bytes to call the setPIN function
+			short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+			byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
+			Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
+			setPIN(pinData);
+			
+			userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+			
+			Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
+			parseUserData(userData,userDataLength);
+			
+		} 
+
+	private void parseUserData(byte[] buffer, short bytesRead) {
+		short pos = 0;
+		byte[] name = {1,2,3,4};
+
 		
-		// Split the last 6 bytes to call the setPIN function
-		short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
-		byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
-		Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
-		setPIN(pinData);
+		user.setFirstName(parseByteArrayUntilDelimiter(buffer, pos));  
+		pos += (short) user.getFirstName().length + 1;  
+
+		user.setLastName(parseByteArrayUntilDelimiter(buffer, pos)); 
+		pos += (short) user.getLastName().length + 1; 
+
+		user.setPhone(parseByteArrayUntilDelimiter(buffer, pos));  
+		pos += (short) user.getPhone().length + 1;  
+
+		user.setIdentification(parseByteArrayUntilDelimiter(buffer, pos));  // CCCD
+		pos += (short) user.getIdentification().length + 1; 
+
+		user.setBirthday(parseByteArrayUntilDelimiter(buffer, pos)); 
+		pos += (short) user.getBirthday().length + 1;  
+
 		
-		userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
-        
-        Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
-        parseUserData(userData,userDataLength);
-        
-	} 
-
-private void parseUserData(byte[] buffer, short bytesRead) {
-    short pos = 0;
-    byte[] name = {1,2,3,4};
-
-    
-    user.setFirstName(parseByteArrayUntilDelimiter(buffer, pos));  
-    pos += (short) user.getFirstName().length + 1;  
-
-    user.setLastName(parseByteArrayUntilDelimiter(buffer, pos)); 
-    pos += (short) user.getLastName().length + 1; 
-
-    user.setPhone(parseByteArrayUntilDelimiter(buffer, pos));  
-    pos += (short) user.getPhone().length + 1;  
-
-    user.setIdentification(parseByteArrayUntilDelimiter(buffer, pos));  // CCCD
-    pos += (short) user.getIdentification().length + 1; 
-
-    user.setBirthday(parseByteArrayUntilDelimiter(buffer, pos)); 
-    pos += (short) user.getBirthday().length + 1;  
-
-    
-    user.setGender(buffer[pos]); 
-}
+		user.setGender(buffer[pos]); 
+	}
 
 
-private byte[] parseByteArrayUntilDelimiter(byte[] buffer, short pos) {
-    short endPos = pos;
-    while (endPos < buffer.length && buffer[endPos] != (byte)0x7C) {
-        endPos++;
-    }
+	private byte[] parseByteArrayUntilDelimiter(byte[] buffer, short pos) {
+		short endPos = pos;
+		while (endPos < buffer.length && buffer[endPos] != (byte)0x7C) {
+			endPos++;
+		}
 
-    // Check if delimiter was found
-    if (endPos == buffer.length) {
-    	short resultLength = (short) (buffer.length - pos);
-        byte[] result = new byte[resultLength];
-		Util.arrayCopy(buffer, pos, result, (short) 0, (short) (buffer.length - pos));
+		// Check if delimiter was found
+		if (endPos == buffer.length) {
+			short resultLength = (short) (buffer.length - pos);
+			byte[] result = new byte[resultLength];
+			Util.arrayCopy(buffer, pos, result, (short) 0, (short) (buffer.length - pos));
+			return result;
+		}
+
+		short length = (short) (endPos - pos);
+		byte[] result = new byte[length];
+		Util.arrayCopy(buffer, pos, result, (short) 0, length);
 		return result;
-    }
+	}
 
-    short length = (short) (endPos - pos);
-    byte[] result = new byte[length];
-    Util.arrayCopy(buffer, pos, result, (short) 0, length);
-    return result;
-}
+	private void readUserData(APDU apdu) {
+		if (user == null) {
+			ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
+		}
 
-private void readUserData(APDU apdu) {
-    if (user == null) {
-        ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
-    }
+		byte[] buffer = apdu.getBuffer();
 
-    byte[] buffer = apdu.getBuffer();
-
-   
-    sendUserData(apdu);
-}
-
-private void sendUserData(APDU apdu) {
-    byte[] tempData = new byte[1024];
-    short bytesSent = (short) 0; 
 	
-    
-    bytesSent = safeSendFieldData(user.getFirstName(), tempData, bytesSent);
-    bytesSent = safeSendFieldData(user.getLastName(), tempData, bytesSent);
-    bytesSent = safeSendFieldData(user.getPhone(), tempData, bytesSent);
-    bytesSent = safeSendFieldData(user.getIdentification(), tempData, bytesSent);
-    bytesSent = safeSendFieldData(user.getBirthday(), tempData, bytesSent);
+		sendUserData(apdu);
+	}
 
-    
-    tempData[bytesSent++] = (byte) (user.getGender());
+	private void sendUserData(APDU apdu) {
+		byte[] tempData = new byte[1024];
+		short bytesSent = (short) 0; 
+		
+		
+		bytesSent = safeSendFieldData(user.getFirstName(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getLastName(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getPhone(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getIdentification(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getBirthday(), tempData, bytesSent);
 
-    
-    if (bytesSent > tempData.length) {
-        ISOException.throwIt(ISO7816.SW_DATA_INVALID);
-    }
-    
-	 apdu.setOutgoing();
-     apdu.setOutgoingLength(bytesSent);
-     apdu.sendBytesLong(tempData, (short) 0, bytesSent);
-}
+		
+		tempData[bytesSent++] = (byte) (user.getGender());
 
-private short safeSendFieldData(byte[] fieldData, byte[] tempData, short bytesSent) {
-    if (fieldData == null || fieldData.length == 0) {
-        
-        tempData[bytesSent++] = (byte) '|';
-        return bytesSent;
-    }
+		
+		if (bytesSent > tempData.length) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
+		
+		apdu.setOutgoing();
+		apdu.setOutgoingLength(bytesSent);
+		apdu.sendBytesLong(tempData, (short) 0, bytesSent);
+	}
 
-   
-    short length = (short) fieldData.length;
-   short lengthData = (short) (bytesSent + ((short)length + 1));
-    if ( lengthData > tempData.length) {
-        ISOException.throwIt(ISO7816.SW_DATA_INVALID);
-    }
-    Util.arrayCopy(fieldData, (short) 0, tempData, bytesSent, length);
-    bytesSent += length;
+	private short safeSendFieldData(byte[] fieldData, byte[] tempData, short bytesSent) {
+		if (fieldData == null || fieldData.length == 0) {
+			
+			tempData[bytesSent++] = (byte) '|';
+			return bytesSent;
+		}
 
- 
-    tempData[bytesSent++] = (byte) '|';
-    return bytesSent;
-}
+	
+		short length = (short) fieldData.length;
+	short lengthData = (short) (bytesSent + ((short)length + 1));
+		if ( lengthData > tempData.length) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
+		Util.arrayCopy(fieldData, (short) 0, tempData, bytesSent, length);
+		bytesSent += length;
+
+	
+		tempData[bytesSent++] = (byte) '|';
+		return bytesSent;
+	}
 
 
 	public void updateFirstName(APDU apdu) {
-    byte[] buffer = apdu.getBuffer();
-    short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-    short bytesRead = apdu.setIncomingAndReceive();
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
 
-    
-    if (bytesRead != lc) {
-        ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-    }
+		
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
 
-    
-    // if (lc > userData.length) {
-        // ISOException.throwIt(ISO7816.SW_FILE_FULL);
-    // }
+		
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
 
-    
-    byte[] data = new byte[lc];
-    Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+		
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-    
-    if (data.length > 0 && data[0] != 0) {
-        user.setFirstName(data); 
-    }
-}
+		
+		if (data.length > 0 && data[0] != 0) {
+			user.setFirstName(data); 
+		}
+	}
 
-public void updateLastName(APDU apdu) {
-    byte[] buffer = apdu.getBuffer();
-    short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-    short bytesRead = apdu.setIncomingAndReceive();
+	public void updateLastName(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
 
-   
-    if (bytesRead != lc) {
-        ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-    }
+	
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
 
-  
-    // if (lc > userData.length) {
-        // ISOException.throwIt(ISO7816.SW_FILE_FULL);
-    // }
+	
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
 
-    byte[] data = new byte[lc];
-    Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-    if (data.length > 0 && data[0] != 0) {
-        user.setLastName(data);  
-    }
-}
+		if (data.length > 0 && data[0] != 0) {
+			user.setLastName(data);  
+		}
+	}
 
-public void updatePhone(APDU apdu) {
-    byte[] buffer = apdu.getBuffer();
-    short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-    short bytesRead = apdu.setIncomingAndReceive();
+	public void updatePhone(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
 
-    if (bytesRead != lc) {
-        ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-    }
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
 
-    // if (lc > userData.length) {
-        // ISOException.throwIt(ISO7816.SW_FILE_FULL);
-    // }
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
 
-    byte[] data = new byte[lc];
-    Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-    if (data.length > 0 && data[0] != 0) {
-        user.setPhone(data);
-    }
-}
+		if (data.length > 0 && data[0] != 0) {
+			user.setPhone(data);
+		}
+	}
 
-public void updateBirthday(APDU apdu) {
-    byte[] buffer = apdu.getBuffer();
-    short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-    short bytesRead = apdu.setIncomingAndReceive();
+	public void updateBirthday(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
 
-    if (bytesRead != lc) {
-        ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-    }
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
 
-    // if (lc > userData.length) {
-        // ISOException.throwIt(ISO7816.SW_FILE_FULL);
-    // }
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
 
-    byte[] data = new byte[lc];
-    Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-    if (data.length > 0 && data[0] != 0) {
-        user.setBirthday(data);  
-    }
-}
-
+		if (data.length > 0 && data[0] != 0) {
+			user.setBirthday(data);  
+		}
+	}
+	public void checkCardHasData(APDU apdu)
+	{	
+		short bytesRead = apdu.setIncomingAndReceive();
+		if(user.getBirthday()== null && user.getFirstName() == null 
+			 && user.getGender() == 0 && user.getIdentification() == null
+			 && user.getPhone() == null  && user.getLastName() == null) 
+		{
+			// card has no data
+			ISOException.throwIt((short) AppletConstants.NO_EXIST_DATA);
+		}
+		// ISOException.throwIt(ISO7816.SW_NO_ERROR);
+	}
+	
 
 }
 

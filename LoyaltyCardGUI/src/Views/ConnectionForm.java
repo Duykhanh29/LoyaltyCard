@@ -88,7 +88,7 @@ public class ConnectionForm extends javax.swing.JFrame {
         try {
             boolean isConnected = smartCardConnection.connectCard();
             if(isConnected){
-                MainView mainView = new MainView();
+                InitView mainView = new InitView();
                 mainView.setVisible(true);
                 this.dispose();
             }else{
