@@ -4,6 +4,8 @@
  */
 package loyaltycard;
 
+import Views.ConnectionForm;
+
 /**
  *
  * @author Admin
@@ -15,6 +17,8 @@ public class LoyaltyCard {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        ConnectionForm connectionForm = new ConnectionForm();
+        connectionForm.setVisible(true);
     }
     
 }

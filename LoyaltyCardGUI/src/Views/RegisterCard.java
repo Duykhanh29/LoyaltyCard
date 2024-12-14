@@ -6,9 +6,26 @@ package Views;
 
 import Controllers.PinController;
 import Controllers.SmartCardConnection;
+import Controllers.UserDataController;
+import constants.AppletConstants;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import utils.AppUtils;
+import utils.DateTimeUtils;
 import utils.ErrorHandleUtils;
+import utils.TextUtils;
 
 /**
  *
@@ -19,14 +36,17 @@ public class RegisterCard extends javax.swing.JFrame {
     /**
      * Creates new form RegisterCard
      */
-    
     PinController pinController;
+    UserDataController userDataController;
     SmartCardConnection smartCardConnection;
+    byte[] imageData;
+
     public RegisterCard() {
         initComponents();
         this.setLocationRelativeTo(null);
-        smartCardConnection=SmartCardConnection.getInstance();
-        pinController= new PinController(smartCardConnection);
+        smartCardConnection = SmartCardConnection.getInstance();
+        pinController = new PinController(smartCardConnection);
+        userDataController = new UserDataController(smartCardConnection);
     }
 
     /**
@@ -40,14 +60,12 @@ public class RegisterCard extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
-        avatarView = new javax.swing.JPanel();
         pickAvatarButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        nameTextField = new javax.swing.JTextField();
+        lastNameTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        birthdayTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        hometownTextField = new javax.swing.JTextField();
+        identifierTextField = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         maleRadioButton = new javax.swing.JRadioButton();
         femaleRadioButton = new javax.swing.JRadioButton();
@@ -57,23 +75,18 @@ public class RegisterCard extends javax.swing.JFrame {
         confirmPinTextField = new javax.swing.JPasswordField();
         confirmButton = new javax.swing.JButton();
         setPinButton = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        phoneTextField = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        firstNameTextField = new javax.swing.JTextField();
+        birthdayChooser = new com.toedter.calendar.JDateChooser();
+        avatarImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Nhập thông tin");
-
-        javax.swing.GroupLayout avatarViewLayout = new javax.swing.GroupLayout(avatarView);
-        avatarView.setLayout(avatarViewLayout);
-        avatarViewLayout.setHorizontalGroup(
-            avatarViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 145, Short.MAX_VALUE)
-        );
-        avatarViewLayout.setVerticalGroup(
-            avatarViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 202, Short.MAX_VALUE)
-        );
 
         pickAvatarButton.setText("Chọn ảnh");
         pickAvatarButton.addActionListener(new java.awt.event.ActionListener() {
@@ -82,11 +95,11 @@ public class RegisterCard extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("Họ tên");
+        jLabel2.setText("Họ");
 
         jLabel3.setText("Ngày sinh");
 
-        jLabel4.setText("Quê quán");
+        jLabel4.setText("CCCD");
 
         jLabel5.setText("Giới tính");
 
@@ -115,98 +128,114 @@ public class RegisterCard extends javax.swing.JFrame {
             }
         });
 
+        jLabel8.setText("Số điện thoại");
+
+        jLabel9.setText("Tên");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(55, 55, 55)
+                .addComponent(setPinButton)
+                .addGap(113, 113, 113))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(57, 57, 57)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(32, 32, 32)
-                                .addComponent(avatarView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(51, 51, 51)
-                                .addComponent(pickAvatarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
+                            .addComponent(avatarImage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(pickAvatarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(33, 33, 33)))
+                        .addGap(36, 36, 36)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(birthdayTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(maleRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(femaleRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(hometownTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(31, 31, 31)
+                                            .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(birthdayChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(firstNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(identifierTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(maleRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addGap(26, 26, 26)
+                                                    .addComponent(femaleRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(phoneTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(pinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(confirmPinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(pinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(confirmPinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(253, 253, 253)
-                        .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(55, 55, 55)
-                        .addComponent(setPinButton)))
-                .addContainerGap(71, Short.MAX_VALUE))
+                        .addGap(233, 233, 233)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 80, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(lastNameTextField))
+                .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(avatarView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(avatarImage, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(pickAvatarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(nameTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(birthdayTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(hometownTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(firstNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(birthdayChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                            .addComponent(maleRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(femaleRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(identifierTextField))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(pinTextField)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(femaleRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(maleRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(phoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
+                        .addGap(17, 17, 17)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(confirmPinTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(38, 38, 38)
+                .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(setPinButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addGap(29, 29, 29))
         );
 
         pack();
@@ -214,24 +243,65 @@ public class RegisterCard extends javax.swing.JFrame {
 
     private void pickAvatarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickAvatarButtonActionPerformed
         // TODO add your handling code here:
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Image Files (JPG)", "jpg");
+        fileChooser.setFileFilter(filter);
+        int value = fileChooser.showOpenDialog(this);
+        if (value == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            BufferedImage bimage;
+            try {
+                bimage = ImageIO.read(file);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bimage, "jpg", baos);
+                byte[] img = baos.toByteArray();
+                if (img.length > 128000) {
+                    JOptionPane.showMessageDialog(this, "Ảnh bạn chọn lớn hơn kích thước tối đa");
+                } else {
+                    imageData = new byte[img.length];
+                    imageData = img;
+                    ImageIcon imageIcon = new ImageIcon(bimage.getScaledInstance(
+                            avatarImage.getWidth(), avatarImage.getHeight(), java.awt.Image.SCALE_SMOOTH));
+                    avatarImage.setIcon(imageIcon);
+                    JOptionPane.showMessageDialog(this, "Ảnh chọn thành công");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+            }
+        }
     }//GEN-LAST:event_pickAvatarButtonActionPerformed
 
-    
 //    just temporary
     private void setPinButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setPinButtonActionPerformed
         // TODO add your handling code here:
         try {
-            char[] pinChars = pinTextField.getPassword();
-            char[] pinConfirmChars = confirmPinTextField.getPassword();
-            String pin = new String(pinChars);
-            String confirmPin = new String(pinConfirmChars);
-            if(!pin.equals(confirmPin)){
-                JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
-            }else{
-                pinController.setPin(pin);
+//            char[] pinChars = pinTextField.getPassword();
+//            char[] pinConfirmChars = confirmPinTextField.getPassword();
+//            String pin = new String(pinChars);
+//            String confirmPin = new String(pinConfirmChars);
+//            if (!pin.equals(confirmPin)) {
+//                JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
+//            } else {
+//                pinController.setPin(pin);
+//                this.dispose();
+//                InitView mainView = new InitView();
+//                mainView.setVisible(true);
+//            }
+            String firstName = "Khánh";
+            String lastName = "Đặng";
+            String phone = "0987654321";
+            String birthday = "02-09-2002";
+            String identification = "12345678";
+            boolean isSuccess = userDataController.writeUserData(firstName, lastName, phone, identification, birthday, true, "123456");
+            if (isSuccess) {
+                JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
                 this.dispose();
-                MainView mainView=new MainView();
+                InitView mainView = new InitView();
                 mainView.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "Khởi tạo không thành công thành công");
             }
         } catch (Exception e) {
             ErrorHandleUtils.handleErrorWithException(this, e, "");
@@ -241,8 +311,122 @@ public class RegisterCard extends javax.swing.JFrame {
 
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         // TODO add your handling code here:
-        
+        try {
+            String firstName = firstNameTextField.getText();
+            String lastName = lastNameTextField.getText();
+            String phone = phoneTextField.getText();
+            String identification = identifierTextField.getText();
+            Date date = birthdayChooser.getDate();
+            String birthday = DateTimeUtils.convertDateToString(date);
+            char[] pinChars = pinTextField.getPassword();
+            char[] pinConfirmChars = confirmPinTextField.getPassword();
+            String pin = new String(pinChars);
+            String confirmPin = new String(pinConfirmChars);
+
+            boolean isValid = validation(firstName, lastName, phone, identification, date, pin, confirmPin);
+
+            if (isValid) {
+                if (!pin.equals(confirmPin)) {
+                    JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
+                } else {
+                    boolean isSuccess = userDataController.writeUserData(firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), pin);
+                    if (isSuccess) {
+                        JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
+                        this.dispose();
+                        HomeView mainView = new HomeView();
+                        mainView.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Khởi tạo không thành công thành công");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            ErrorHandleUtils.handleErrorWithException(this, e, "");
+        } finally {
+        }
     }//GEN-LAST:event_confirmButtonActionPerformed
+    private boolean validation(String firstName, String lastName, String phone, String identification, Date date, String pin, String confirmPin) {
+        if (firstName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Trường tên không được để trống");
+            firstNameTextField.requestFocus();
+            return false;
+        }
+        if (lastName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Trường họ không được để trống");
+            lastNameTextField.requestFocus();
+            return false;
+        }
+
+        if (phone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Trường số điện thoại không được để trống");
+            phoneTextField.requestFocus();
+            return false;
+        }
+        
+        if (!TextUtils.isValidPhone(phone)) {
+            JOptionPane.showMessageDialog(null, "Số điện thoại không đúng định dạng");
+            phoneTextField.requestFocus();
+            return false;
+        }
+        
+        if (identification.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Trường căn cước công dân không được để trống");
+            identifierTextField.requestFocus();
+            return false;
+        }
+
+        if (date == null) {
+            JOptionPane.showMessageDialog(null, "Ngày sinh không hợp lệ");
+            birthdayChooser.requestFocus();
+            return false;
+        }
+
+        String birthday = DateTimeUtils.convertDateToString(date);
+        if (birthday == null) {
+            JOptionPane.showMessageDialog(null, "Ngày sinh không hợp lệ");
+            birthdayChooser.requestFocus();
+            return false;
+        }
+        if (lastName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Trường tên không được để trống");
+            pinTextField.requestFocus();
+            return false;
+        }
+
+        if (pin.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mã PIN tên không được để trống");
+            pinTextField.requestFocus();
+            return false;
+        }
+
+        if (confirmPin.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Xác nhận mã PIN không được để trống");
+            confirmPinTextField.requestFocus();
+            return false;
+        }
+
+        if (pin.length() != AppletConstants.MAX_PIN_SIZE) {
+            JOptionPane.showMessageDialog(this, "Mã PIN phải gồm " + AppletConstants.MAX_PIN_SIZE + " ký tự");
+            pinTextField.requestFocus();
+            return false;
+        }
+        
+        String defaultPIN = AppUtils.byteArrayToText(AppletConstants.DEFAUL_PIN);
+        if(pin.equals(defaultPIN))
+        {
+            JOptionPane.showMessageDialog(this, "Mã PIN không được trùng với mã mặc định");
+            pinTextField.requestFocus();
+            return false;
+        }
+
+        // image
+//            if (imageData == null || imageData.length == 0) {
+//                JOptionPane.showMessageDialog(this, "Bạn cần phải chọn ảnh");
+//                return;
+//            }
+        return true;
+    }
 
     /**
      * @param args the command line arguments
@@ -280,13 +464,14 @@ public class RegisterCard extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel avatarView;
-    private javax.swing.JTextField birthdayTextField;
+    private javax.swing.JLabel avatarImage;
+    private com.toedter.calendar.JDateChooser birthdayChooser;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton confirmButton;
     private javax.swing.JPasswordField confirmPinTextField;
     private javax.swing.JRadioButton femaleRadioButton;
-    private javax.swing.JTextField hometownTextField;
+    private javax.swing.JTextField firstNameTextField;
+    private javax.swing.JTextField identifierTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -294,8 +479,11 @@ public class RegisterCard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JTextField lastNameTextField;
     private javax.swing.JRadioButton maleRadioButton;
-    private javax.swing.JTextField nameTextField;
+    private javax.swing.JTextField phoneTextField;
     private javax.swing.JButton pickAvatarButton;
     private javax.swing.JPasswordField pinTextField;
     private javax.swing.JButton setPinButton;

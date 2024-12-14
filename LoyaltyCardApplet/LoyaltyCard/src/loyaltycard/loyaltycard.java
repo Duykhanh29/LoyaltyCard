@@ -5,15 +5,18 @@ import javacard.framework.*;
 
 public class loyaltycard extends Applet
 {
-	
+	private static User user;
 	private static OwnerPIN pin;
 	private static byte[] userData = new byte[1024];
+	private short userDataLength = 0;
 
+ 
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
 	{
 		pin = new OwnerPIN(AppletConstants.PIN_RETRIES, AppletConstants.MAX_PIN_SIZE);
-		// byte[] pinArr = {1,2,3,4,5,6};
-		// pin.update(pinArr, (short) 0, (byte)pinArr.length);
+		user = new User();
+		byte[] pinArr = AppletConstants.DEFAUL_PIN;
+		pin.update(pinArr, (short) 0, (byte)pinArr.length);
 		new loyaltycard().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 	}
 
@@ -32,10 +35,10 @@ public class loyaltycard extends Applet
 			verifyPIN(apdu);
 			break;
 		case AppletInsConstants.INS_READ_USER_PIN:
-			readData(apdu);
+			readUserData(apdu);
 			break;
 		case AppletInsConstants.INS_WRITE_USER_DATA:
-			writeData(apdu);
+			writeUserData(apdu);
 			break;
 		case AppletInsConstants.INS_CHANGE_PIN:
 			changePin(apdu);
@@ -43,68 +46,29 @@ public class loyaltycard extends Applet
 		case AppletInsConstants.INS_SET_PIN:
 			createPIN(apdu);
 			break;
+			
+		case AppletInsConstants.INS_UPDATE_FIRST_NAME:
+			updateFirstName(apdu);
+			break;
+		case AppletInsConstants.INS_UPDATE_LAST_NAME:
+			updateLastName(apdu);
+			break;
+		case AppletInsConstants.INS_UPDATE_BIRTHDAY:
+			updateBirthday(apdu);
+			break;
+		case AppletInsConstants.INS_UPDATE_PHONE:
+			updatePhone(apdu);
+			break;
+		case AppletInsConstants.INS_CHECK_INIT:
+			checkCardHasData(apdu);
+			break;
+		
 		
 		default:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
 	}
 	
-	 
-    
-     private void writeData(APDU apdu) {
-        if (!pin.isValidated()) {
-            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-        }
-
-        byte[] buffer = apdu.getBuffer();
-        short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
-        Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, lc);
-    }
-
-    private void readData(APDU apdu) {
-    // Check if the PIN is validated, throw an exception if not
-    if (!pin.isValidated()) {
-        ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-    }
-
-    // Check if the length of userData exceeds the maximum size for short
-    if (userData.length > Short.MAX_VALUE) {
-        ISOException.throwIt(ISO7816.SW_DATA_INVALID);
-    }
-
-    // Get the total length of user data to send
-    short totalLength = (short) userData.length;
-    short bytesRead = 0; // Track the number of bytes read
-
-    // Set the outgoing mode to send data
-    apdu.setOutgoing();
-
-    // Loop to send data in chunks
-    while (bytesRead < totalLength) {
-        // Calculate the chunk size (up to 255 bytes, but no more than the remaining data)
-        short chunkSize = (short) (totalLength - bytesRead); // Default to the remaining data
-        if (chunkSize > 255) {
-            chunkSize = 255; // Limit the chunk size to 255 bytes
-        }
-
-        // Set the outgoing length to the chunk size
-        apdu.setOutgoingLength(chunkSize);
-
-        // Send the chunk of data
-        apdu.sendBytesLong(userData, bytesRead, chunkSize);
-
-        // Update the number of bytes read
-        bytesRead += chunkSize;
-
-        // If there is more data to send, throw SW=0x6310 to indicate that more data is available
-        if (bytesRead < totalLength) {
-            ISOException.throwIt((short) 0x6310); //  continue reading
-        }
-    }
-
- 
-    ISOException.throwIt((short) 0x9000); // Success, all data read
-}
 
 	
 	
@@ -144,8 +108,11 @@ public class loyaltycard extends Applet
         short off = ISO7816.OFFSET_CDATA;
         short expectedLength = (short) (AppletConstants.MAX_PIN_SIZE * 2);
 		if (!pin.isValidated()) {
-			 ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-			 return;
+			// if (!pin.check(buffer, off, AppletConstants.MAX_PIN_SIZE)) {
+            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+            return;
+        // }
+			 
 		}
 		if(pin.getTriesRemaining()==0){
 			ISOException.throwIt(ISO7816.SW_BYTES_REMAINING_00);
@@ -172,9 +139,24 @@ public class loyaltycard extends Applet
         }
 		
 		
-        pin.update(buffer, (short) (off + AppletConstants.MAX_PIN_SIZE), (byte) AppletConstants.MAX_PIN_SIZE);
+         try {
+			JCSystem.beginTransaction();
+			short dataLength = (short) AppletConstants.MAX_PIN_SIZE;
+			byte[] pinData = new byte[dataLength];
+			Util.arrayCopy(buffer, (short) (off + dataLength), pinData, (short) 0, (short) dataLength);
+			pin.update(pinData, (short) 0, (byte) dataLength);
+			pin.reset();
+			if (!pin.check(pinData,(short)0, (byte) dataLength)) {
+				ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			}
+			JCSystem.commitTransaction();
+		} catch (Exception e) {
+			JCSystem.abortTransaction();
+			ISOException.throwIt(AppletConstants.SW_ACTION_FAILED); 
+		}
 		pin.reset();
 	}
+
 	
 	private void createPIN(APDU apdu){
 		byte[] buffer = apdu.getBuffer(); 
@@ -190,10 +172,24 @@ public class loyaltycard extends Applet
 		
 		short dataOffset = ISO7816.OFFSET_CDATA;
 		pin.update(buffer, dataOffset, (byte) dataLength);
-		
+		pin.reset();
+	}
+	
+	private void setPIN(byte[] pinData){
+		short dataLength = (short) pinData.length;
+		if (dataLength == 0 || dataLength > AppletConstants.MAX_PIN_SIZE) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+		pin.update(pinData, (short) 0, (byte) dataLength);
+		pin.reset();
+		if (!pin.check(pinData,(short)0, (byte) dataLength)) {
+			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+		}
 	}
 
     
+    
+	// 
     public boolean select(){
 	    if ( pin.getTriesRemaining() == 0 )
 			return false;
@@ -207,5 +203,287 @@ public class loyaltycard extends Applet
     public void deselect(){
 	  pin.reset();
 	}
+	
+	
+	// user data 
+	
+	private void writeUserData(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
+
+		if (bytesRead != lc) {
+				ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+			}
+			// Check if sending data exceeds memory capacity
+			if ( lc > userData.length) {
+				ISOException.throwIt(ISO7816.SW_FILE_FULL);
+			}
+			
+			JCSystem.beginTransaction();
+			
+			
+			 try {
+				// Split the last 6 bytes to call the setPIN function
+				short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+				byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
+				Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
+				setPIN(pinData); 
+
+				userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+				Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
+				parseUserData(userData, userDataLength); 
+
+				JCSystem.commitTransaction();
+
+			} catch (ISOException e) {
+				
+				JCSystem.abortTransaction();
+				ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);  
+			}
+			
+		} 
+
+	private void parseUserData(byte[] buffer, short bytesRead) {
+		short pos = 0;
+		byte[] name = {1,2,3,4};
+
+		
+		user.setFirstName(parseByteArrayUntilDelimiter(buffer, pos));  
+		pos += (short) user.getFirstName().length + 1;  
+
+		user.setLastName(parseByteArrayUntilDelimiter(buffer, pos)); 
+		pos += (short) user.getLastName().length + 1; 
+
+		user.setPhone(parseByteArrayUntilDelimiter(buffer, pos));  
+		pos += (short) user.getPhone().length + 1;  
+
+		user.setIdentification(parseByteArrayUntilDelimiter(buffer, pos));  // CCCD
+		pos += (short) user.getIdentification().length + 1; 
+
+		user.setBirthday(parseByteArrayUntilDelimiter(buffer, pos)); 
+		pos += (short) user.getBirthday().length + 1;  
+
+		
+		user.setGender(buffer[pos]); 
+	}
+
+
+	private byte[] parseByteArrayUntilDelimiter(byte[] buffer, short pos) {
+		short endPos = pos;
+		while (endPos < buffer.length && buffer[endPos] != (byte)0x7C) {
+			endPos++;
+		}
+
+		// Check if delimiter was found
+		if (endPos == buffer.length) {
+			short resultLength = (short) (buffer.length - pos);
+			byte[] result = new byte[resultLength];
+			Util.arrayCopy(buffer, pos, result, (short) 0, (short) (buffer.length - pos));
+			return result;
+		}
+
+		short length = (short) (endPos - pos);
+		byte[] result = new byte[length];
+		Util.arrayCopy(buffer, pos, result, (short) 0, length);
+		return result;
+	}
+
+	private void readUserData(APDU apdu) {
+		if (user == null) {
+			ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
+		}
+
+		byte[] buffer = apdu.getBuffer();
+
+	
+		sendUserData(apdu);
+	}
+
+	private void sendUserData(APDU apdu) {
+		byte[] tempData = new byte[1024];
+		short bytesSent = (short) 0; 
+		
+		
+		bytesSent = safeSendFieldData(user.getFirstName(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getLastName(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getPhone(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getIdentification(), tempData, bytesSent);
+		bytesSent = safeSendFieldData(user.getBirthday(), tempData, bytesSent);
+
+		
+		tempData[bytesSent++] = (byte) (user.getGender());
+
+		
+		if (bytesSent > tempData.length) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
+		
+		apdu.setOutgoing();
+		apdu.setOutgoingLength(bytesSent);
+		apdu.sendBytesLong(tempData, (short) 0, bytesSent);
+	}
+
+	private short safeSendFieldData(byte[] fieldData, byte[] tempData, short bytesSent) {
+		if (fieldData == null || fieldData.length == 0) {
+			
+			tempData[bytesSent++] = (byte) '|';
+			return bytesSent;
+		}
+
+	
+		short length = (short) fieldData.length;
+		short lengthData = (short) (bytesSent + ((short)length + 1));
+		if ( lengthData > tempData.length) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
+		Util.arrayCopy(fieldData, (short) 0, tempData, bytesSent, length);
+		bytesSent += length;
+
+	
+		tempData[bytesSent++] = (byte) '|';
+		return bytesSent;
+	}
+
+
+	public void updateFirstName(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
+
+		
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+
+		
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
+
+		
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+
+		
+		
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+			user.setFirstName(data); 
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
+		}
+	}
+
+	public void updateLastName(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
+
+	
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+
+	
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
+
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+			user.setLastName(data);  
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
+		}
+	}
+
+	public void updatePhone(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
+
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
+
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+
+		
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+				user.setPhone(data);
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
+		}
+    
+	}
+
+	public void updateBirthday(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0xFF);
+		short bytesRead = apdu.setIncomingAndReceive();
+
+		if (bytesRead != lc) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+		}
+
+		// if (lc > userData.length) {
+			// ISOException.throwIt(ISO7816.SW_FILE_FULL);
+		// }
+
+		byte[] data = new byte[lc];
+		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+				user.setBirthday(data); 
+			}
+			JCSystem.commitTransaction(); 
+    	} catch (Exception e) {
+			JCSystem.abortTransaction();
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED); 
+		}
+    
+	}
+	public void checkCardHasData(APDU apdu)
+	{	
+		short bytesRead = apdu.setIncomingAndReceive();
+		if(user.getBirthday()== null && user.getFirstName() == null 
+			 && user.getGender() == 0 && user.getIdentification() == null
+			 && user.getPhone() == null  && user.getLastName() == null) 
+		{
+			// card has no data
+			ISOException.throwIt((short) AppletConstants.NO_EXIST_DATA);
+		}
+		// ISOException.throwIt(ISO7816.SW_NO_ERROR);
+	}
+	
 
 }
+
+
+

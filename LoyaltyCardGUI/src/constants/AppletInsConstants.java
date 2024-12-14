@@ -18,5 +18,16 @@ public class AppletInsConstants {
         public final static byte INS_CHANGE_PIN = (byte) 0x03;
         
         public final static byte INS_SET_PIN = (byte) 0x04;
+   
+        
+        public final static byte INS_UPDATE_FIRST_NAME = (byte) 0x05;
+	
+	public final static byte INS_UPDATE_LAST_NAME = (byte) 0x06;
+	
+	public final static byte INS_UPDATE_BIRTHDAY = (byte) 0x07;
+	
+	public final static byte INS_UPDATE_PHONE = (byte) 0x08;
+        
+        public final static byte INS_CHECK_INIT = (byte) 0x09;
 	
 }
