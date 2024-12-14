@@ -108,8 +108,11 @@ public class loyaltycard extends Applet
         short off = ISO7816.OFFSET_CDATA;
         short expectedLength = (short) (AppletConstants.MAX_PIN_SIZE * 2);
 		if (!pin.isValidated()) {
-			 ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-			 return;
+			// if (!pin.check(buffer, off, AppletConstants.MAX_PIN_SIZE)) {
+            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+            return;
+        // }
+			 
 		}
 		if(pin.getTriesRemaining()==0){
 			ISOException.throwIt(ISO7816.SW_BYTES_REMAINING_00);
@@ -136,7 +139,21 @@ public class loyaltycard extends Applet
         }
 		
 		
-        pin.update(buffer, (short) (off + AppletConstants.MAX_PIN_SIZE), (byte) AppletConstants.MAX_PIN_SIZE);
+         try {
+			JCSystem.beginTransaction();
+			short dataLength = (short) AppletConstants.MAX_PIN_SIZE;
+			byte[] pinData = new byte[dataLength];
+			Util.arrayCopy(buffer, (short) (off + dataLength), pinData, (short) 0, (short) dataLength);
+			pin.update(pinData, (short) 0, (byte) dataLength);
+			pin.reset();
+			if (!pin.check(pinData,(short)0, (byte) dataLength)) {
+				ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			}
+			JCSystem.commitTransaction();
+		} catch (Exception e) {
+			JCSystem.abortTransaction();
+			ISOException.throwIt(AppletConstants.SW_ACTION_FAILED); 
+		}
 		pin.reset();
 	}
 
@@ -155,7 +172,7 @@ public class loyaltycard extends Applet
 		
 		short dataOffset = ISO7816.OFFSET_CDATA;
 		pin.update(buffer, dataOffset, (byte) dataLength);
-		
+		pin.reset();
 	}
 	
 	private void setPIN(byte[] pinData){
@@ -164,6 +181,10 @@ public class loyaltycard extends Applet
 			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
 		pin.update(pinData, (short) 0, (byte) dataLength);
+		pin.reset();
+		if (!pin.check(pinData,(short)0, (byte) dataLength)) {
+			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+		}
 	}
 
     
@@ -199,16 +220,27 @@ public class loyaltycard extends Applet
 				ISOException.throwIt(ISO7816.SW_FILE_FULL);
 			}
 			
-			// Split the last 6 bytes to call the setPIN function
-			short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
-			byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
-			Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
-			setPIN(pinData);
+			JCSystem.beginTransaction();
 			
-			userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
 			
-			Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
-			parseUserData(userData,userDataLength);
+			 try {
+				// Split the last 6 bytes to call the setPIN function
+				short pinOffset = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+				byte[] pinData = new byte[AppletConstants.MAX_PIN_SIZE];
+				Util.arrayCopy(buffer, (short) (ISO7816.OFFSET_CDATA + pinOffset), pinData, (short) 0, (short) AppletConstants.MAX_PIN_SIZE);
+				setPIN(pinData); 
+
+				userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
+				Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
+				parseUserData(userData, userDataLength); 
+
+				JCSystem.commitTransaction();
+
+			} catch (ISOException e) {
+				
+				JCSystem.abortTransaction();
+				ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);  
+			}
 			
 		} 
 
@@ -301,7 +333,7 @@ public class loyaltycard extends Applet
 
 	
 		short length = (short) fieldData.length;
-	short lengthData = (short) (bytesSent + ((short)length + 1));
+		short lengthData = (short) (bytesSent + ((short)length + 1));
 		if ( lengthData > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
 		}
@@ -334,8 +366,17 @@ public class loyaltycard extends Applet
 		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
 		
-		if (data.length > 0 && data[0] != 0) {
+		
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
 			user.setFirstName(data); 
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
 		}
 	}
 
@@ -357,8 +398,16 @@ public class loyaltycard extends Applet
 		byte[] data = new byte[lc];
 		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-		if (data.length > 0 && data[0] != 0) {
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
 			user.setLastName(data);  
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
 		}
 	}
 
@@ -378,9 +427,19 @@ public class loyaltycard extends Applet
 		byte[] data = new byte[lc];
 		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
 
-		if (data.length > 0 && data[0] != 0) {
-			user.setPhone(data);
+		
+		
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+				user.setPhone(data);
+			}
+			JCSystem.commitTransaction(); 
+		} catch (Exception e) {
+			JCSystem.abortTransaction(); 
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);
 		}
+    
 	}
 
 	public void updateBirthday(APDU apdu) {
@@ -398,10 +457,17 @@ public class loyaltycard extends Applet
 
 		byte[] data = new byte[lc];
 		Util.arrayCopy(buffer, (short) 5, data, (short) 0, lc);
-
-		if (data.length > 0 && data[0] != 0) {
-			user.setBirthday(data);  
+		JCSystem.beginTransaction();
+		try {
+			if (data.length > 0 && data[0] != 0) {
+				user.setBirthday(data); 
+			}
+			JCSystem.commitTransaction(); 
+    	} catch (Exception e) {
+			JCSystem.abortTransaction();
+			ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED); 
 		}
+    
 	}
 	public void checkCardHasData(APDU apdu)
 	{	

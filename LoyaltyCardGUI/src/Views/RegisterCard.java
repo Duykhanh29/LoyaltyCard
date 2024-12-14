@@ -22,6 +22,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import utils.AppUtils;
 import utils.DateTimeUtils;
 import utils.ErrorHandleUtils;
 import utils.TextUtils;
@@ -407,6 +408,14 @@ public class RegisterCard extends javax.swing.JFrame {
 
         if (pin.length() != AppletConstants.MAX_PIN_SIZE) {
             JOptionPane.showMessageDialog(this, "Mã PIN phải gồm " + AppletConstants.MAX_PIN_SIZE + " ký tự");
+            pinTextField.requestFocus();
+            return false;
+        }
+        
+        String defaultPIN = AppUtils.byteArrayToText(AppletConstants.DEFAUL_PIN);
+        if(pin.equals(defaultPIN))
+        {
+            JOptionPane.showMessageDialog(this, "Mã PIN không được trùng với mã mặc định");
             pinTextField.requestFocus();
             return false;
         }

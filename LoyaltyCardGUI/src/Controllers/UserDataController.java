@@ -84,6 +84,9 @@ public class UserDataController {
         byte[] command = buildWriteAPDU(userData);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
+            if(isActionFail(response.getBytes())){
+                return false;
+            }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
@@ -130,6 +133,9 @@ public class UserDataController {
         byte[] command = buildUpdateFisrtNameAPDU(firstNameByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
+             if(isActionFail(response.getBytes())){
+                return false;
+            }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
@@ -141,6 +147,9 @@ public class UserDataController {
         byte[] command = buildUpdateLastNameAPDU(lastNameByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
+             if(isActionFail(response.getBytes())){
+                return false;
+            }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
@@ -153,6 +162,9 @@ public class UserDataController {
         byte[] command = buildUpdateBirthdayAPDU(birthdayByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
+             if(isActionFail(response.getBytes())){
+                return false;
+            }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
@@ -166,6 +178,9 @@ public class UserDataController {
         byte[] command = buildUpdatePhoneAPDU(phoneByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
+             if(isActionFail(response.getBytes())){
+                return false;
+            }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
@@ -303,5 +318,9 @@ public class UserDataController {
     
     private boolean isNoData(byte[] responseBytes) {
         return responseBytes[0] == (byte)0x6A && responseBytes[1] == (byte) 0x88;
+    }
+    
+    private boolean isActionFail(byte[] responseBytes) {
+        return responseBytes[0] == (byte)0x9F && responseBytes[1] == (byte) 0xFF;
     }
 }

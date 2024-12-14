@@ -9,7 +9,9 @@ import Controllers.SmartCardConnection;
 import constants.AppletConstants;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import utils.AppUtils;
 import utils.ErrorHandleUtils;
+
 /**
  *
  * @author Admin
@@ -21,11 +23,12 @@ public class ChangePINCode extends javax.swing.JFrame {
      */
     PinController pinController;
     SmartCardConnection smartCardConnection;
+
     public ChangePINCode() {
         initComponents();
         this.setLocationRelativeTo(null);
-        smartCardConnection= SmartCardConnection.getInstance();
-        pinController=new PinController(smartCardConnection);
+        smartCardConnection = SmartCardConnection.getInstance();
+        pinController = new PinController(smartCardConnection);
 //        pinTextField = new JPasswordField(AppletConstants.MAX_PIN_SIZE);
 //        confirmPINTextField=new JPasswordField(AppletConstants.MAX_PIN_SIZE);
 //        newPINTextField =new JPasswordField(AppletConstants.MAX_PIN_SIZE);
@@ -144,7 +147,7 @@ public class ChangePINCode extends javax.swing.JFrame {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        HomeView homeView=new HomeView();
+        HomeView homeView = new HomeView();
         homeView.setVisible(true);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
@@ -157,25 +160,31 @@ public class ChangePINCode extends javax.swing.JFrame {
             String pin = new String(pinChars);
             String newPin = new String(newPinChars);
             String confirmPin = new String(confirmPinChars);
-            if(pin.isEmpty()||newPin.isEmpty()||confirmPin.isEmpty()){
+            String defaultPIN = AppUtils.byteArrayToText(AppletConstants.DEFAUL_PIN);
+
+            if (pin.isEmpty() || newPin.isEmpty() || confirmPin.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Bạn cần nhập đầy đủ các ô nhập");
-               
-            }else if(!newPin.equals(confirmPin)){
+
+            } else if (!newPin.equals(confirmPin)) {
                 JOptionPane.showMessageDialog(this, "Mã PIN không trùng khớp");
                 newPINTextField.requestFocus();
-            }else{
-                boolean isSuccess = pinController.changePIN(pin,newPin);
-                if(isSuccess){
+            } else if (newPin.equals(defaultPIN)) {
+                JOptionPane.showMessageDialog(this, "Mã PIN không được trùng với mã mặc định");
+                pinTextField.requestFocus();
+
+            } else {
+                boolean isSuccess = pinController.changePIN(pin, newPin);
+                if (isSuccess) {
 //                    UserInfo userInfoView = new UserInfo();
 //                    userInfoView.setVisible(true);
                     HomeView homeView = new HomeView();
                     homeView.setVisible(true);
                     this.dispose();
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(this, "Đổi mã PIN không thành công");
                 }
             }
-            
+
         } catch (Exception e) {
             ErrorHandleUtils.handleErrorWithException(this, e, "");
         } finally {

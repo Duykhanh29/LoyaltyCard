@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Sat Dec 14 15:36:55 ICT 2024
+// on Sat Dec 14 17:02:48 ICT 2024
 
 .package loyaltycard {
 	.aid 0x11:0x22:0x33:0x44:0x55:0x66;
@@ -108,54 +108,64 @@
 		// 35
 		virtualMethodRef 1.9.1([BSB)Z;		// javacard/framework/OwnerPIN.check([BSB)Z
 		// 36
-		virtualMethodRef 1.9.4()Z;		// javacard/framework/OwnerPIN.isValidated()Z
+		classRef 0.2;		// java/lang/Exception
 		// 37
-		virtualMethodRef 1.9.5()V;		// javacard/framework/OwnerPIN.reset()V
+		virtualMethodRef 1.9.4()Z;		// javacard/framework/OwnerPIN.isValidated()Z
 		// 38
-		staticFieldRef byte[] loyaltycard/userData;
+		staticMethodRef 1.8.1()V;		// javacard/framework/JCSystem.beginTransaction()V
 		// 39
 		staticMethodRef 1.16.1([BS[BSS)S;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 		// 40
-		staticMethodRef loyaltycard/setPIN([B)V;
+		virtualMethodRef 1.9.5()V;		// javacard/framework/OwnerPIN.reset()V
 		// 41
-		staticMethodRef loyaltycard/parseUserData([BS)V;
+		staticMethodRef 1.8.2()V;		// javacard/framework/JCSystem.commitTransaction()V
 		// 42
-		staticMethodRef loyaltycard/parseByteArrayUntilDelimiter([BS)[B;
+		staticMethodRef 1.8.0()V;		// javacard/framework/JCSystem.abortTransaction()V
 		// 43
-		virtualMethodRef User/setFirstName([B)V;
+		classRef 1.7;		// javacard/framework/ISOException
 		// 44
-		virtualMethodRef User/getFirstName()[B;
+		staticFieldRef byte[] loyaltycard/userData;
 		// 45
-		virtualMethodRef User/setLastName([B)V;
+		staticMethodRef loyaltycard/setPIN([B)V;
 		// 46
-		virtualMethodRef User/getLastName()[B;
+		staticMethodRef loyaltycard/parseUserData([BS)V;
 		// 47
-		virtualMethodRef User/setPhone([B)V;
+		staticMethodRef loyaltycard/parseByteArrayUntilDelimiter([BS)[B;
 		// 48
-		virtualMethodRef User/getPhone()[B;
+		virtualMethodRef User/setFirstName([B)V;
 		// 49
-		virtualMethodRef User/setIdentification([B)V;
+		virtualMethodRef User/getFirstName()[B;
 		// 50
-		virtualMethodRef User/getIdentification()[B;
+		virtualMethodRef User/setLastName([B)V;
 		// 51
-		virtualMethodRef User/setBirthday([B)V;
+		virtualMethodRef User/getLastName()[B;
 		// 52
-		virtualMethodRef User/getBirthday()[B;
+		virtualMethodRef User/setPhone([B)V;
 		// 53
-		virtualMethodRef User/setGender(B)V;
+		virtualMethodRef User/getPhone()[B;
 		// 54
+		virtualMethodRef User/setIdentification([B)V;
+		// 55
+		virtualMethodRef User/getIdentification()[B;
+		// 56
+		virtualMethodRef User/setBirthday([B)V;
+		// 57
+		virtualMethodRef User/getBirthday()[B;
+		// 58
+		virtualMethodRef User/setGender(B)V;
+		// 59
 		staticMethodRef loyaltycard/sendUserData(Ljavacard/framework/APDU;)V;
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
-		// 55
+		// 60
 		staticMethodRef loyaltycard/safeSendFieldData([B[BS)S;
-		// 56
+		// 61
 		virtualMethodRef User/getGender()B;
-		// 57
+		// 62
 		virtualMethodRef 1.10.7()S;		// javacard/framework/APDU.setOutgoing()S
-		// 58
+		// 63
 		virtualMethodRef 1.10.9(S)V;		// javacard/framework/APDU.setOutgoingLength(S)V
-		// 59
+		// 64
 		virtualMethodRef 1.10.5([BSS)V;		// javacard/framework/APDU.sendBytesLong([BSS)V
 	}
 
@@ -168,6 +178,7 @@
 			public static final byte NUMBER_NINE = 57;		// B
 			public static final short MAX_CHUNK_SIZE = 255;		// S
 			public static final short NO_EXIST_DATA = 27272;		// S
+			public static final short SW_ACTION_FAILED = -24577;		// S
 			public static final byte[] DEFAUL_PIN 0 = {49,50,51,52,53,54};		// [B
 		}
 
@@ -578,8 +589,8 @@
 		}
 
 		.method private changePin(Ljavacard/framework/APDU;)V {
-			.stack 4;
-			.locals 5;
+			.stack 5;
+			.locals 6;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
@@ -594,7 +605,7 @@
 				L3:	bspush 12;
 					sstore 5;
 				L4:	getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 36;		// javacard/framework/OwnerPIN.isValidated()Z
+					invokevirtual 37;		// javacard/framework/OwnerPIN.isValidated()Z
 					ifne L6;
 				L5:	sspush 27010;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
@@ -646,16 +657,51 @@
 					sload 6;
 					sor;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
-				L19:	getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
-					aload_2;
+				L19:	invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
+					bspush 6;
+					sstore 6;
+				L20:	sload 6;
+					newarray 11;
+					astore 7;
+				L21:	aload_2;
 					sload 4;
-					bspush 6;
+					sload 6;
 					sadd;
-					bspush 6;
+					aload 7;
+					sconst_0;
+					sload 6;
+					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
+					pop;
+					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					aload 7;
+					sconst_0;
+					sload 6;
+					s2b;
 					invokevirtual 16;		// javacard/framework/OwnerPIN.update([BSB)V
 					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 37;		// javacard/framework/OwnerPIN.reset()V
+					invokevirtual 40;		// javacard/framework/OwnerPIN.reset()V
+					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					aload 7;
+					sconst_0;
+					sload 6;
+					s2b;
+					invokevirtual 35;		// javacard/framework/OwnerPIN.check([BSB)Z
+					ifne L23;
+				L22:	sspush 27010;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L23:	invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L24:	goto L27;
+				L25:	astore 6;
+				L26:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					sspush -24577;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L27:	getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 40;		// javacard/framework/OwnerPIN.reset()V
 					return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L19 L24 L25 36;
+			}
 		}
 
 		.method private createPIN(Ljavacard/framework/APDU;)V {
@@ -696,6 +742,8 @@
 					sload_3;
 					s2b;
 					invokevirtual 16;		// javacard/framework/OwnerPIN.update([BSB)V
+					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 40;		// javacard/framework/OwnerPIN.reset()V
 					return;
 		}
 
@@ -719,7 +767,18 @@
 					sload_2;
 					s2b;
 					invokevirtual 16;		// javacard/framework/OwnerPIN.update([BSB)V
-					return;
+					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					invokevirtual 40;		// javacard/framework/OwnerPIN.reset()V
+					getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
+					aload_1;
+					sconst_0;
+					sload_2;
+					s2b;
+					invokevirtual 35;		// javacard/framework/OwnerPIN.check([BSB)Z
+					ifne L6;
+				L5:	sspush 27010;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L6:	return;
 		}
 
 		.method public select()Z 6 {
@@ -745,7 +804,7 @@
 			.locals 0;
 
 				L0:	getstatic_a 11;		// reference loyaltycard/loyaltycard.pin
-					invokevirtual 37;		// javacard/framework/OwnerPIN.reset()V
+					invokevirtual 40;		// javacard/framework/OwnerPIN.reset()V
 					return;
 		}
 
@@ -773,19 +832,20 @@
 				L4:	sspush 26368;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
 				L5:	sload_3;
-					getstatic_a 38;		// reference loyaltycard/loyaltycard.userData
+					getstatic_a 44;		// reference loyaltycard/loyaltycard.userData
 					arraylength;
 					if_scmple L7;
 				L6:	sspush 27268;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
-				L7:	sload_3;
+				L7:	invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
+				L8:	sload_3;
 					bspush 6;
 					ssub;
 					sstore 5;
-				L8:	bspush 6;
+				L9:	bspush 6;
 					newarray 11;
 					astore 6;
-				L9:	aload_2;
+				L10:	aload_2;
 					sconst_5;
 					sload 5;
 					sadd;
@@ -796,7 +856,7 @@
 					pop;
 					aload_0;
 					aload 6;
-					invokespecial 40;		// loyaltycard/loyaltycard.setPIN([B)V
+					invokespecial 45;		// loyaltycard/loyaltycard.setPIN([B)V
 					aload_0;
 					sload_3;
 					bspush 6;
@@ -804,16 +864,26 @@
 					putfield_s 6;		// short loyaltycard/loyaltycard.userDataLength
 					aload_2;
 					sconst_5;
-					getstatic_a 38;		// reference loyaltycard/loyaltycard.userData
+					getstatic_a 44;		// reference loyaltycard/loyaltycard.userData
 					sconst_0;
 					getfield_s_this 6;		// short loyaltycard/loyaltycard.userDataLength
 					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
 					aload_0;
-					getstatic_a 38;		// reference loyaltycard/loyaltycard.userData
+					getstatic_a 44;		// reference loyaltycard/loyaltycard.userData
 					getfield_s_this 6;		// short loyaltycard/loyaltycard.userDataLength
-					invokespecial 41;		// loyaltycard/loyaltycard.parseUserData([BS)V
-					return;
+					invokespecial 46;		// loyaltycard/loyaltycard.parseUserData([BS)V
+					invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L11:	goto L14;
+				L12:	astore 5;
+				L13:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					aload 5;
+					athrow;
+				L14:	return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L8 L11 L12 43;
+			}
 		}
 
 		.method private parseUserData([BS)V {
@@ -845,11 +915,11 @@
 					aload_0;
 					aload_1;
 					sload_3;
-					invokespecial 42;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
-					invokevirtual 43;		// loyaltycard/User.setFirstName([B)V
+					invokespecial 47;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
+					invokevirtual 48;		// loyaltycard/User.setFirstName([B)V
 					sload_3;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 44;		// loyaltycard/User.getFirstName()[B
+					invokevirtual 49;		// loyaltycard/User.getFirstName()[B
 					arraylength;
 					sconst_1;
 					sadd;
@@ -859,11 +929,11 @@
 					aload_0;
 					aload_1;
 					sload_3;
-					invokespecial 42;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
-					invokevirtual 45;		// loyaltycard/User.setLastName([B)V
+					invokespecial 47;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
+					invokevirtual 50;		// loyaltycard/User.setLastName([B)V
 					sload_3;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 46;		// loyaltycard/User.getLastName()[B
+					invokevirtual 51;		// loyaltycard/User.getLastName()[B
 					arraylength;
 					sconst_1;
 					sadd;
@@ -873,11 +943,11 @@
 					aload_0;
 					aload_1;
 					sload_3;
-					invokespecial 42;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
-					invokevirtual 47;		// loyaltycard/User.setPhone([B)V
+					invokespecial 47;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
+					invokevirtual 52;		// loyaltycard/User.setPhone([B)V
 					sload_3;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 48;		// loyaltycard/User.getPhone()[B
+					invokevirtual 53;		// loyaltycard/User.getPhone()[B
 					arraylength;
 					sconst_1;
 					sadd;
@@ -887,11 +957,11 @@
 					aload_0;
 					aload_1;
 					sload_3;
-					invokespecial 42;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
-					invokevirtual 49;		// loyaltycard/User.setIdentification([B)V
+					invokespecial 47;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
+					invokevirtual 54;		// loyaltycard/User.setIdentification([B)V
 					sload_3;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 50;		// loyaltycard/User.getIdentification()[B
+					invokevirtual 55;		// loyaltycard/User.getIdentification()[B
 					arraylength;
 					sconst_1;
 					sadd;
@@ -901,11 +971,11 @@
 					aload_0;
 					aload_1;
 					sload_3;
-					invokespecial 42;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
-					invokevirtual 51;		// loyaltycard/User.setBirthday([B)V
+					invokespecial 47;		// loyaltycard/loyaltycard.parseByteArrayUntilDelimiter([BS)[B
+					invokevirtual 56;		// loyaltycard/User.setBirthday([B)V
 					sload_3;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 52;		// loyaltycard/User.getBirthday()[B
+					invokevirtual 57;		// loyaltycard/User.getBirthday()[B
 					arraylength;
 					sconst_1;
 					sadd;
@@ -915,7 +985,7 @@
 					aload_1;
 					sload_3;
 					baload;
-					invokevirtual 53;		// loyaltycard/User.setGender(B)V
+					invokevirtual 58;		// loyaltycard/User.setGender(B)V
 					return;
 		}
 
@@ -993,7 +1063,7 @@
 					astore_2;
 				L3:	aload_0;
 					aload_1;
-					invokespecial 54;		// loyaltycard/loyaltycard.sendUserData(Ljavacard/framework/APDU;)V
+					invokespecial 59;		// loyaltycard/loyaltycard.sendUserData(Ljavacard/framework/APDU;)V
 					return;
 		}
 
@@ -1010,44 +1080,44 @@
 					sstore_3;
 				L2:	aload_0;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 44;		// loyaltycard/User.getFirstName()[B
+					invokevirtual 49;		// loyaltycard/User.getFirstName()[B
 					aload_2;
 					sload_3;
-					invokespecial 55;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
+					invokespecial 60;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
 					sstore_3;
 					aload_0;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 46;		// loyaltycard/User.getLastName()[B
+					invokevirtual 51;		// loyaltycard/User.getLastName()[B
 					aload_2;
 					sload_3;
-					invokespecial 55;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
+					invokespecial 60;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
 					sstore_3;
 					aload_0;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 48;		// loyaltycard/User.getPhone()[B
+					invokevirtual 53;		// loyaltycard/User.getPhone()[B
 					aload_2;
 					sload_3;
-					invokespecial 55;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
+					invokespecial 60;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
 					sstore_3;
 					aload_0;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 50;		// loyaltycard/User.getIdentification()[B
+					invokevirtual 55;		// loyaltycard/User.getIdentification()[B
 					aload_2;
 					sload_3;
-					invokespecial 55;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
+					invokespecial 60;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
 					sstore_3;
 					aload_0;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 52;		// loyaltycard/User.getBirthday()[B
+					invokevirtual 57;		// loyaltycard/User.getBirthday()[B
 					aload_2;
 					sload_3;
-					invokespecial 55;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
+					invokespecial 60;		// loyaltycard/loyaltycard.safeSendFieldData([B[BS)S
 					sstore_3;
 					aload_2;
 					sload_3;
 					sinc 3 1;
 					getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 56;		// loyaltycard/User.getGender()B
+					invokevirtual 61;		// loyaltycard/User.getGender()B
 					bastore;
 					sload_3;
 					aload_2;
@@ -1056,16 +1126,16 @@
 				L3:	sspush 27012;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
 				L4:	aload_1;
-					invokevirtual 57;		// javacard/framework/APDU.setOutgoing()S
+					invokevirtual 62;		// javacard/framework/APDU.setOutgoing()S
 					pop;
 					aload_1;
 					sload_3;
-					invokevirtual 58;		// javacard/framework/APDU.setOutgoingLength(S)V
+					invokevirtual 63;		// javacard/framework/APDU.setOutgoingLength(S)V
 					aload_1;
 					aload_2;
 					sconst_0;
 					sload_3;
-					invokevirtual 59;		// javacard/framework/APDU.sendBytesLong([BSS)V
+					invokevirtual 64;		// javacard/framework/APDU.sendBytesLong([BSS)V
 					return;
 		}
 
@@ -1122,7 +1192,7 @@
 
 		.method public updateFirstName(Ljavacard/framework/APDU;)V 8 {
 			.stack 5;
-			.locals 4;
+			.locals 5;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
@@ -1153,22 +1223,33 @@
 					sload_3;
 					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
-					aload 5;
-					arraylength;
-					ifle L9;
+					invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
 				L7:	aload 5;
+					arraylength;
+					ifle L10;
+				L8:	aload 5;
 					sconst_0;
 					baload;
-					ifeq L9;
-				L8:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
+					ifeq L10;
+				L9:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
 					aload 5;
-					invokevirtual 43;		// loyaltycard/User.setFirstName([B)V
-				L9:	return;
+					invokevirtual 48;		// loyaltycard/User.setFirstName([B)V
+				L10:	invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L11:	goto L14;
+				L12:	astore 6;
+				L13:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					sspush -24577;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L14:	return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L7 L11 L12 36;
+			}
 		}
 
 		.method public updateLastName(Ljavacard/framework/APDU;)V 9 {
 			.stack 5;
-			.locals 4;
+			.locals 5;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
@@ -1199,22 +1280,33 @@
 					sload_3;
 					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
-					aload 5;
-					arraylength;
-					ifle L9;
+					invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
 				L7:	aload 5;
+					arraylength;
+					ifle L10;
+				L8:	aload 5;
 					sconst_0;
 					baload;
-					ifeq L9;
-				L8:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
+					ifeq L10;
+				L9:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
 					aload 5;
-					invokevirtual 45;		// loyaltycard/User.setLastName([B)V
-				L9:	return;
+					invokevirtual 50;		// loyaltycard/User.setLastName([B)V
+				L10:	invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L11:	goto L14;
+				L12:	astore 6;
+				L13:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					sspush -24577;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L14:	return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L7 L11 L12 36;
+			}
 		}
 
 		.method public updatePhone(Ljavacard/framework/APDU;)V 10 {
 			.stack 5;
-			.locals 4;
+			.locals 5;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
@@ -1245,22 +1337,33 @@
 					sload_3;
 					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
-					aload 5;
-					arraylength;
-					ifle L9;
+					invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
 				L7:	aload 5;
+					arraylength;
+					ifle L10;
+				L8:	aload 5;
 					sconst_0;
 					baload;
-					ifeq L9;
-				L8:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
+					ifeq L10;
+				L9:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
 					aload 5;
-					invokevirtual 47;		// loyaltycard/User.setPhone([B)V
-				L9:	return;
+					invokevirtual 52;		// loyaltycard/User.setPhone([B)V
+				L10:	invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L11:	goto L14;
+				L12:	astore 6;
+				L13:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					sspush -24577;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L14:	return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L7 L11 L12 36;
+			}
 		}
 
 		.method public updateBirthday(Ljavacard/framework/APDU;)V 11 {
 			.stack 5;
-			.locals 4;
+			.locals 5;
 
 			.descriptor	Ljavacard/framework/APDU;	1.10;
 
@@ -1291,17 +1394,28 @@
 					sload_3;
 					invokestatic 39;		// javacard/framework/Util.arrayCopy([BS[BSS)S
 					pop;
-					aload 5;
-					arraylength;
-					ifle L9;
+					invokestatic 38;		// javacard/framework/JCSystem.beginTransaction()V
 				L7:	aload 5;
+					arraylength;
+					ifle L10;
+				L8:	aload 5;
 					sconst_0;
 					baload;
-					ifeq L9;
-				L8:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
+					ifeq L10;
+				L9:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
 					aload 5;
-					invokevirtual 51;		// loyaltycard/User.setBirthday([B)V
-				L9:	return;
+					invokevirtual 56;		// loyaltycard/User.setBirthday([B)V
+				L10:	invokestatic 41;		// javacard/framework/JCSystem.commitTransaction()V
+				L11:	goto L14;
+				L12:	astore 6;
+				L13:	invokestatic 42;		// javacard/framework/JCSystem.abortTransaction()V
+					sspush -24577;
+					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
+				L14:	return;
+			.exceptionTable {
+				// start_block end_block handler_block catch_type_index
+				L7 L11 L12 36;
+			}
 		}
 
 		.method public checkCardHasData(Ljavacard/framework/APDU;)V 12 {
@@ -1314,22 +1428,22 @@
 					invokevirtual 33;		// javacard/framework/APDU.setIncomingAndReceive()S
 					sstore_2;
 				L1:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 52;		// loyaltycard/User.getBirthday()[B
+					invokevirtual 57;		// loyaltycard/User.getBirthday()[B
 					ifnonnull L8;
 				L2:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 44;		// loyaltycard/User.getFirstName()[B
+					invokevirtual 49;		// loyaltycard/User.getFirstName()[B
 					ifnonnull L8;
 				L3:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 56;		// loyaltycard/User.getGender()B
+					invokevirtual 61;		// loyaltycard/User.getGender()B
 					ifne L8;
 				L4:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 50;		// loyaltycard/User.getIdentification()[B
+					invokevirtual 55;		// loyaltycard/User.getIdentification()[B
 					ifnonnull L8;
 				L5:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 48;		// loyaltycard/User.getPhone()[B
+					invokevirtual 53;		// loyaltycard/User.getPhone()[B
 					ifnonnull L8;
 				L6:	getstatic_a 14;		// reference loyaltycard/loyaltycard.user
-					invokevirtual 46;		// loyaltycard/User.getLastName()[B
+					invokevirtual 51;		// loyaltycard/User.getLastName()[B
 					ifnonnull L8;
 				L7:	sspush 27272;
 					invokestatic 32;		// javacard/framework/ISOException.throwIt(S)V
