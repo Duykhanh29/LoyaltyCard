@@ -7,15 +7,15 @@
 <FileNodes>
 <fnode>
 <fileName>src\loyaltycard\AppletConstants.java</fileName>
-<line>8</line>
+<line>6</line>
 </fnode>
 <fnode>
 <fileName>src\loyaltycard\User.java</fileName>
-<line>11</line>
+<line>16</line>
 </fnode>
 <fnode>
 <fileName>C:\JavaCardKit\SDK\Tools\JCIDE\apis\jc222\javacard\framework\ISO7816.java</fileName>
-<line>38</line>
+<line>111</line>
 </fnode>
 <fnode>
 <fileName>src\loyaltycard\AppletInsConstants.java</fileName>
@@ -23,7 +23,7 @@
 </fnode>
 <ActiveFile>
 <fileName>src\loyaltycard\loyaltycard.java</fileName>
-<line>154</line>
+<line>305</line>
 </ActiveFile>
 </FileNodes>
 </StateInfo>

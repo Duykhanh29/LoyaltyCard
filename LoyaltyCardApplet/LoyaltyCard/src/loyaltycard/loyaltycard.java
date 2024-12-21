@@ -1,7 +1,8 @@
 package loyaltycard;
 
 import javacard.framework.*;
-
+import javacard.security.*;
+import javacardx.crypto.Cipher;
 
 public class loyaltycard extends Applet
 {
@@ -9,6 +10,9 @@ public class loyaltycard extends Applet
 	private static OwnerPIN pin;
 	private static byte[] userData = new byte[1024];
 	private short userDataLength = 0;
+	private static MessageDigest digest;
+	private AESKey aesKey;
+	private static Cipher cipher;
 
  
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
@@ -17,6 +21,9 @@ public class loyaltycard extends Applet
 		user = new User();
 		byte[] pinArr = AppletConstants.DEFAUL_PIN;
 		pin.update(pinArr, (short) 0, (byte)pinArr.length);
+		
+		cipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_ECB_NOPAD,false);
+		digest = MessageDigest.getInstance(MessageDigest.ALG_SHA, false);     // ALG_SHA returns with 20 byte 
 		new loyaltycard().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 	}
 
@@ -105,56 +112,91 @@ public class loyaltycard extends Applet
 	private void changePin(APDU apdu) {
 		byte[] buffer = apdu.getBuffer();
 		short lc = apdu.setIncomingAndReceive();
-        short off = ISO7816.OFFSET_CDATA;
-        short expectedLength = (short) (AppletConstants.MAX_PIN_SIZE * 2);
+		short off = ISO7816.OFFSET_CDATA;
+		short expectedLength = (short) (AppletConstants.MAX_PIN_SIZE * 2);
+
 		if (!pin.isValidated()) {
-			// if (!pin.check(buffer, off, AppletConstants.MAX_PIN_SIZE)) {
-            ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-            return;
-        // }
-			 
+			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			return;
 		}
-		if(pin.getTriesRemaining()==0){
+
+		if (pin.getTriesRemaining() == 0) {
 			ISOException.throwIt(ISO7816.SW_BYTES_REMAINING_00);
 			return;
 		}
-		
+
 		if (lc != expectedLength) {
 			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
-		
+
 		// check if bytes are numbers from 0 to 9 
-		 for (short i = 0; i < expectedLength ; i++) {
-            if (((buffer[(short) (i + off)] < AppletConstants.NUMBER_ZERO)
-                    || (buffer[(short) (i + off)] > AppletConstants.NUMBER_NINE))) {
-                ISOException.throwIt(ISO7816.SW_WRONG_DATA);
-            }
-        }
-			
+		for (short i = 0; i < expectedLength; i++) {
+			if (((buffer[(short) (i + off)] < AppletConstants.NUMBER_ZERO)
+					|| (buffer[(short) (i + off)] > AppletConstants.NUMBER_NINE))) {
+				ISOException.throwIt(ISO7816.SW_WRONG_DATA);
+			}
+		}
+
 		// offset from 0 to MAX_PIN_SIZE is data of current PIN
-        if (!pin.check(buffer, off, (byte) AppletConstants.MAX_PIN_SIZE)) {
-            
-            short triesRemaining = (short) pin.getTriesRemaining();
-            ISOException.throwIt((short) (ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED | triesRemaining));
-        }
-		
-		
-         try {
+		if (!pin.check(buffer, off, (byte) AppletConstants.MAX_PIN_SIZE)) {
+			short triesRemaining = (short) pin.getTriesRemaining();
+			ISOException.throwIt((short) (ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED | triesRemaining));
+		}
+
+		try {
 			JCSystem.beginTransaction();
+
+			// Step 1: Store the old AES key
+			// byte[] oldAesKey = new byte[(short)16];
+			// aesKey.getKey(oldAesKey, (short) 0);
+
+			// Step 2: Decrypt user data fields using the old AES key
+			short firstNameLen = (short) user.getFirstName().length;
+			short lastNameLen = (short) user.getLastName().length;
+			short birthdayLen = (short) user.getBirthday().length;
+			short phoneLen = (short) user.getPhone().length;
+			short identificationLen = (short) user.getIdentification().length;
+			
+			byte[] firstName = new byte[firstNameLen];
+			byte[] lastName = new byte[lastNameLen];
+			byte[] birthday = new byte[birthdayLen];
+			byte[] phone = new byte[phoneLen];
+			byte[] identification = new byte[identificationLen];
+			Util.arrayCopy(user.getFirstName(), (short) (0), firstName, (short) 0, (short) firstNameLen);
+			Util.arrayCopy(user.getLastName(), (short) (0), lastName , (short) 0, (short) lastNameLen);
+			Util.arrayCopy(user.getBirthday(), (short) (0), birthday, (short) 0, (short) birthdayLen);
+			Util.arrayCopy(user.getPhone() ,(short) (0), phone, (short) 0, (short) phoneLen);
+			Util.arrayCopy(user.getIdentification(), (short) (0), identification, (short) 0, (short) identificationLen);
+		
+			byte[] decryptedFirstName = decryptField(firstName);
+			byte[] decryptedLastName = decryptField(lastName);
+			byte[] decryptedPhone = decryptField(phone);
+			byte[] decryptedIdentification = decryptField(identification);
+			byte[] decryptedBirthday = decryptField(birthday);
+
+			// Step 3: Change the PIN and update the AES key
 			short dataLength = (short) AppletConstants.MAX_PIN_SIZE;
 			byte[] pinData = new byte[dataLength];
 			Util.arrayCopy(buffer, (short) (off + dataLength), pinData, (short) 0, (short) dataLength);
 			pin.update(pinData, (short) 0, (byte) dataLength);
 			pin.reset();
-			if (!pin.check(pinData,(short)0, (byte) dataLength)) {
+			if (!pin.check(pinData, (short) 0, (byte) dataLength)) {
 				ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
 			}
+			generateAESKeyFromPin(pinData); // Update AES key
+
+			// Step 4: Encrypt user data fields using the new AES key
+			user.setFirstName(encryptField(decryptedFirstName));
+			user.setLastName(encryptField(decryptedLastName));
+			user.setPhone(encryptField(decryptedPhone));
+			user.setIdentification(encryptField(decryptedIdentification));
+			user.setBirthday(encryptField(decryptedBirthday));
+
 			JCSystem.commitTransaction();
 		} catch (Exception e) {
 			JCSystem.abortTransaction();
-			ISOException.throwIt(AppletConstants.SW_ACTION_FAILED); 
+			ISOException.throwIt(AppletConstants.SW_ACTION_FAILED);
 		}
-		pin.reset();
 	}
 
 	
@@ -184,6 +226,35 @@ public class loyaltycard extends Applet
 		pin.reset();
 		if (!pin.check(pinData,(short)0, (byte) dataLength)) {
 			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+		}
+		generateAESKeyFromPin(pinData);
+		
+	}
+
+
+	 private byte[] generateAESKeyFromPin(byte[] pinData) {
+		try {
+			
+			
+			byte[] hashedPin = new byte[digest.getLength()];  
+			digest.doFinal(pinData, (short) 0, (short) pinData.length, hashedPin, (short) 0);
+
+			
+			byte[] keyBytes = new byte[16];
+
+			
+			Util.arrayCopy(hashedPin, (short) 0, keyBytes, (short) 0, (short) 16);
+
+			
+			aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, (short) (8 * 16), false);
+			aesKey.setKey(keyBytes, (short) 0);
+
+			
+			return keyBytes;  
+		} catch (Exception e) {
+		
+			ISOException.throwIt(ISO7816.SW_UNKNOWN);
+			return null;  
 		}
 	}
 
@@ -248,24 +319,28 @@ public class loyaltycard extends Applet
 		short pos = 0;
 		byte[] name = {1,2,3,4};
 
-		
-		user.setFirstName(parseByteArrayUntilDelimiter(buffer, pos));  
-		pos += (short) user.getFirstName().length + 1;  
+		byte[] firstName = parseByteArrayUntilDelimiter(buffer, pos);
+		byte[] firstNAME = encryptField(firstName);
+		user.setFirstName(firstNAME);  
+		pos += (short) firstName.length + 1;  
 
-		user.setLastName(parseByteArrayUntilDelimiter(buffer, pos)); 
-		pos += (short) user.getLastName().length + 1; 
+		byte[] lastName = parseByteArrayUntilDelimiter(buffer, pos);
+		user.setLastName(encryptField(lastName)); 
+		pos += (short) lastName.length + 1; 
 
-		user.setPhone(parseByteArrayUntilDelimiter(buffer, pos));  
-		pos += (short) user.getPhone().length + 1;  
+		byte[] phone = parseByteArrayUntilDelimiter(buffer, pos);
+		user.setPhone(encryptField(phone));  
+		pos += (short) phone.length + 1;  
 
-		user.setIdentification(parseByteArrayUntilDelimiter(buffer, pos));  // CCCD
-		pos += (short) user.getIdentification().length + 1; 
+		byte[] identification = parseByteArrayUntilDelimiter(buffer, pos);
+		user.setIdentification(encryptField(identification));  // CCCD
+		pos += (short) identification.length + 1; 
 
-		user.setBirthday(parseByteArrayUntilDelimiter(buffer, pos)); 
-		pos += (short) user.getBirthday().length + 1;  
+		byte[] birthday = parseByteArrayUntilDelimiter(buffer, pos);
+		user.setBirthday(encryptField(birthday)); 
+		pos += (short) birthday.length + 1;  
 
-		
-		user.setGender(buffer[pos]); 
+		user.setGender(buffer[pos]);    // Do not encode single byte fields
 	}
 
 
@@ -288,6 +363,35 @@ public class loyaltycard extends Applet
 		Util.arrayCopy(buffer, pos, result, (short) 0, length);
 		return result;
 	}
+	
+	private byte[] encryptField(byte[] fieldData) {
+    
+		short blockSize = 16;
+		short paddingLength = (short) (blockSize - (fieldData.length % blockSize));
+		short paddedLength = (short) (fieldData.length + paddingLength);
+
+		
+		byte[] paddedData = new byte[paddedLength];
+		Util.arrayCopy(fieldData, (short) 0, paddedData, (short) 0, (short) fieldData.length);
+
+		
+		for (short i = (short) fieldData.length; i < paddedLength; i++) {
+			paddedData[i] = (byte) paddingLength;
+		}
+
+		
+		byte[] encryptedData = new byte[paddedLength];
+		
+		
+		cipher.init(aesKey, Cipher.MODE_ENCRYPT);
+		cipher.doFinal(paddedData, (short) 0, paddedLength, encryptedData, (short) 0);
+
+		return encryptedData;
+	}
+	
+	
+	
+	// read data
 
 	private void readUserData(APDU apdu) {
 		if (user == null) {
@@ -332,17 +436,39 @@ public class loyaltycard extends Applet
 		}
 
 	
-		short length = (short) fieldData.length;
-		short lengthData = (short) (bytesSent + ((short)length + 1));
-		if ( lengthData > tempData.length) {
+		byte[] decryptedData = decryptField(fieldData);
+		short length = (short) decryptedData.length;
+		if ( (short) (bytesSent + length + 1) > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
 		}
-		Util.arrayCopy(fieldData, (short) 0, tempData, bytesSent, length);
+		Util.arrayCopy(decryptedData, (short) 0, tempData, bytesSent, length);
 		bytesSent += length;
 
 	
 		tempData[bytesSent++] = (byte) '|';
 		return bytesSent;
+	}
+	
+	
+	private byte[] decryptField(byte[] encryptedData) {
+    
+		byte[] decryptedData = new byte[encryptedData.length];
+		
+		
+		cipher.init(aesKey, Cipher.MODE_DECRYPT);
+		cipher.doFinal(encryptedData, (short) 0, (short) encryptedData.length, decryptedData, (short) 0);
+
+		
+		short paddingLength = (short) (decryptedData[(short) (decryptedData.length - 1)] & 0xFF);
+		if (paddingLength < 1 || paddingLength > 16) {
+			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
+		}
+
+		short dataLength = (short) (decryptedData.length - paddingLength);
+		byte[] originalData = new byte[dataLength];
+		Util.arrayCopy(decryptedData, (short) 0, originalData, (short) 0, dataLength);
+
+		return originalData;
 	}
 
 
@@ -371,7 +497,8 @@ public class loyaltycard extends Applet
 		JCSystem.beginTransaction();
 		try {
 			if (data.length > 0 && data[0] != 0) {
-			user.setFirstName(data); 
+				byte[] encryptedData = encryptField(data);
+				user.setFirstName(encryptedData); 
 			}
 			JCSystem.commitTransaction(); 
 		} catch (Exception e) {
@@ -402,7 +529,8 @@ public class loyaltycard extends Applet
 		JCSystem.beginTransaction();
 		try {
 			if (data.length > 0 && data[0] != 0) {
-			user.setLastName(data);  
+				byte[] encryptedData = encryptField(data);
+				user.setLastName(encryptedData);  
 			}
 			JCSystem.commitTransaction(); 
 		} catch (Exception e) {
@@ -432,7 +560,8 @@ public class loyaltycard extends Applet
 		JCSystem.beginTransaction();
 		try {
 			if (data.length > 0 && data[0] != 0) {
-				user.setPhone(data);
+				byte[] encryptedData = encryptField(data);
+				user.setPhone(encryptedData);
 			}
 			JCSystem.commitTransaction(); 
 		} catch (Exception e) {
@@ -460,7 +589,8 @@ public class loyaltycard extends Applet
 		JCSystem.beginTransaction();
 		try {
 			if (data.length > 0 && data[0] != 0) {
-				user.setBirthday(data); 
+				byte[] encryptedData = encryptField(data);
+				user.setBirthday(encryptedData); 
 			}
 			JCSystem.commitTransaction(); 
     	} catch (Exception e) {
@@ -484,6 +614,3 @@ public class loyaltycard extends Applet
 	
 
 }
-
-
-
