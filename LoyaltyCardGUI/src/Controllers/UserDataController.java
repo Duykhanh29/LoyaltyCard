@@ -230,8 +230,10 @@ public class UserDataController {
     // Parse user data from byte[] (including name, age, photo, PIN)
     public UserData parseUserData(byte[] userData) throws Exception {
 
+        byte[] pointBytes = Arrays.copyOfRange(userData, userData.length - 2, userData.length);
+        byte[] userWihoutPoint = Arrays.copyOfRange(userData, 0, userData.length - 2);
         // Convert byte[] to string and split by separator '|'
-        String dataString = new String(userData, StandardCharsets.UTF_8);
+        String dataString = new String(userWihoutPoint, StandardCharsets.UTF_8);
         String[] fields = dataString.split("\\|");
 
         String firstName = fields[0];
@@ -248,9 +250,14 @@ public class UserDataController {
             isMale = false;
         }
 
+        short point = 0;
+        if (pointBytes.length == 2) {
+            point = (short) ((pointBytes[0] << 8) | (pointBytes[1] & 0xFF));
+        }
+
 //        byte[] imageData = Arrays.copyOfRange(userData, dataString.indexOf(fields[2]), dataString.lastIndexOf(fields[2]));
 //        String pin = fields[3];
-        return new UserData(firstName, lastName, phone, identification, birthday, isMale);
+        return new UserData(firstName, lastName, phone, identification, birthday, isMale, point);
     }
 
     // Function to find the position of the first delimiter '|' in the byte array
@@ -363,6 +370,13 @@ public class UserDataController {
         baos.write(value.getBytes(StandardCharsets.UTF_8));
         return baos.toByteArray();
     }
+
+
+    
+    
+    
+    
+    
 
 //    public boolean setImage(byte[] imageData){
 //        

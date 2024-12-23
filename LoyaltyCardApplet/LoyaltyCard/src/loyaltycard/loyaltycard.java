@@ -71,7 +71,11 @@ public class loyaltycard extends Applet {
 			case AppletInsConstants.INS_SIGN_DATA:
 				signData(apdu);
 				break;
-
+	
+		case AppletInsConstants.INS_UPDATE_POINT:
+			updatePoints(apdu);
+			break;
+		
 			default:
 				ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
@@ -79,22 +83,22 @@ public class loyaltycard extends Applet {
 	
 	private void signData(APDU apdu) {
 		byte[] buffer = apdu.getBuffer();
-		short dataLen = apdu.setIncomingAndReceive(); // Nhn d liu t APDU (chui ngu nhiên)
+		short dataLen = apdu.setIncomingAndReceive(); // Nhn d liu t APDU (chui ngu nhiï¿½n)
 		
-		// Kim tra kích thc d liu
-		if (dataLen > 64) { // Gii hn d liu gi vào (tùy thuc vào thut toán ký)
+		// Kim tra kï¿½ch thc d liu
+		if (dataLen > 64) { // Gii hn d liu gi vï¿½o (tï¿½y thuc vï¿½o thut toï¿½n kï¿½)
 			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
 	
 		try {
-			// To i tng Signature  ký d liu
+			// To i tng Signature  kï¿½ d liu
 			Signature signature = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
 			signature.init(privateKey, Signature.MODE_SIGN);
 			
-			// Ký d liu
+			// Kï¿½ d liu
 			short signLen = signature.sign(buffer, ISO7816.OFFSET_CDATA, dataLen, buffer, (short) 0);
 	
-			// Gi ch ký v client
+			// Gi ch kï¿½ v client
 			apdu.setOutgoing();
 			apdu.setOutgoingLength(signLen);
 			apdu.sendBytes((short) 0, signLen);
@@ -443,6 +447,13 @@ public class loyaltycard extends Applet {
 
 		tempData[bytesSent++] = (byte) (user.getGender());
 
+
+		tempData[bytesSent++] = (byte) '|';
+		
+		short point = user.getPoint();
+    Util.setShort(tempData, bytesSent, point);
+    bytesSent += 2; // Thêm 2 byte cho trng point
+		
 		if (bytesSent > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
 		}
@@ -662,5 +673,47 @@ public class loyaltycard extends Applet {
 		}
 		// ISOException.throwIt(ISO7816.SW_NO_ERROR);
 	}
+	
+	
+	
+	private void updatePoints(APDU apdu) {
+        byte[] buffer = apdu.getBuffer();
+        short bytesRead = apdu.setIncomingAndReceive();
+        // Ly giï¿½ tr P1 (cng hay tr im)
+        byte p1 = buffer[ISO7816.OFFSET_P1];
+        
+        // Ly d liu im t APDU command (2 byte)
+        short pointsToUpdate = (short) ((buffer[ISO7816.OFFSET_CDATA] << 8) | (buffer[ISO7816.OFFSET_CDATA + 1] & 0xFF));
+
+        // Thc hin cng hoc tr im tï¿½y theo giï¿½ tr P1
+        switch (p1) {
+            case AppletInsConstants.P1_PLUS_POINT:
+                user.addPoint(pointsToUpdate); 
+                break;
+            case AppletInsConstants.P1_SUB_POINT:
+                user.subtractPoint(pointsToUpdate); 
+                break;
+            default:
+                ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
+        }
+
+        // m bo im khï¿½ng ï¿½m
+        if (user.getPoint() < 0) {
+            user.setPoint((short) 0); // Nu im < 0, t li im = 0
+        }
+
+        // Tr v kt qu (im hin ti)
+        // byte[] response = new byte[2];
+        // response[0] = (byte) (user.getPoint() >> 8);  // Byte cao ca im
+        // response[1] = (byte) (user.getPoint() & 0xFF); // Byte thp ca im
+
+        // // t kt qu vï¿½o buffer vï¿½ tr v
+        // apdu.setOutgoing();
+        // apdu.setOutgoingLength((short) response.length);
+        // apdu.sendBytes((short) 0, (short) response.length);
+    } 
+	
+	
+	
 
 }

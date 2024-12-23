@@ -20,14 +20,16 @@ public class UserData {
     private String birthday;
     private String phone;
     private byte[] image;
+    private short points;
 
-    public UserData(String firstName, String lastName,String phone,String identification, String birthday , boolean isMale) {
+    public UserData(String firstName, String lastName,String phone,String identification, String birthday , boolean isMale,short points) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.isMale = isMale;
         this.identification = identification;
         this.birthday = birthday;
         this.phone = phone;
+        this.points = points;
     }
 
     public String getFirstName() {
@@ -89,10 +91,13 @@ public class UserData {
     public void setImage(byte[] image) {
         this.image = image;
     }
-    
-  
-    
-    
-    
+
+    public short getPoints() {
+        return points;
+    }
+
+    public void setPoints(short points) {
+        this.points = points;
+    }
     
 }
