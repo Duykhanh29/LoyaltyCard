@@ -135,7 +135,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
         getContentPane().add(lastNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(231, 164, 275, 31));
         getContentPane().add(birthdayChooser, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 210, 275, 32));
 
-        lb_bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_inf.jpg"))); // NOI18N
+        lb_bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_665x443.jpg"))); // NOI18N
         getContentPane().add(lb_bg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 590, 440));
 
         pack();
