@@ -4,9 +4,14 @@
  */
 package Views;
 
+import Controllers.PinController;
 import Controllers.PointController;
 import Controllers.SmartCardConnection;
 import Models.UserData;
+import constants.AppletInsConstants;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -20,9 +25,24 @@ public class ExchangePoints extends javax.swing.JFrame {
     UserData userData;
     PointController pointController;
     SmartCardConnection smartCardConnection;
-    public ExchangePoints() {
+    PinController pinController;
+
+    public ExchangePoints(UserData userData) {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.userData = userData;
+        initViews();
+        smartCardConnection = SmartCardConnection.getInstance();
+        pointController = new PointController(smartCardConnection);
+        pinController =  new PinController(smartCardConnection);
+    }
+
+    private ExchangePoints() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private void initViews() {
+        currentPointLabel.setText(String.valueOf(userData.getPoints()));
     }
 
     /**
@@ -42,8 +62,8 @@ public class ExchangePoints extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
+        textField = new javax.swing.JTextField();
+        currentPointLabel = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
@@ -75,7 +95,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         jTextArea1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("-   Khách hàng có thể quy đổi 500 điểm thành Phiếu CKTM trị giá 100.000 đồng tại quầy DVKH, số điểm tối đa có thể quy đổi là 2.500 điểm (tương ứng với giá trị tối đa là 500.000 đồng);\n-  Hoặc khách hàng có thể quy đổi điểm thành tiền dùng để thanh toán hóa đơn trực tiếp tại quầy Thu ngân với hệ số quy đổi là cứ mỗi 500 điểm tương ứng 100.000 đồng.");
+        jTextArea1.setText("-   Khách hàng có thể quy đổi 500 điểm thành Phiếu CKTM trị giá 100.000 đồng tại quầy DVKH, số điểm tối đa có thể quy đổi là 25 điểm (tương ứng với giá trị tối đa là 500.000 đồng);\n-  Hoặc khách hàng có thể quy đổi điểm thành tiền dùng để thanh toán hóa đơn trực tiếp tại quầy Thu ngân với hệ số quy đổi là cứ mỗi 500 điểm tương ứng 100.000 đồng.");
         jTextArea1.setFocusable(false);
         jScrollPane1.setViewportView(jTextArea1);
 
@@ -89,14 +109,14 @@ public class ExchangePoints extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        textField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                textFieldActionPerformed(evt);
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setText("2002");
+        currentPointLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        currentPointLabel.setText("2002");
 
         jButton3.setBackground(new java.awt.Color(204, 204, 255));
         jButton3.setForeground(new java.awt.Color(0, 0, 51));
@@ -120,8 +140,8 @@ public class ExchangePoints extends javax.swing.JFrame {
                             .addComponent(jLabel3))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(currentPointLabel)
+                            .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel2)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(67, 67, 67))
@@ -149,11 +169,11 @@ public class ExchangePoints extends javax.swing.JFrame {
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel5))
+                    .addComponent(currentPointLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 36, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addGap(22, 22, 22))
@@ -164,11 +184,53 @@ public class ExchangePoints extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        
+        try {
+             String input = textField.getText();
+             short number = validateAndConvertToShort(input);
+              String pin = JOptionPane.showInputDialog(this, "Nhập mã PIN:");
+        if (pin != null && !pin.isEmpty()) {
+            try {
+               boolean isVerified = pinController.verifyPin(pin);
+               if(isVerified)
+               {
+                  boolean isSucess = pointController.updatePoint(number,false);
+                  if(isSucess)
+                  {
+                      JOptionPane.showMessageDialog(this, "Đổi điểm công", "Thành công", JOptionPane.ERROR_MESSAGE);
+                  }else{
+                      JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                  }
+               }else{
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+               }
+            } catch (Exception ex) {
+                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Mã PIN không thể trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        } catch (Exception e) {
+        } finally {
+        }
+      
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    
+     public static short validateAndConvertToShort(String input) throws NumberFormatException, IllegalArgumentException {
+        // Kiểm tra nếu chuỗi trống
+        if (input == null || input.trim().isEmpty()) {
+            throw new NumberFormatException("Dữ liệu không thể trống");
+        }
+
+        // Kiểm tra nếu chuỗi là số
+        short value = Short.parseShort(input);  // Nếu không phải số, sẽ ném lỗi NumberFormatException
+
+        return value;
+    }
+    private void textFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_textFieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -220,6 +282,7 @@ public class ExchangePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel currentPointLabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -227,9 +290,8 @@ public class ExchangePoints extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField textField;
     // End of variables declaration//GEN-END:variables
 }

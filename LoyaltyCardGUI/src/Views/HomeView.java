@@ -7,6 +7,8 @@ package Views;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utils.ErrorHandleUtils;
 
 /**
@@ -21,11 +23,21 @@ public class HomeView extends javax.swing.JFrame {
     
     UserDataController userDataController;
     SmartCardConnection smartCardConnection;
+    UserData userData;
     public HomeView() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+          try {
+            initUserData();
+        } catch (Exception ex) {
+            Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+     private void initUserData() throws Exception{
+        userData = userDataController.readUserData();
+        loyaltyPointsTextView.setText(String.valueOf(userData.getPoints()));
     }
 
     /**
@@ -211,7 +223,7 @@ public class HomeView extends javax.swing.JFrame {
     private void redeemPointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redeemPointButtonActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        ExchangePoints exchangePoints = new ExchangePoints();
+        ExchangePoints exchangePoints = new ExchangePoints(userData);
         exchangePoints.setVisible(true);
     }//GEN-LAST:event_redeemPointButtonActionPerformed
 

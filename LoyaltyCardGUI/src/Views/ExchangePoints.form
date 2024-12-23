@@ -49,8 +49,8 @@
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                          <Component id="jTextField1" min="-2" pref="96" max="-2" attributes="0"/>
+                          <Component id="currentPointLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="textField" min="-2" pref="96" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -87,12 +87,12 @@
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="currentPointLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField1" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="textField" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" pref="36" max="32767" attributes="0"/>
               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
@@ -153,7 +153,7 @@
             </Property>
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="-   Kh&#xe1;ch h&#xe0;ng c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i 500 &#x111;i&#x1ec3;m th&#xe0;nh Phi&#x1ebf;u CKTM tr&#x1ecb; gi&#xe1; 100.000 &#x111;&#x1ed3;ng t&#x1ea1;i qu&#x1ea7;y DVKH, s&#x1ed1; &#x111;i&#x1ec3;m t&#x1ed1;i &#x111;a c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i l&#xe0; 2.500 &#x111;i&#x1ec3;m (t&#x1b0;&#x1a1;ng &#x1ee9;ng v&#x1edb;i gi&#xe1; tr&#x1ecb; t&#x1ed1;i &#x111;a l&#xe0; 500.000 &#x111;&#x1ed3;ng);&#xa;-  Ho&#x1eb7;c kh&#xe1;ch h&#xe0;ng c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i &#x111;i&#x1ec3;m th&#xe0;nh ti&#x1ec1;n d&#xf9;ng &#x111;&#x1ec3; thanh to&#xe1;n h&#xf3;a &#x111;&#x1a1;n tr&#x1ef1;c ti&#x1ebf;p t&#x1ea1;i qu&#x1ea7;y Thu ng&#xe2;n v&#x1edb;i h&#x1ec7; s&#x1ed1; quy &#x111;&#x1ed5;i l&#xe0; c&#x1ee9; m&#x1ed7;i 500 &#x111;i&#x1ec3;m t&#x1b0;&#x1a1;ng &#x1ee9;ng 100.000 &#x111;&#x1ed3;ng."/>
+            <Property name="text" type="java.lang.String" value="-   Kh&#xe1;ch h&#xe0;ng c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i 500 &#x111;i&#x1ec3;m th&#xe0;nh Phi&#x1ebf;u CKTM tr&#x1ecb; gi&#xe1; 100.000 &#x111;&#x1ed3;ng t&#x1ea1;i qu&#x1ea7;y DVKH, s&#x1ed1; &#x111;i&#x1ec3;m t&#x1ed1;i &#x111;a c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i l&#xe0; 25 &#x111;i&#x1ec3;m (t&#x1b0;&#x1a1;ng &#x1ee9;ng v&#x1edb;i gi&#xe1; tr&#x1ecb; t&#x1ed1;i &#x111;a l&#xe0; 500.000 &#x111;&#x1ed3;ng);&#xa;-  Ho&#x1eb7;c kh&#xe1;ch h&#xe0;ng c&#xf3; th&#x1ec3; quy &#x111;&#x1ed5;i &#x111;i&#x1ec3;m th&#xe0;nh ti&#x1ec1;n d&#xf9;ng &#x111;&#x1ec3; thanh to&#xe1;n h&#xf3;a &#x111;&#x1a1;n tr&#x1ef1;c ti&#x1ebf;p t&#x1ea1;i qu&#x1ea7;y Thu ng&#xe2;n v&#x1edb;i h&#x1ec7; s&#x1ed1; quy &#x111;&#x1ed5;i l&#xe0; c&#x1ee9; m&#x1ed7;i 500 &#x111;i&#x1ec3;m t&#x1b0;&#x1a1;ng &#x1ee9;ng 100.000 &#x111;&#x1ed3;ng."/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
         </Component>
@@ -176,12 +176,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField1">
+    <Component class="javax.swing.JTextField" name="textField">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextField1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textFieldActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel5">
+    <Component class="javax.swing.JLabel" name="currentPointLabel">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="0"/>
