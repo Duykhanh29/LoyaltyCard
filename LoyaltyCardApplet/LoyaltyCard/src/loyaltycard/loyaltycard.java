@@ -447,6 +447,12 @@ public class loyaltycard extends Applet {
 
 		tempData[bytesSent++] = (byte) (user.getGender());
 
+
+		tempData[bytesSent++] = (byte) '|';
+		
+		short point = user.getPoint();
+    Util.setShort(tempData, bytesSent, point);
+    bytesSent += 2; // Thêm 2 byte cho trng point
 		
 		if (bytesSent > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);

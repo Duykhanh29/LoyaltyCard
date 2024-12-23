@@ -7,7 +7,7 @@
 <FileNodes>
 <fnode>
 <fileName>src\loyaltycard\User.java</fileName>
-<line>32</line>
+<line>20</line>
 </fnode>
 <fnode>
 <fileName>C:\JavaCardKit\SDK\Tools\JCIDE\apis\jc222\javacard\framework\ISO7816.java</fileName>
@@ -23,7 +23,7 @@
 </fnode>
 <ActiveFile>
 <fileName>src\loyaltycard\loyaltycard.java</fileName>
-<line>744</line>
+<line>446</line>
 </ActiveFile>
 </FileNodes>
 </StateInfo>
