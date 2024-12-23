@@ -7,13 +7,14 @@ package Controllers;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import javax.smartcardio.*;
-import java.util.Arrays; 
+import java.util.Arrays;
 import Models.UserData;
 import constants.AppletConstants;
 import constants.AppletInsConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import utils.StringUtils;
 
 /**
  *
@@ -28,14 +29,13 @@ public class UserDataController {
     }
 
     // Ghép thông tin người dùng thành một mảng byte để lưu vào thẻ
-    public byte[] buildUserData( String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
+    public byte[] buildUserData(String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 //        if (imageData != null && imageData.length > 0) {
 //            baos.write(imageData);
 //        }
 //        baos.write('|');
-
         // firstName 
         baos.write(firstName.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
@@ -68,23 +68,22 @@ public class UserDataController {
 
         return baos.toByteArray();
     }
-    
-    public boolean checkExistedData() throws Exception
-    {
+
+    public boolean checkExistedData() throws Exception {
         byte[] command = buildCheckExistedAPDU();
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
-        if(isNoData(response.getBytes())){
+        if (isNoData(response.getBytes())) {
             return false;
         }
         return isSuccess(response.getBytes());
     }
 
-    public boolean writeUserData( String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
-        byte[] userData = buildUserData( firstName, lastName, phone, cccd, birthday, isMale, pin);
+    public boolean writeUserData(String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
+        byte[] userData = buildUserData(firstName, lastName, phone, cccd, birthday, isMale, pin);
         byte[] command = buildWriteAPDU(userData);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
-            if(isActionFail(response.getBytes())){
+            if (isActionFail(response.getBytes())) {
                 return false;
             }
             throw new Exception("Failed to write user data.");
@@ -94,7 +93,7 @@ public class UserDataController {
 
     public UserData readUserData() throws Exception {
         List<Byte> fullData = new ArrayList<>();
-        short offset = 0; 
+        short offset = 0;
         byte le = (byte) 0xFF; // Read up to 255 bytes at a time
 
         while (true) {
@@ -126,59 +125,101 @@ public class UserDataController {
 
         return parseUserData(finalData);
     }
-    
-    public boolean updateFirstName(String firstName) throws Exception
-    {
+
+    public byte[] readPublicKey() throws Exception {
+        List<Byte> fullData = new ArrayList<>();
+        short offset = 0;
+        byte le = (byte) 0xFF; // Read up to 255 bytes at a time
+        while (true) {
+            byte[] apdu = buildReadKeyAPDU(offset, le);
+            ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(apdu));
+
+            // Add data to the list
+            byte[] responseData = response.getData();
+            for (byte b : responseData) {
+                fullData.add(b);
+            }
+
+            int sw = response.getSW();
+            if (sw == 0x9000) { // SW_NO_ERROR: Hoàn thành
+                break;
+            } else if (sw != 0x6310) { // SW_WARNING_STATE_NC: More data, continue
+                throw new CardException("Error during reading data: SW=" + Integer.toHexString(sw));
+            }
+            // Increment offset to read next data
+            offset += responseData.length;
+        }
+
+        // Convert data list to byte array
+        byte[] finalData = new byte[fullData.size()];
+        for (int i = 0; i < fullData.size(); i++) {
+            finalData[i] = fullData.get(i);
+        }
+
+        return finalData;
+    }
+
+    public byte[] signMessage(byte[] data) throws Exception {
+        byte le = (byte) 0xFF; // Read up to 255 bytes at a time
+
+        byte[] apdu = buildSignDataAPDU(data, le);
+        ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(apdu));
+
+        int sw = response.getSW();
+        byte[] responseData;
+        if (sw == 0x9000) { // SW_NO_ERROR: Hoàn thành
+            responseData = response.getData();
+        } else { 
+            throw new CardException("Error during reading data: SW=" + Integer.toHexString(sw));
+        }
+        return responseData;
+    }
+
+    public boolean updateFirstName(String firstName) throws Exception {
         byte[] firstNameByte = parseStringToByte(firstName);
         byte[] command = buildUpdateFisrtNameAPDU(firstNameByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
-             if(isActionFail(response.getBytes())){
+            if (isActionFail(response.getBytes())) {
                 return false;
             }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
     }
-    
-    public boolean updateLastName(String lastName) throws Exception
-    {
+
+    public boolean updateLastName(String lastName) throws Exception {
         byte[] lastNameByte = parseStringToByte(lastName);
         byte[] command = buildUpdateLastNameAPDU(lastNameByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
-             if(isActionFail(response.getBytes())){
+            if (isActionFail(response.getBytes())) {
                 return false;
             }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
     }
-    
-    
-    public boolean updateBirthday(String birthday) throws Exception
-    {
+
+    public boolean updateBirthday(String birthday) throws Exception {
         byte[] birthdayByte = parseStringToByte(birthday);
         byte[] command = buildUpdateBirthdayAPDU(birthdayByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
-             if(isActionFail(response.getBytes())){
+            if (isActionFail(response.getBytes())) {
                 return false;
             }
             throw new Exception("Failed to write user data.");
         }
         return isSuccess(response.getBytes());
     }
-    
-    
-    
-    public boolean updatePhone(String phone) throws Exception
-    {
+
+    public boolean updatePhone(String phone) throws Exception {
         byte[] phoneByte = parseStringToByte(phone);
         byte[] command = buildUpdatePhoneAPDU(phoneByte);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
-             if(isActionFail(response.getBytes())){
+            if (isActionFail(response.getBytes())) {
                 return false;
             }
             throw new Exception("Failed to write user data.");
@@ -226,11 +267,10 @@ public class UserDataController {
         return new byte[]{
             (byte) 0x00, // CLA
             (byte) AppletInsConstants.INS_CHECK_INIT, // INS
-            (byte) 0x00, 
-            (byte) 0x00, 
-        };
+            (byte) 0x00,
+            (byte) 0x00,};
     }
-    
+
     private byte[] buildWriteAPDU(byte[] userData) {
         byte[] apduCommand = new byte[5 + userData.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -242,7 +282,6 @@ public class UserDataController {
         return apduCommand;
     }
 
-   
     private byte[] buildReadAPDU(short offset, byte le) {
         return new byte[]{
             (byte) 0x00, // CLA
@@ -252,7 +291,29 @@ public class UserDataController {
             le // Le
         };
     }
-    
+
+    private byte[] buildReadKeyAPDU(short offset, byte le) {
+        return new byte[]{
+            (byte) 0x00, // CLA
+            (byte) AppletInsConstants.INS_GET_PUBLIC_KEY, // INS
+            (byte) (offset >> 8), // P1 (byte cao của offset)
+            (byte) (offset & 0xFF), // P2 (byte thấp của offset)
+            le // Le
+        };
+    }
+
+    private byte[] buildSignDataAPDU(byte[] data, byte le) {
+        byte[] apduCommand = new byte[6 + data.length]; // 6 = 5 (CLA, INS, P1, P2, Lc) + 1 (LE)
+        apduCommand[0] = (byte) 0x00; // CLA
+        apduCommand[1] = AppletInsConstants.INS_SIGN_DATA; // INS
+        apduCommand[2] = (byte) 0x00; // P1
+        apduCommand[3] = (byte) 0x00; // P2
+        apduCommand[4] = (byte) data.length; // Lc (Độ dài dữ liệu)
+        System.arraycopy(data, 0, apduCommand, 5, data.length); // Copy dữ liệu vào apduCommand
+        apduCommand[5 + data.length] = le;
+        return apduCommand;
+    }
+
     private byte[] buildUpdateFisrtNameAPDU(byte[] firstName) {
         byte[] apduCommand = new byte[5 + firstName.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -263,7 +324,7 @@ public class UserDataController {
         System.arraycopy(firstName, 0, apduCommand, 5, firstName.length);
         return apduCommand;
     }
-    
+
     private byte[] buildUpdateLastNameAPDU(byte[] lastName) {
         byte[] apduCommand = new byte[5 + lastName.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -274,8 +335,7 @@ public class UserDataController {
         System.arraycopy(lastName, 0, apduCommand, 5, lastName.length);
         return apduCommand;
     }
-    
-    
+
     private byte[] buildUpdateBirthdayAPDU(byte[] birthday) {
         byte[] apduCommand = new byte[5 + birthday.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -286,7 +346,7 @@ public class UserDataController {
         System.arraycopy(birthday, 0, apduCommand, 5, birthday.length);
         return apduCommand;
     }
-    
+
     private byte[] buildUpdatePhoneAPDU(byte[] phone) {
         byte[] apduCommand = new byte[5 + phone.length];
         apduCommand[0] = (byte) 0x00; // CLA
@@ -297,17 +357,12 @@ public class UserDataController {
         System.arraycopy(phone, 0, apduCommand, 5, phone.length);
         return apduCommand;
     }
-    
-    
-    public byte[] parseStringToByte(String value) throws IOException
-    {
+
+    public byte[] parseStringToByte(String value) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write(value.getBytes(StandardCharsets.UTF_8));
         return baos.toByteArray();
     }
-    
-    
-   
 
 //    public boolean setImage(byte[] imageData){
 //        
@@ -315,12 +370,12 @@ public class UserDataController {
     private boolean isSuccess(byte[] responseBytes) {
         return responseBytes[0] == (byte) 0x90 && responseBytes[1] == (byte) 0x00;
     }
-    
+
     private boolean isNoData(byte[] responseBytes) {
-        return responseBytes[0] == (byte)0x6A && responseBytes[1] == (byte) 0x88;
+        return responseBytes[0] == (byte) 0x6A && responseBytes[1] == (byte) 0x88;
     }
-    
+
     private boolean isActionFail(byte[] responseBytes) {
-        return responseBytes[0] == (byte)0x9F && responseBytes[1] == (byte) 0xFF;
+        return responseBytes[0] == (byte) 0x9F && responseBytes[1] == (byte) 0xFF;
     }
 }

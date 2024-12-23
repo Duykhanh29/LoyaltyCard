@@ -21,7 +21,7 @@ public class AppletInsConstants {
 	
 	public final static byte INS_CHECK_INIT = (byte) 0x09;
 	
-	public final static byte INS_GET_PUBLIC_KEY = (byte) 0xA;
+	public final static byte INS_GET_PUBLIC_KEY = (byte) 0x0A;
 	
-	public final static byte INS_SIGN_DATA = (byte) 0xB;
+	public final static byte INS_SIGN_DATA = (byte) 0x0B;
 }
