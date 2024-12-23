@@ -7,11 +7,14 @@ package Views;
 import Controllers.PinController;
 import Controllers.PointController;
 import Controllers.SmartCardConnection;
+import Controllers.UserDataController;
 import Models.UserData;
 import constants.AppletInsConstants;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import utils.RSASignature;
+import utils.StringUtils;
 
 /**
  *
@@ -26,6 +29,7 @@ public class ExchangePoints extends javax.swing.JFrame {
     PointController pointController;
     SmartCardConnection smartCardConnection;
     PinController pinController;
+    UserDataController userDataController;
 
     public ExchangePoints(UserData userData) {
         initComponents();
@@ -35,6 +39,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         smartCardConnection = SmartCardConnection.getInstance();
         pointController = new PointController(smartCardConnection);
         pinController =  new PinController(smartCardConnection);
+        userDataController = new UserDataController(smartCardConnection);
     }
 
     private ExchangePoints() {
@@ -194,11 +199,15 @@ public class ExchangePoints extends javax.swing.JFrame {
                boolean isVerified = pinController.verifyPin(pin);
                if(isVerified)
                {
+                  boolean isVerifyRSA = verifyRSA();
+                  if (!isVerifyRSA){
+                      JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                  }
                   boolean isSucess = pointController.updatePoint(number,false);
                   if(isSucess)
                   {
                       JOptionPane.showMessageDialog(this, "Đổi điểm công", "Thành công", JOptionPane.ERROR_MESSAGE);
-                  }else{
+                  } else{
                       JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                   }
                }else{
@@ -216,6 +225,24 @@ public class ExchangePoints extends javax.swing.JFrame {
       
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    public boolean verifyRSA(){
+        try {
+            byte[] data = StringUtils.generateRandomBytes(16);
+            byte[] publicKey = userDataController.readPublicKey();
+            byte[] signature = userDataController.signMessage(data); // TODO add your handling code here:
+            byte[] modulus = new byte[128]; // Giả sử modulus là 128 byte
+            byte[] exponent = new byte[3]; // Exponent thường có kích thước 3 byte
+            System.arraycopy(publicKey, 0, modulus, 0, modulus.length);
+            System.arraycopy(publicKey, modulus.length, exponent, 0, exponent.length);
+
+            boolean isSuccess = RSASignature.verifySignature(modulus, exponent, data, signature);
+            System.out.println("result: " + isSuccess);
+            return isSuccess;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
     
      public static short validateAndConvertToShort(String input) throws NumberFormatException, IllegalArgumentException {
         // Kiểm tra nếu chuỗi trống
