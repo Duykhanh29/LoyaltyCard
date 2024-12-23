@@ -1,5 +1,11 @@
 package loyaltycard;
 
+import java.applet.Applet;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+
 import javacard.framework.*;
 import javacard.security.*;
 import javacardx.crypto.Cipher;
@@ -13,6 +19,8 @@ public class loyaltycard extends Applet
 	private static MessageDigest digest;
 	private AESKey aesKey;
 	private static Cipher cipher;
+	private RSAPrivateKey privateKey;
+    private RSAPublicKey publicKey;
 
  
 	public static void install(byte[] bArray, short bOffset, byte bLength) 
@@ -303,7 +311,8 @@ public class loyaltycard extends Applet
 
 				userDataLength = (short) (lc - AppletConstants.MAX_PIN_SIZE);
 				Util.arrayCopy(buffer, ISO7816.OFFSET_CDATA, userData, (short) 0, userDataLength);
-				parseUserData(userData, userDataLength); 
+				parseUserData(userData, userDataLength);
+				innitKeyRSA(); 
 
 				JCSystem.commitTransaction();
 
@@ -313,7 +322,25 @@ public class loyaltycard extends Applet
 				ISOException.throwIt((short) AppletConstants.SW_ACTION_FAILED);  
 			}
 			
+			
+			
 		} 
+		
+
+		
+	private void innitKeyRSA(){
+		try {
+			KeyPair keyPair = new KeyPair(KeyPair.ALG_RSA, KeyBuilder.LENGTH_RSA_1024);
+			keyPair.genKeyPair();
+        
+        // Lu private key trong th
+			this.privateKey = (RSAPrivateKey) keyPair.getPrivate();
+			this.publicKey = (RSAPublicKey) keyPair.getPublic();
+		} catch (CryptoException e){
+			JCSystem.abortTransaction();
+			ISOException.throwIt(ISO7816.SW_UNKNOWN);  
+		}
+	}
 
 	private void parseUserData(byte[] buffer, short bytesRead) {
 		short pos = 0;
@@ -427,6 +454,38 @@ public class loyaltycard extends Applet
 		apdu.setOutgoingLength(bytesSent);
 		apdu.sendBytesLong(tempData, (short) 0, bytesSent);
 	}
+	
+	
+	private byte[] getPublicKeyBytes(RSAPublicKey rsaPublicKey) {
+		// K�ch thc ca modulus RSA 1024 bit = 128 byte
+		byte[] publicKeyBytes = new byte[128 + 3]; // 128 byte cho modulus v� 3 byte cho exponent
+		short bytesWritten = 0;
+		
+		// Mng byte  cha modulus (128 bytes cho kh�a RSA 1024 bit)
+		byte[] modulus = new byte[128]; 
+		// Ly modulus
+		rsaPublicKey.getModulus(modulus, (short) 0);
+		
+		// Sao ch�p modulus v�o publicKeyBytes
+		Util.arrayCopy(modulus, (short) 0, publicKeyBytes, bytesWritten, (short) modulus.length);
+		bytesWritten += modulus.length;
+		
+		// Mng byte  cha exponent (3 bytes)
+		byte[] exponent = new byte[3]; // Thng public exponent c� k�ch thc 3 byte (v� d 0x010001)
+		// Ly exponent
+		rsaPublicKey.getExponent(exponent, (short) 0);
+		
+		// Sao ch�p exponent v�o publicKeyBytes
+		Util.arrayCopy(exponent, (short) 0, publicKeyBytes, bytesWritten, (short) exponent.length);
+		bytesWritten += exponent.length;
+		
+		// Tr v mng byte cha public key
+		byte[] finalPublicKeyBytes = new byte[bytesWritten];
+		Util.arrayCopy(publicKeyBytes, (short) 0, finalPublicKeyBytes, (short) 0, bytesWritten);
+		
+		return finalPublicKeyBytes;
+	}
+
 
 	private short safeSendFieldData(byte[] fieldData, byte[] tempData, short bytesSent) {
 		if (fieldData == null || fieldData.length == 0) {
