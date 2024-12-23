@@ -6,10 +6,6 @@
 </ExpandNodes>
 <FileNodes>
 <fnode>
-<fileName>src\loyaltycard\AppletConstants.java</fileName>
-<line>6</line>
-</fnode>
-<fnode>
 <fileName>src\loyaltycard\User.java</fileName>
 <line>16</line>
 </fnode>
@@ -21,9 +17,13 @@
 <fileName>src\loyaltycard\AppletInsConstants.java</fileName>
 <line>23</line>
 </fnode>
-<ActiveFile>
+<fnode>
 <fileName>src\loyaltycard\loyaltycard.java</fileName>
 <line>305</line>
+</fnode>
+<ActiveFile>
+<fileName>src\loyaltycard\AppletConstants.java</fileName>
+<line>6</line>
 </ActiveFile>
 </FileNodes>
 </StateInfo>

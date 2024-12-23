@@ -47,24 +47,26 @@ public class HomeView extends javax.swing.JFrame {
         transactionHistoryButton = new javax.swing.JButton();
         disconnectButton = new javax.swing.JButton();
         chargePointButton = new javax.swing.JButton();
+        lb_bg = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setBackground(new java.awt.Color(204, 255, 255));
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 102, 102));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Màn hình chính");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 30, 227, 37));
 
+        jPanel1.setBackground(new java.awt.Color(49, 145, 174));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 51));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Điểm tích lũy hiện tại");
 
         loyaltyPointsTextView.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        loyaltyPointsTextView.setForeground(new java.awt.Color(255, 0, 0));
+        loyaltyPointsTextView.setForeground(new java.awt.Color(255, 255, 255));
         loyaltyPointsTextView.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         loyaltyPointsTextView.setText("400");
 
@@ -74,10 +76,12 @@ public class HomeView extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
-                    .addComponent(loyaltyPointsTextView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(loyaltyPointsTextView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -86,11 +90,13 @@ public class HomeView extends javax.swing.JFrame {
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(loyaltyPointsTextView, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        userInfoButton.setBackground(new java.awt.Color(153, 153, 255));
-        userInfoButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, -1, 150));
+
+        userInfoButton.setBackground(new java.awt.Color(176, 213, 199));
+        userInfoButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         userInfoButton.setForeground(new java.awt.Color(0, 51, 51));
         userInfoButton.setText("Thông tin cá nhân");
         userInfoButton.addActionListener(new java.awt.event.ActionListener() {
@@ -98,9 +104,10 @@ public class HomeView extends javax.swing.JFrame {
                 userInfoButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(userInfoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(474, 88, 155, 40));
 
-        changePINButton.setBackground(new java.awt.Color(153, 153, 255));
-        changePINButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        changePINButton.setBackground(new java.awt.Color(176, 213, 199));
+        changePINButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         changePINButton.setForeground(new java.awt.Color(0, 0, 51));
         changePINButton.setText("Đổi PIN");
         changePINButton.addActionListener(new java.awt.event.ActionListener() {
@@ -108,9 +115,10 @@ public class HomeView extends javax.swing.JFrame {
                 changePINButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(changePINButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(474, 294, 155, 40));
 
-        redeemPointButton.setBackground(new java.awt.Color(153, 153, 255));
-        redeemPointButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        redeemPointButton.setBackground(new java.awt.Color(176, 213, 199));
+        redeemPointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         redeemPointButton.setForeground(new java.awt.Color(0, 51, 51));
         redeemPointButton.setText("Đổi điểm");
         redeemPointButton.addActionListener(new java.awt.event.ActionListener() {
@@ -118,9 +126,10 @@ public class HomeView extends javax.swing.JFrame {
                 redeemPointButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(redeemPointButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(27, 88, 155, 40));
 
-        transactionHistoryButton.setBackground(new java.awt.Color(153, 153, 255));
-        transactionHistoryButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        transactionHistoryButton.setBackground(new java.awt.Color(176, 213, 199));
+        transactionHistoryButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         transactionHistoryButton.setForeground(new java.awt.Color(0, 51, 51));
         transactionHistoryButton.setText("Lịch sử giao dịch");
         transactionHistoryButton.addActionListener(new java.awt.event.ActionListener() {
@@ -128,19 +137,21 @@ public class HomeView extends javax.swing.JFrame {
                 transactionHistoryButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(transactionHistoryButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(474, 191, 155, 40));
 
-        disconnectButton.setBackground(new java.awt.Color(255, 204, 204));
-        disconnectButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        disconnectButton.setForeground(new java.awt.Color(153, 0, 0));
+        disconnectButton.setBackground(new java.awt.Color(238, 108, 77));
+        disconnectButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        disconnectButton.setForeground(new java.awt.Color(51, 51, 51));
         disconnectButton.setText("Ngắt kết nối");
         disconnectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 disconnectButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(disconnectButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(27, 288, 155, 40));
 
-        chargePointButton.setBackground(new java.awt.Color(153, 153, 255));
-        chargePointButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        chargePointButton.setBackground(new java.awt.Color(176, 213, 199));
+        chargePointButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         chargePointButton.setForeground(new java.awt.Color(0, 51, 51));
         chargePointButton.setText("Tích điểm");
         chargePointButton.addActionListener(new java.awt.event.ActionListener() {
@@ -148,59 +159,10 @@ public class HomeView extends javax.swing.JFrame {
                 chargePointButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(chargePointButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(27, 187, 155, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(217, 217, 217)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(redeemPointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(disconnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chargePointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(userInfoButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(changePINButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(transactionHistoryButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(36, 36, 36))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(userInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(redeemPointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(7, 7, 7)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(69, 69, 69)
-                                .addComponent(transactionHistoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(chargePointButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(67, 67, 67)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(changePINButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(disconnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(48, 48, 48))
-        );
+        lb_bg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_800x533.jpg"))); // NOI18N
+        getContentPane().add(lb_bg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 670, 380));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -295,6 +257,7 @@ public class HomeView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lb_bg;
     private javax.swing.JLabel loyaltyPointsTextView;
     private javax.swing.JButton redeemPointButton;
     private javax.swing.JButton transactionHistoryButton;
