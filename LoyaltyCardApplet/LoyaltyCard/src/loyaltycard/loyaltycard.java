@@ -71,7 +71,11 @@ public class loyaltycard extends Applet {
 			case AppletInsConstants.INS_SIGN_DATA:
 				signData(apdu);
 				break;
-
+	
+		case AppletInsConstants.INS_UPDATE_POINT:
+			
+			break;
+		
 			default:
 				ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
@@ -79,22 +83,22 @@ public class loyaltycard extends Applet {
 	
 	private void signData(APDU apdu) {
 		byte[] buffer = apdu.getBuffer();
-		short dataLen = apdu.setIncomingAndReceive(); // Nhn d liu t APDU (chui ngu nhiên)
+		short dataLen = apdu.setIncomingAndReceive(); // Nhn d liu t APDU (chui ngu nhiï¿½n)
 		
-		// Kim tra kích thc d liu
-		if (dataLen > 64) { // Gii hn d liu gi vào (tùy thuc vào thut toán ký)
+		// Kim tra kï¿½ch thc d liu
+		if (dataLen > 64) { // Gii hn d liu gi vï¿½o (tï¿½y thuc vï¿½o thut toï¿½n kï¿½)
 			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
 		}
 	
 		try {
-			// To i tng Signature  ký d liu
+			// To i tng Signature  kï¿½ d liu
 			Signature signature = Signature.getInstance(Signature.ALG_RSA_SHA_PKCS1, false);
 			signature.init(privateKey, Signature.MODE_SIGN);
 			
-			// Ký d liu
+			// Kï¿½ d liu
 			short signLen = signature.sign(buffer, ISO7816.OFFSET_CDATA, dataLen, buffer, (short) 0);
 	
-			// Gi ch ký v client
+			// Gi ch kï¿½ v client
 			apdu.setOutgoing();
 			apdu.setOutgoingLength(signLen);
 			apdu.sendBytes((short) 0, signLen);
@@ -443,6 +447,7 @@ public class loyaltycard extends Applet {
 
 		tempData[bytesSent++] = (byte) (user.getGender());
 
+		
 		if (bytesSent > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
 		}
@@ -662,5 +667,6 @@ public class loyaltycard extends Applet {
 		}
 		// ISOException.throwIt(ISO7816.SW_NO_ERROR);
 	}
+	
 
 }

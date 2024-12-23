@@ -29,9 +29,15 @@ public class AppletInsConstants {
 	public final static byte INS_UPDATE_PHONE = (byte) 0x08;
         
         public final static byte INS_CHECK_INIT = (byte) 0x09;
-        
+
         public final static byte INS_GET_PUBLIC_KEY = (byte) 0x0A;
         
         public final static byte INS_SIGN_DATA = (byte) 0x0B;
+
+        public final static byte INS_UPDATE_POINT = (byte) 0x10;
+        
+        public final static byte P1_PLUS_POINT = (byte) 0x01;
+        
+        public final static byte P1_SUB_POINT = (byte) 0x02;
 	
 }

@@ -4,6 +4,10 @@
  */
 package Views;
 
+import Controllers.PointController;
+import Controllers.SmartCardConnection;
+import Models.UserData;
+
 /**
  *
  * @author datlogarit
@@ -13,6 +17,9 @@ public class ExchangePoints extends javax.swing.JFrame {
     /**
      * Creates new form ExchangePoints
      */
+    UserData userData;
+    PointController pointController;
+    SmartCardConnection smartCardConnection;
     public ExchangePoints() {
         initComponents();
         this.setLocationRelativeTo(null);
