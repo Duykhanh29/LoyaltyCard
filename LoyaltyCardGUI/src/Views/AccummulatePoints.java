@@ -4,6 +4,17 @@
  */
 package Views;
 
+import Controllers.PinController;
+import Controllers.PointController;
+import Controllers.RSAController;
+import Controllers.SmartCardConnection;
+import Controllers.UserDataController;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import utils.ErrorHandleUtils;
+import utils.NumberUtils;
+
 /**
  *
  * @author datlogarit
@@ -13,9 +24,18 @@ public class AccummulatePoints extends javax.swing.JFrame {
     /**
      * Creates new form AccummulatePoints
      */
+    SmartCardConnection smartCardConnection;
+    PointController pointController;
+    PinController pinController;
+    UserDataController userDataController;
+
     public AccummulatePoints() {
         initComponents();
         this.setLocationRelativeTo(null);
+        smartCardConnection = SmartCardConnection.getInstance();
+        pointController = new PointController(smartCardConnection);
+        pinController = new PinController(smartCardConnection);
+        userDataController = new UserDataController(smartCardConnection);
     }
 
     /**
@@ -35,8 +55,9 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        accumulatePointField = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        pointTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -72,8 +93,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setText("2.002.000đ");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setText("2002");
+        accumulatePointField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
         jButton2.setForeground(new java.awt.Color(0, 0, 51));
@@ -88,10 +108,6 @@ public class AccummulatePoints extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(266, 266, 266))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -104,14 +120,20 @@ public class AccummulatePoints extends javax.swing.JFrame {
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel6))
+                                .addGap(262, 262, 262)
+                                .addComponent(accumulatePointField, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel2)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(152, 152, 152)
                         .addComponent(jLabel4))
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(pointTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addGap(266, 266, 266))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,14 +145,15 @@ public class AccummulatePoints extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel6))
+                    .addComponent(accumulatePointField)
+                    .addComponent(pointTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addGap(22, 22, 22))
@@ -140,16 +163,63 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        try {
+            String pointInString = pointTextField.getText();
+            short number = NumberUtils.validateAndConvertToShort(pointInString);
+            JFrame frame = new JFrame("Nhập mã PIN");
+            JPasswordField passwordField = new JPasswordField(10);
+            int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (option == JOptionPane.OK_OPTION) {
+                char[] pin = passwordField.getPassword();
+                String pinStr = new String(pin);
+                System.out.println("Mã PIN bạn nhập là: " + pinStr);
+                onHandleAccummulatePoint(pinStr, number);
+            }
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } catch (Exception e) {
+            ErrorHandleUtils.handleErrorWithException(this, e, "Điểm không hợp lệ");
+        } finally {
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void onHandleAccummulatePoint(String pin, short number) {
+        if (pin != null && !pin.isEmpty()) {
+            try {
+                boolean isVerified = pinController.verifyPin(pin);
+                if (isVerified) {
+                    RSAController rsaController = new RSAController(userDataController);
+                    boolean isVerifyRSA = rsaController.verifyRSA(this);
+                    if (!isVerifyRSA) {
+                        JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                    boolean isSucess = pointController.updatePoint(number, true);
+                    if (isSucess) {
+                        JOptionPane.showMessageDialog(this, "Tích điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        onBackToHomeView();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Mã PIN không thể trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        onBackToHomeView();
+    }//GEN-LAST:event_jButton2ActionPerformed
+    
+    private void onBackToHomeView()
+    {
         this.dispose();
         HomeView homeView = new HomeView();
         homeView.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
-
+    }
     /**
      * @param args the command line arguments
      */
@@ -186,6 +256,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel accumulatePointField;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -193,8 +264,8 @@ public class AccummulatePoints extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField pointTextField;
     // End of variables declaration//GEN-END:variables
 }

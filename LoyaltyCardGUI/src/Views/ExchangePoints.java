@@ -6,13 +6,17 @@ package Views;
 
 import Controllers.PinController;
 import Controllers.PointController;
+import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
 import constants.AppletInsConstants;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import utils.NumberUtils;
 import utils.RSASignature;
 import utils.StringUtils;
 
@@ -38,7 +42,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         initViews();
         smartCardConnection = SmartCardConnection.getInstance();
         pointController = new PointController(smartCardConnection);
-        pinController =  new PinController(smartCardConnection);
+        pinController = new PinController(smartCardConnection);
         userDataController = new UserDataController(smartCardConnection);
     }
 
@@ -189,83 +193,68 @@ public class ExchangePoints extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        
         try {
-             String input = textField.getText();
-             short number = validateAndConvertToShort(input);
-              String pin = JOptionPane.showInputDialog(this, "Nhập mã PIN:");
+            String input = textField.getText();
+            short number = NumberUtils.validateAndConvertToShort(input);
+            JFrame frame = new JFrame("Nhập mã PIN");
+            JPasswordField passwordField = new JPasswordField(10);
+            int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (option == JOptionPane.OK_OPTION) {
+                char[] pin = passwordField.getPassword();
+                String pinStr = new String(pin);
+                System.out.println("Mã PIN bạn nhập là: " + pinStr);
+                onHandleExchangePoint(pinStr, number);
+            }
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Điểm không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void onHandleExchangePoint(String pin, short number) {
         if (pin != null && !pin.isEmpty()) {
             try {
-               boolean isVerified = pinController.verifyPin(pin);
-               if(isVerified)
-               {
-                  boolean isVerifyRSA = verifyRSA();
-                  if (!isVerifyRSA){
-                      JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                  }
-                  boolean isSucess = pointController.updatePoint(number,false);
-                  if(isSucess)
-                  {
-                      JOptionPane.showMessageDialog(this, "Đổi điểm công", "Thành công", JOptionPane.ERROR_MESSAGE);
-                  } else{
-                      JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                  }
-               }else{
+                boolean isVerified = pinController.verifyPin(pin);
+                if (isVerified) {
+                    RSAController rsaController = new RSAController(userDataController);
+                    boolean isVerifyRSA = rsaController.verifyRSA(this);
+                    if (!isVerifyRSA) {
+                        JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                    boolean isSucess = pointController.updatePoint(number, false);
+                    if (isSucess) {
+                        JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        onBackToHomeView();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Đổi điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
                     JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-               }
+                }
             } catch (Exception ex) {
-                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Mã PIN không thể trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-        } catch (Exception e) {
-        } finally {
-        }
-      
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    public boolean verifyRSA(){
-        try {
-            byte[] data = StringUtils.generateRandomBytes(16);
-            byte[] publicKey = userDataController.readPublicKey();
-            byte[] signature = userDataController.signMessage(data); // TODO add your handling code here:
-            byte[] modulus = new byte[128]; // Giả sử modulus là 128 byte
-            byte[] exponent = new byte[3]; // Exponent thường có kích thước 3 byte
-            System.arraycopy(publicKey, 0, modulus, 0, modulus.length);
-            System.arraycopy(publicKey, modulus.length, exponent, 0, exponent.length);
-
-            boolean isSuccess = RSASignature.verifySignature(modulus, exponent, data, signature);
-            System.out.println("result: " + isSuccess);
-            return isSuccess;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-        return false;
     }
-    
-     public static short validateAndConvertToShort(String input) throws NumberFormatException, IllegalArgumentException {
-        // Kiểm tra nếu chuỗi trống
-        if (input == null || input.trim().isEmpty()) {
-            throw new NumberFormatException("Dữ liệu không thể trống");
-        }
 
-        // Kiểm tra nếu chuỗi là số
-        short value = Short.parseShort(input);  // Nếu không phải số, sẽ ném lỗi NumberFormatException
-
-        return value;
-    }
     private void textFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textFieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        onBackToHomeView();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void onBackToHomeView() {
         this.dispose();
         HomeView homeView = new HomeView();
         homeView.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
-
+    }
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         this.dispose();

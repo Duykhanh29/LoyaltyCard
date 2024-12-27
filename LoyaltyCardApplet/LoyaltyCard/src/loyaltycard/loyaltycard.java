@@ -253,6 +253,8 @@ public class loyaltycard extends Applet {
 		generateAESKeyFromPin(pinData);
 
 	}
+	
+	
 
 	private byte[] generateAESKeyFromPin(byte[] pinData) {
 		try {
@@ -452,7 +454,7 @@ public class loyaltycard extends Applet {
 		
 		short point = user.getPoint();
     Util.setShort(tempData, bytesSent, point);
-    bytesSent += 2; // Thêm 2 byte cho trng point
+    bytesSent += 2; 
 		
 		if (bytesSent > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);
@@ -679,13 +681,12 @@ public class loyaltycard extends Applet {
 	private void updatePoints(APDU apdu) {
         byte[] buffer = apdu.getBuffer();
         short bytesRead = apdu.setIncomingAndReceive();
-        // Ly giï¿½ tr P1 (cng hay tr im)
+        
         byte p1 = buffer[ISO7816.OFFSET_P1];
         
-        // Ly d liu im t APDU command (2 byte)
+        
         short pointsToUpdate = (short) ((buffer[ISO7816.OFFSET_CDATA] << 8) | (buffer[ISO7816.OFFSET_CDATA + 1] & 0xFF));
 
-        // Thc hin cng hoc tr im tï¿½y theo giï¿½ tr P1
         switch (p1) {
             case AppletInsConstants.P1_PLUS_POINT:
                 user.addPoint(pointsToUpdate); 
@@ -697,20 +698,11 @@ public class loyaltycard extends Applet {
                 ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
         }
 
-        // m bo im khï¿½ng ï¿½m
+        
         if (user.getPoint() < 0) {
-            user.setPoint((short) 0); // Nu im < 0, t li im = 0
+            user.setPoint((short) 0);
         }
 
-        // Tr v kt qu (im hin ti)
-        // byte[] response = new byte[2];
-        // response[0] = (byte) (user.getPoint() >> 8);  // Byte cao ca im
-        // response[1] = (byte) (user.getPoint() & 0xFF); // Byte thp ca im
-
-        // // t kt qu vï¿½o buffer vï¿½ tr v
-        // apdu.setOutgoing();
-        // apdu.setOutgoingLength((short) response.length);
-        // apdu.sendBytes((short) 0, (short) response.length);
     } 
 	
 	
