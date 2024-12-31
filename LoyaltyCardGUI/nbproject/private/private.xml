@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/constants/AppletInsConstants.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/ConnectionForm.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Res/background_900x600.jpg</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/AccummulatePoints.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/InitView.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/UserInfoThuc.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/TextUtils.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/HomeView.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/JDBCUtil.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Controllers/UserDataController.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/RSASignature.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/ImageUtils.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/AppUtils.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/StringUtils.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/RegisterCard.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/ChangePINCode.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Models/UserData.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/ExchangePoints.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/Views/HistoryForm.java</file>
+            <file>file:/D:/JAVACARD-PJ/LoyaltyCard/LoyaltyCardGUI/src/utils/ErrorHandleUtils.java</file>
+        </group>
+    </open-files>
+</project-private>
