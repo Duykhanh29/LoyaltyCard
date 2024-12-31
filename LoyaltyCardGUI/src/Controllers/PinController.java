@@ -4,6 +4,7 @@
  */
 package Controllers;
 
+import constants.AppletConstants;
 import constants.AppletInsConstants;
 import java.nio.charset.StandardCharsets;
 import javax.smartcardio.ResponseAPDU;
@@ -28,19 +29,46 @@ public class PinController {
         return isSuccess(response.getBytes());
     }
 
-    public boolean verifyPin(String pin) throws Exception {
+    public int verifyPin(String pin) throws Exception {
         byte[] command = buildPinAPDU(AppletInsConstants.INS_VERIFY_PIN, pin);
         ResponseAPDU response = smartCardConnection.getChannel()
                 .transmit(new CommandAPDU(command));
-        return isSuccess(response.getBytes());
+        if (isSuccess(response.getBytes())) {
+            return AppletConstants.VERIFY_SUCCESS;
+        } else {
+            byte[] responseBytes = response.getBytes();
+            if ((responseBytes[responseBytes.length - 2] & 0xFF) == 0x63) {
+                int remainingTries = responseBytes[responseBytes.length - 1] & 0x0F; // Lấy 4 bit cuối của byte cuối
+                return remainingTries;
+            } else {
+                // Handle other errors
+                throw new Exception("Card error: " + Integer.toHexString(response.getSW()));
+            }
+        }
+
     }
 
-    public boolean changePIN(String pin,String newPin) throws Exception {
+    public boolean changePIN(String pin, String newPin) throws Exception {
         String combinedPin = pin + newPin;
         byte[] command = buildPinAPDU(AppletInsConstants.INS_CHANGE_PIN, combinedPin);
         ResponseAPDU response = smartCardConnection.getChannel()
                 .transmit(new CommandAPDU(command));
         return isSuccess(response.getBytes());
+    }
+
+    public boolean unlockPIN() throws Exception {
+        byte[] command = buildUnlockAPDU();
+        ResponseAPDU response = smartCardConnection.getChannel()
+                .transmit(new CommandAPDU(command));
+        return isSuccess(response.getBytes());
+    }
+
+    private byte[] buildUnlockAPDU() {
+        return new byte[]{
+            (byte) 0x00, // CLA
+            (byte) AppletInsConstants.INS_UNLOCK_PIN, // INS
+            (byte) 0x00,
+            (byte) 0x00,};
     }
 
     // helpers

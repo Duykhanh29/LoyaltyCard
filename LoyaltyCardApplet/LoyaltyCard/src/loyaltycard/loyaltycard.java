@@ -71,6 +71,10 @@ public class loyaltycard extends Applet {
 			case AppletInsConstants.INS_SIGN_DATA:
 				signData(apdu);
 				break;
+				
+			case AppletInsConstants.INS_UNLOCK_PIN:
+				unlockPIN(apdu);
+				break;
 	
 		case AppletInsConstants.INS_UPDATE_POINT:
 			updatePoints(apdu);
@@ -129,7 +133,11 @@ public class loyaltycard extends Applet {
 		if (pin.check(buffer, ISO7816.OFFSET_CDATA, pinLength) == true) {
 			return;
 		} else {
-			ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
+			 short remainingTries = pin.getTriesRemaining();
+			// Returns the error code with the remaining number of times the PIN is entered incorrectly
+			ISOException.throwIt((short) (0x63C0 | remainingTries)); 
+			// ISOException.throwIt(errorCode);
+			
 		}
 	}
 
@@ -252,6 +260,14 @@ public class loyaltycard extends Applet {
 		}
 		generateAESKeyFromPin(pinData);
 
+	}
+	
+	
+	private void unlockPIN(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = apdu.setIncomingAndReceive();
+		short off = ISO7816.OFFSET_CDATA;
+		pin.resetAndUnblock();
 	}
 	
 	

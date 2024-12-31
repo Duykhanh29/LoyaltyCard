@@ -17,4 +17,6 @@ public class AppletConstants {
         public static final short SW_ACTION_FAILED = (short) 0x9FFF;
         
         public static final byte[] DEFAUL_PIN = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
+        
+        public static final int VERIFY_SUCCESS = -1;
 }

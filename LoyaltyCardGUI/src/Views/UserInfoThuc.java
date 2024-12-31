@@ -4,6 +4,8 @@
  */
 package Views;
 
+import Controllers.PinController;
+import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
@@ -33,12 +35,14 @@ public class UserInfoThuc extends javax.swing.JFrame {
      */
     SmartCardConnection smartCardConnection;
     UserDataController userDataController;
+    PinController pinController;
     UserData userData;
     public UserInfoThuc() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+        pinController = new PinController(smartCardConnection);
         try {
             initUserData();
         } catch (Exception ex) {
@@ -92,6 +96,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
         birthdayChooser = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -148,6 +153,13 @@ public class UserInfoThuc extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("unlock");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -160,6 +172,8 @@ public class UserInfoThuc extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton4)
+                        .addGap(62, 62, 62)
+                        .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -231,7 +245,9 @@ public class UserInfoThuc extends javax.swing.JFrame {
                 .addGap(45, 45, 45)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton4)
+                        .addComponent(jButton2)))
                 .addGap(29, 29, 29))
         );
 
@@ -294,6 +310,31 @@ public class UserInfoThuc extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+          try {
+            RSAController rsaController = new RSAController(userDataController);
+            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            if (isVerifyRSA) {
+                boolean isSuccess = pinController.unlockPIN();
+
+                if (isSuccess) {
+                    JOptionPane.showMessageDialog(this, "Tích điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    onBackToHomeView();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Xác minh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+   private void onBackToHomeView() {
+        this.dispose();
+        HomeView homeView = new HomeView();
+        homeView.setVisible(true);
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -338,6 +379,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
     private javax.swing.JLabel identifierView;
     private javax.swing.JLabel imageView;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

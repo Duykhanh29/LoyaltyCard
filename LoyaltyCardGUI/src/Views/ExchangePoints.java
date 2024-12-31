@@ -10,6 +10,7 @@ import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
+import constants.AppletConstants;
 import constants.AppletInsConstants;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -216,8 +217,8 @@ public class ExchangePoints extends javax.swing.JFrame {
     private void onHandleExchangePoint(String pin, short number) {
         if (pin != null && !pin.isEmpty()) {
             try {
-                boolean isVerified = pinController.verifyPin(pin);
-                if (isVerified) {
+                int pinTries = pinController.verifyPin(pin);
+                if ( pinTries  == AppletConstants.VERIFY_SUCCESS  ) {
                     RSAController rsaController = new RSAController(userDataController);
                     boolean isVerifyRSA = rsaController.verifyRSA(this);
                     if (!isVerifyRSA) {
@@ -231,7 +232,7 @@ public class ExchangePoints extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(this, "Đổi điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries +" lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);

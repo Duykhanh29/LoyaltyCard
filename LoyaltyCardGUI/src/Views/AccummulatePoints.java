@@ -9,6 +9,7 @@ import Controllers.PointController;
 import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import constants.AppletConstants;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -150,10 +151,11 @@ public class AccummulatePoints extends javax.swing.JFrame {
                     .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(accumulatePointField)
-                    .addComponent(pointTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pointTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(accumulatePointField)))
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addGap(22, 22, 22))
@@ -185,8 +187,8 @@ public class AccummulatePoints extends javax.swing.JFrame {
     private void onHandleAccummulatePoint(String pin, short number) {
         if (pin != null && !pin.isEmpty()) {
             try {
-                boolean isVerified = pinController.verifyPin(pin);
-                if (isVerified) {
+                int pinTries = pinController.verifyPin(pin);
+                if ( pinTries  == AppletConstants.VERIFY_SUCCESS ) {
                     RSAController rsaController = new RSAController(userDataController);
                     boolean isVerifyRSA = rsaController.verifyRSA(this);
                     if (!isVerifyRSA) {
@@ -200,7 +202,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries +" lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
