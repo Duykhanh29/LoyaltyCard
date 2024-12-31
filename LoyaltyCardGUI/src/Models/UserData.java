@@ -5,12 +5,15 @@
 package Models;
 
 import java.util.UUID;
+import java.sql.Timestamp;
 
 /**
  *
  * @author Admin
  */
 public class UserData {
+    
+    private int id;
     private String firstName;
     private String lastName;
     private boolean isMale;
@@ -21,8 +24,15 @@ public class UserData {
     private String phone;
     private byte[] image;
     private short points;
+    private int gender;
+    private String publicKey;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
-    public UserData(String firstName, String lastName,String phone,String identification, String birthday , boolean isMale,short points) {
+    public UserData() {
+    }
+
+    public UserData(String firstName, String lastName, String phone, String identification, String birthday, boolean isMale, short points) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.isMale = isMale;
@@ -31,6 +41,15 @@ public class UserData {
         this.phone = phone;
         this.points = points;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
 
     public String getFirstName() {
         return firstName;
@@ -72,10 +91,6 @@ public class UserData {
         this.phone = phone;
     }
 
-   
-    
-
-
     public String getBirthday() {
         return birthday;
     }
@@ -98,6 +113,38 @@ public class UserData {
 
     public void setPoints(short points) {
         this.points = points;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Timestamp updateAt) {
+        this.updatedAt = updateAt;
+    }
+
+        public int getGender() {
+        return gender;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
     
 }
