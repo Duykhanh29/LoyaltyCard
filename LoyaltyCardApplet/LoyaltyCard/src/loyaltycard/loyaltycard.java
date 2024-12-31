@@ -72,9 +72,13 @@ public class loyaltycard extends Applet {
 				signData(apdu);
 				break;
 	
-		case AppletInsConstants.INS_UPDATE_POINT:
-			updatePoints(apdu);
-			break;
+			case AppletInsConstants.INS_UPDATE_POINT:
+				updatePoints(apdu);
+				break;
+				
+			case AppletInsConstants.INS_UNLOCK_PIN:
+				unlockPIN(apdu);
+				break;
 		
 			default:
 				ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
@@ -253,6 +257,26 @@ public class loyaltycard extends Applet {
 		generateAESKeyFromPin(pinData);
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	private void unlockPIN(APDU apdu) {
+		byte[] buffer = apdu.getBuffer();
+		short lc = apdu.setIncomingAndReceive();
+		short off = ISO7816.OFFSET_CDATA;
+		pin.resetAndUnblock();
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 
@@ -707,5 +731,7 @@ public class loyaltycard extends Applet {
 	
 	
 	
+	
+
 
 }

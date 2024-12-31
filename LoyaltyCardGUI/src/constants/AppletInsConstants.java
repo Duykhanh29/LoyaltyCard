@@ -39,5 +39,8 @@ public class AppletInsConstants {
         public final static byte P1_PLUS_POINT = (byte) 0x01;
         
         public final static byte P1_SUB_POINT = (byte) 0x02;
+        
+        
+        public final static byte INS_UNLOCK_PIN = (byte) 0x0C;
 	
 }

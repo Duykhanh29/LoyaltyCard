@@ -42,6 +42,23 @@ public class PinController {
                 .transmit(new CommandAPDU(command));
         return isSuccess(response.getBytes());
     }
+    
+    public boolean unlockPIN() throws Exception 
+    {
+        byte[] command = buildUnlockAPDU();
+        ResponseAPDU response = smartCardConnection.getChannel()
+                .transmit(new CommandAPDU(command));
+        return isSuccess(response.getBytes());
+    }
+    
+    
+    private byte[] buildUnlockAPDU() {
+        return new byte[]{
+            (byte) 0x00, // CLA
+            (byte) AppletInsConstants.INS_UNLOCK_PIN, // INS
+            (byte) 0x00,
+            (byte) 0x00,};
+    }
 
     // helpers
     private byte[] buildPinAPDU(byte ins, String pin) {

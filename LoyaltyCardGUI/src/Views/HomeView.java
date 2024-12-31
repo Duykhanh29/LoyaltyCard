@@ -216,8 +216,10 @@ public class HomeView extends javax.swing.JFrame {
     private void chargePointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargePointButtonActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        AccummulatePoints accummulatePoints = new AccummulatePoints();
-        accummulatePoints.setVisible(true);
+//        AccummulatePoints accummulatePoints = new AccummulatePoints();
+//        accummulatePoints.setVisible(true);
+        UserInfoThuc userInfoThuc = new UserInfoThuc();
+        userInfoThuc.setVisible(true);
     }//GEN-LAST:event_chargePointButtonActionPerformed
 
     private void redeemPointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redeemPointButtonActionPerformed

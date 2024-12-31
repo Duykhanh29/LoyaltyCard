@@ -5,6 +5,7 @@
 package Views;
 
 import Controllers.PinController;
+import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import constants.AppletConstants;
@@ -54,7 +55,7 @@ public class InitView extends javax.swing.JFrame {
         noticeText = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        bgEnterPin = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -96,8 +97,13 @@ public class InitView extends javax.swing.JFrame {
         jLabel3.setText("WELCOME");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 80, -1, -1));
 
-        bgEnterPin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_600x400.jpg"))); // NOI18N
-        getContentPane().add(bgEnterPin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 360));
+        jButton1.setText("UNLOCK");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 283, -1, 30));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -137,6 +143,31 @@ public class InitView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_pinTextFieldActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+         try {
+            RSAController rsaController = new RSAController(userDataController);
+            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            if (isVerifyRSA) {
+                boolean isSuccess = pinController.unlockPIN();
+
+                if (isSuccess) {
+                    JOptionPane.showMessageDialog(this, "Tích điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+//                    onBackToHomeView();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Xác minh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+     private void onBackToHomeView() {
+        this.dispose();
+        HomeView homeView = new HomeView();
+        homeView.setVisible(true);
+    }
     /**
      * @param args the command line arguments
      */
@@ -174,7 +205,7 @@ public class InitView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel bgEnterPin;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

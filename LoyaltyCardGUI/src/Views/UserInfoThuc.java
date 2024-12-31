@@ -4,6 +4,8 @@
  */
 package Views;
 
+import Controllers.PinController;
+import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
@@ -34,18 +36,22 @@ public class UserInfoThuc extends javax.swing.JFrame {
     SmartCardConnection smartCardConnection;
     UserDataController userDataController;
     UserData userData;
+    PinController pinController;
+
     public UserInfoThuc() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+        pinController = new PinController(smartCardConnection);
         try {
             initUserData();
         } catch (Exception ex) {
             Logger.getLogger(UserInfoThuc.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private void initUserData() throws Exception{
+
+    private void initUserData() throws Exception {
         userData = userDataController.readUserData();
         firstNameLabel.setText(userData.getFirstName());
         lastNameLabel.setText(userData.getLastName());
@@ -54,11 +60,12 @@ public class UserInfoThuc extends javax.swing.JFrame {
         identifierView.setText(userData.getIdentification());
         setBirthday(userData);
     }
-    private void setBirthday(UserData userData){
-         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+    private void setBirthday(UserData userData) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         try {
-            Date date = dateFormat.parse(userData.getBirthday()); 
-            birthdayChooser.setDate(date); 
+            Date date = dateFormat.parse(userData.getBirthday());
+            birthdayChooser.setDate(date);
             birthdayChooser.setEnabled(false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,6 +99,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
         birthdayChooser = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -148,6 +156,13 @@ public class UserInfoThuc extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("Unlock PIN");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -160,7 +175,9 @@ public class UserInfoThuc extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(93, 93, 93)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
                         .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -231,7 +248,9 @@ public class UserInfoThuc extends javax.swing.JFrame {
                 .addGap(45, 45, 45)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton4)
+                        .addComponent(jButton2)))
                 .addGap(29, 29, 29))
         );
 
@@ -242,18 +261,18 @@ public class UserInfoThuc extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser fileChooser = new JFileChooser();
         int value = fileChooser.showOpenDialog(this);
-        if(value == JFileChooser.APPROVE_OPTION){
+        if (value == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             BufferedImage bimage;
             try {
                 bimage = ImageIO.read(file);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(bimage, "jpg", baos);
-                byte[] img= baos.toByteArray();
-                if(img.length > 128000){
+                byte[] img = baos.toByteArray();
+                if (img.length > 128000) {
                     JOptionPane.showMessageDialog(this, "Ảnh bạn chọn lớn hơn kích thước tối đa");
-                }else{
-                    
+                } else {
+
                 }
             } catch (IOException ex) {
                 Logger.getLogger(UserInfoThuc.class.getName()).log(Level.SEVERE, null, ex);
@@ -264,7 +283,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
 
     private void updateInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateInfoButtonActionPerformed
         // TODO add your handling code here:
-        if(userData!=null){
+        if (userData != null) {
             this.dispose();
             UpdateUserInfo updateUserInfoView = new UpdateUserInfo(userData);
             updateUserInfoView.setVisible(true);
@@ -293,6 +312,33 @@ public class UserInfoThuc extends javax.swing.JFrame {
         } catch (Exception e) {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try {
+            RSAController rsaController = new RSAController(userDataController);
+            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            if (isVerifyRSA) {
+                boolean isSuccess = pinController.unlockPIN();
+
+                if (isSuccess) {
+                    JOptionPane.showMessageDialog(this, "Tích điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    onBackToHomeView();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Xác minh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void onBackToHomeView() {
+        this.dispose();
+        HomeView homeView = new HomeView();
+        homeView.setVisible(true);
+    }
 
     /**
      * @param args the command line arguments
@@ -338,6 +384,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
     private javax.swing.JLabel identifierView;
     private javax.swing.JLabel imageView;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
