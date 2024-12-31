@@ -1,0 +1,11 @@
+<JavaCardProject name="LoyaltyCard">
+<USER>
+<PKG name="loyaltycard" aid="11 22 33 44 55 66" major="1" minor="0">
+<APPLET aid="11 22 33 44 55 66 00" instanceaid="" parameter="" authority="" privileges="" index="11128" name="loyaltycard"/>
+<CLASS name="AppletConstants"/>
+<CLASS name="AppletInsConstants"/>
+<CLASS name="User"/>
+</PKG>
+<Libs/>
+</USER>
+</JavaCardProject>

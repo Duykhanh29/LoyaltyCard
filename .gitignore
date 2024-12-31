@@ -1,0 +1,20 @@
+**/LoyaltyCard/LoyaltyCardGUI/nbproject/private/private.xml
+/LoyaltyCardGUI/nbproject/private/private.properties
+/LoyaltyCardGUI/nbproject/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Other IDE-specific files
+.project
+.classpath
+
+# Specific to Java Card or other technologies
+.cap
+.exp
+.jca
+
+build/
