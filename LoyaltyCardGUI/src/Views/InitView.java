@@ -5,6 +5,7 @@
 package Views;
 
 import Controllers.PinController;
+import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import constants.AppletConstants;
@@ -48,13 +49,16 @@ public class InitView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        bgEnterPin = new javax.swing.JLabel();
         loginButton = new javax.swing.JButton();
         pinTextField = new javax.swing.JPasswordField();
         jLabel1 = new javax.swing.JLabel();
         noticeText = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        bgEnterPin = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -96,8 +100,17 @@ public class InitView extends javax.swing.JFrame {
         jLabel3.setText("WELCOME");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 80, -1, -1));
 
-        bgEnterPin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_600x400.jpg"))); // NOI18N
-        getContentPane().add(bgEnterPin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 360));
+        jButton1.setBackground(new java.awt.Color(0, 102, 102));
+        jButton1.setText("Unlock");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 280, -1, 40));
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_540x360.jpg"))); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 360));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -110,8 +123,8 @@ public class InitView extends javax.swing.JFrame {
             }else{
                char[] pinChars = pinTextField.getPassword();
                String pin = new String(pinChars);
-               boolean isVerified =  pinController.verifyPin(pin);
-               if(isVerified){
+               int pinTries =  pinController.verifyPin(pin);
+               if( pinTries  == AppletConstants.VERIFY_SUCCESS){
 //                   JOptionPane.showMessageDialog(this, "Thành công");
                     this.dispose();
                     boolean isInitialized = userDataController.checkExistedData();
@@ -124,11 +137,11 @@ public class InitView extends javax.swing.JFrame {
                     }
                     
                }else{
-                   JOptionPane.showMessageDialog(this, "Sai mã PIN");
+                   JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries +" lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                }
             }
         } catch (Exception e) {
-             ErrorHandleUtils.handleErrorWithException(this, e, "");
+             ErrorHandleUtils.handleErrorWithException(this, e, e.toString());
         } finally {
         }
     }//GEN-LAST:event_loginButtonActionPerformed
@@ -136,6 +149,25 @@ public class InitView extends javax.swing.JFrame {
     private void pinTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pinTextFieldActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+          try {
+            RSAController rsaController = new RSAController(userDataController);
+            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            if (isVerifyRSA) {
+                boolean isSuccess = pinController.unlockPIN();
+
+                if (isSuccess) {
+                    JOptionPane.showMessageDialog(this, "Mở khóa PIN thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Mở khóa không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Xác minh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -175,9 +207,12 @@ public class InitView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bgEnterPin;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JButton loginButton;
     private javax.swing.JLabel noticeText;
     private javax.swing.JPasswordField pinTextField;
