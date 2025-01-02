@@ -6,8 +6,11 @@ package Views;
 
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.UserDao;
 import Models.UserData;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +19,11 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import utils.ImageUtils;
 
 /**
  *
@@ -31,18 +37,22 @@ public class UserInfo extends javax.swing.JFrame {
     SmartCardConnection smartCardConnection;
     UserDataController userDataController;
     UserData userData;
+    UserDao userDao;
+
     public UserInfo() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+        userDao = UserDao.getInstance();
         try {
             initUserData();
         } catch (Exception ex) {
             Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private void initUserData() throws Exception{
+
+    private void initUserData() throws Exception {
         userData = userDataController.readUserData();
         firstNameLabel.setText(userData.getFirstName());
         lastNameLabel.setText(userData.getLastName());
@@ -50,12 +60,66 @@ public class UserInfo extends javax.swing.JFrame {
         genderView.setText(userData.isIsMale() ? "Nam" : "Nữ");
         identifierView.setText(userData.getIdentification());
         setBirthday(userData);
+        getImageFromDB(userData.getId());
+
     }
-    private void setBirthday(UserData userData){
-         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+    private void getImageFromDB(int id) throws IOException {
         try {
-            Date date = dateFormat.parse(userData.getBirthday()); 
-            birthdayChooser.setDate(date); 
+            UserData user = userDao.getUserById(id);
+            if (user != null) {
+                userData.setImagePath(user.getImagePath());
+                userData.setPublicKey(user.getPublicKey());
+                setImage(user.getImagePath());
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void setImage(String filePath) {
+
+        try {
+            if (filePath != null) {
+                byte[] imageBytes = ImageUtils.loadImage(filePath);
+                BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+                if (image == null) {
+                    JOptionPane.showMessageDialog(this, "Không thể tải ảnh từ file", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Lấy kích thước của avatarImage
+                int width = avatarImage.getWidth();
+                int height = avatarImage.getHeight();
+
+                // Tính tỷ lệ giữ nguyên tỷ lệ gốc của hình ảnh
+//            double aspectRatio = (double) image.getWidth() / image.getHeight();
+                int newWidth = width;
+                int newHeight = height;
+
+                // Nếu chiều cao vượt quá kích thước của avatarImage, điều chỉnh lại
+//            if (newHeight > height) {
+//                newHeight = height;
+//                newWidth = (int) (newHeight * aspectRatio);
+//            }
+                // Thay đổi kích thước hình ảnh giữ tỷ lệ gốc
+                Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+
+                // Cập nhật ImageIcon
+                ImageIcon imageIcon = new ImageIcon(scaledImage);
+                avatarImage.setIcon(imageIcon);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Cập nhật ảnh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+        }
+
+    }
+
+    private void setBirthday(UserData userData) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            Date date = dateFormat.parse(userData.getBirthday());
+            birthdayChooser.setDate(date);
             birthdayChooser.setEnabled(false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,19 +246,32 @@ public class UserInfo extends javax.swing.JFrame {
     private void changeAvatarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeAvatarButtonActionPerformed
         // TODO add your handling code here:
         JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Image Files (JPG, PNG)", "jpg", "png");
+        fileChooser.setFileFilter(filter);
         int value = fileChooser.showOpenDialog(this);
-        if(value == JFileChooser.APPROVE_OPTION){
+        if (value == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+            String fileName = file.getName(); // Chỉ lấy tên file (ví dụ: "example.jpg")
+            String filePath = file.getAbsolutePath();
             BufferedImage bimage;
             try {
                 bimage = ImageIO.read(file);
+                if (bimage == null) {
+                    JOptionPane.showMessageDialog(this, "Không thể đọc ảnh từ file", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(bimage, "jpg", baos);
-                byte[] img= baos.toByteArray();
-                if(img.length > 128000){
+                boolean isWritten = ImageIO.write(bimage, "jpg", baos);
+                if (!isWritten) {
+                    JOptionPane.showMessageDialog(this, "Lỗi khi ghi ảnh vào bộ nhớ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                byte[] img = baos.toByteArray();
+                if (img.length > 1280000) {
                     JOptionPane.showMessageDialog(this, "Ảnh bạn chọn lớn hơn kích thước tối đa");
-                }else{
-                    
+                } else {
+                    updateImage(bimage, img, fileName);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
@@ -203,9 +280,33 @@ public class UserInfo extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_changeAvatarButtonActionPerformed
 
+    private void updateImage(BufferedImage bimage, byte[] img, String fileName) throws IOException {
+        try {
+//            byte[] imageData = new byte[img.length];
+            ImageIcon imageIcon = new ImageIcon(bimage.getScaledInstance(
+                    avatarImage.getWidth(), avatarImage.getHeight(), java.awt.Image.SCALE_SMOOTH));
+
+            String imagePath = ImageUtils.saveImage(img, fileName);
+            UserData updatedUser = new UserData(userData.getFirstName(), userData.getLastName(), userData.getPhone(), userData.getIdentification(), userData.getBirthday(), userData.isIsMale(), userData.getPoints());
+            updatedUser.setId(userData.getId());
+            updatedUser.setPublicKey(userData.getPublicKey());
+            updatedUser.setImagePath(imagePath);
+            boolean isSuccess = userDao.updateUser(updatedUser);
+            if (isSuccess) {
+                JOptionPane.showMessageDialog(this, "Cập nhật ảnh thành công");
+                avatarImage.setIcon(imageIcon);
+            } else {
+                JOptionPane.showMessageDialog(this, "Cập nhật ảnh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Cập nhật ảnh không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+        }
+
+    }
     private void updateInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateInfoButtonActionPerformed
         // TODO add your handling code here:
-        if(userData!=null){
+        if (userData != null) {
             this.dispose();
             UpdateUserInfo updateUserInfoView = new UpdateUserInfo(userData);
             updateUserInfoView.setVisible(true);
@@ -214,8 +315,8 @@ public class UserInfo extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        this.dispose();
         HomeView homeView = new HomeView();
+        this.dispose();
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 

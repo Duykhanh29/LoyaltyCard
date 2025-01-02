@@ -41,5 +41,7 @@ public class AppletInsConstants {
         public final static byte P1_SUB_POINT = (byte) 0x02;
         
          public final static byte INS_UNLOCK_PIN = (byte) 0x0C;
+         
+         public final static byte INS_RESET_CARD_DATA = (byte) 0x0D;
 	
 }

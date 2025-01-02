@@ -6,6 +6,7 @@ package Views;
 
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.UserDao;
 import Models.UserData;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +31,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     String initFirstName;
     String initPhone;
     String initBirthday;
+    UserDao userDao;
 
     public UpdateUserInfo(UserData userData) {
         initComponents();
@@ -37,6 +39,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
         this.userData = userData;
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+        userDao = UserDao.getInstance();
         initView(userData);
     }
 
@@ -151,27 +154,41 @@ public class UpdateUserInfo extends javax.swing.JFrame {
 
             boolean isValid = validation(firstName, lastName, phone, date);
             if (isValid) {
-                String birthday = DateTimeUtils.convertDateToString(date);
-                boolean isSucess = true;
-                if (!phone.equals(initPhone)) {
-                    userDataController.updatePhone(phone);
+                boolean canUpdatePhone = canUpdatePhone(phone);
+                if (canUpdatePhone) {
+
+                    String birthday = DateTimeUtils.convertDateToString(date);
+                    UserData updatedUser = new UserData(firstName, lastName, phone, userData.getIdentification(), birthday, userData.isIsMale(), userData.getPoints());
+                    updatedUser.setPublicKey(userData.getPublicKey());
+                    updatedUser.setId(userData.getId());
+                    updatedUser.setImagePath(userData.getImagePath());  
+                    boolean isUpdateSuccess = userDao.updateUser(updatedUser);
+                    if (isUpdateSuccess) {
+                        boolean isSucess = true;   // recognize jump to catch block
+                        if (!phone.equals(initPhone)) {
+                            userDataController.updatePhone(phone);
+                        }
+                        if (!lastName.equals(initLastName)) {
+                            userDataController.updateLastName(lastName);
+                        }
+                        if (!firstName.equals(initFirstName)) {
+                            userDataController.updateFirstName(firstName);
+                        }
+                        if (!birthday.equals(initBirthday)) {
+                            userDataController.updateBirthday(birthday);
+                        }
+                        if (isSucess) {
+                            JOptionPane.showMessageDialog(null, "Cập nhật thành công");
+                            UserInfo userInfoView = new UserInfo();
+                            this.dispose();
+                            userInfoView.setVisible(true);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Cập nhật không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+
                 }
-                if (!lastName.equals(initLastName)) {
-                    userDataController.updateLastName(lastName);
-                }
-                if (!firstName.equals(initFirstName)) {
-                    userDataController.updateFirstName(firstName);
-                }
-                if (!birthday.equals(initBirthday)) {
-                    userDataController.updateBirthday(birthday);
-                }
-                if(isSucess)
-                {
-                    JOptionPane.showMessageDialog(null, "Cập nhật thành công");
-                    this.dispose();
-                    UserInfo userInfoView = new UserInfo();
-                    userInfoView.setVisible(true);
-                }
+
             }
 
         } catch (Exception e) {
@@ -179,6 +196,22 @@ public class UpdateUserInfo extends javax.swing.JFrame {
         } finally {
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
+
+    private boolean canUpdatePhone(String phone) {
+        try {
+            UserData checkUserData = userDao.checkExistUser(phone, userData.getIdentification());
+            if (checkUserData != null) {
+                if (checkUserData.getId() == userData.getId() && checkUserData.getIdentification().equals(userData.getIdentification())) {
+                    // can update phone
+                    return true;
+                } else {
+
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
 
     private boolean validation(String firstName, String lastName, String phone, Date date) {
         if (date == null) {

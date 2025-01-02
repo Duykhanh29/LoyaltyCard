@@ -313,7 +313,7 @@ public class UserInfoThuc extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
           try {
             RSAController rsaController = new RSAController(userDataController);
-            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            boolean isVerifyRSA = rsaController.verifyRSA(this,null);
             if (isVerifyRSA) {
                 boolean isSuccess = pinController.unlockPIN();
 

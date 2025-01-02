@@ -9,6 +9,7 @@ import Controllers.PointController;
 import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import Models.UserData;
 import constants.AppletConstants;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,14 +30,19 @@ public class AccummulatePoints extends javax.swing.JFrame {
     PointController pointController;
     PinController pinController;
     UserDataController userDataController;
+    UserData userData;
 
-    public AccummulatePoints() {
+    public AccummulatePoints(UserData userData) {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.userData = userData;
         smartCardConnection = SmartCardConnection.getInstance();
         pointController = new PointController(smartCardConnection);
         pinController = new PinController(smartCardConnection);
         userDataController = new UserDataController(smartCardConnection);
+    }
+
+    private AccummulatePoints() {
     }
 
     /**
@@ -190,9 +196,10 @@ public class AccummulatePoints extends javax.swing.JFrame {
                 int pinTries = pinController.verifyPin(pin);
                 if ( pinTries  == AppletConstants.VERIFY_SUCCESS ) {
                     RSAController rsaController = new RSAController(userDataController);
-                    boolean isVerifyRSA = rsaController.verifyRSA(this);
+                    boolean isVerifyRSA = rsaController.verifyRSA(this,userData.getPublicKey());
                     if (!isVerifyRSA) {
                         JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                     boolean isSucess = pointController.updatePoint(number, true);
                     if (isSucess) {
@@ -218,8 +225,8 @@ public class AccummulatePoints extends javax.swing.JFrame {
     
     private void onBackToHomeView()
     {
-        this.dispose();
         HomeView homeView = new HomeView();
+        this.dispose();
         homeView.setVisible(true);
     }
     /**

@@ -6,6 +6,7 @@ package Views;
 
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.UserDao;
 import Models.UserData;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,11 +25,13 @@ public class HomeView extends javax.swing.JFrame {
     UserDataController userDataController;
     SmartCardConnection smartCardConnection;
     UserData userData;
+    UserDao userDao;
     public HomeView() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
+        userDao = UserDao.getInstance();
           try {
             initUserData();
         } catch (Exception ex) {
@@ -36,7 +39,9 @@ public class HomeView extends javax.swing.JFrame {
         }
     }
      private void initUserData() throws Exception{
-        userData = userDataController.readUserData();
+//        userData = userDataController.readUserData();
+        UserData cardUserData = userDataController.readUserData();
+        userData = userDao.getUserById(cardUserData.getId());
         loyaltyPointsTextView.setText(String.valueOf(userData.getPoints()));
     }
 
@@ -195,8 +200,8 @@ public class HomeView extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
 //           UserData userData = userDataController.readUserData();
-            this.dispose();
             UserInfo userInfoView = new UserInfo();
+            this.dispose();
             userInfoView.setVisible(true);
            
         } catch (Exception e) {
@@ -215,15 +220,15 @@ public class HomeView extends javax.swing.JFrame {
 
     private void chargePointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chargePointButtonActionPerformed
         // TODO add your handling code here:
+        AccummulatePoints accummulatePoints = new AccummulatePoints(userData);
         this.dispose();
-        AccummulatePoints accummulatePoints = new AccummulatePoints();
         accummulatePoints.setVisible(true);
     }//GEN-LAST:event_chargePointButtonActionPerformed
 
     private void redeemPointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redeemPointButtonActionPerformed
         // TODO add your handling code here:
-        this.dispose();
         ExchangePoints exchangePoints = new ExchangePoints(userData);
+        this.dispose();
         exchangePoints.setVisible(true);
     }//GEN-LAST:event_redeemPointButtonActionPerformed
 

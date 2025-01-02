@@ -220,7 +220,7 @@ public class ExchangePoints extends javax.swing.JFrame {
                 int pinTries = pinController.verifyPin(pin);
                 if ( pinTries  == AppletConstants.VERIFY_SUCCESS  ) {
                     RSAController rsaController = new RSAController(userDataController);
-                    boolean isVerifyRSA = rsaController.verifyRSA(this);
+                    boolean isVerifyRSA = rsaController.verifyRSA(this,userData.getPublicKey());
                     if (!isVerifyRSA) {
                         JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
@@ -252,14 +252,14 @@ public class ExchangePoints extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void onBackToHomeView() {
-        this.dispose();
         HomeView homeView = new HomeView();
+        this.dispose();
         homeView.setVisible(true);
     }
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        this.dispose();
         HomeView homeView = new HomeView();
+        this.dispose();
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
 

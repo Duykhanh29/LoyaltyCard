@@ -1,5 +1,6 @@
 package loyaltycard;
 public class User {
+	private short id;  
 	private byte[] firstName;
     private byte[] lastName;
     private byte[] phone;
@@ -18,7 +19,8 @@ public class User {
         this.identification = null;
         this.birthday = null;
         this.gender = 0;
-        this.point = 100;
+        this.point = 0;
+        this.id = 0;
     }
 		
     public void setFirstName(byte[] firstName) { this.firstName = firstName; }
@@ -37,9 +39,12 @@ public class User {
     public void setPoint(short point) {
         this.point = point;
     }
+    public void setID(short id) {
+        this.id = id;
+    }
     
 	
-
+	
     public byte[] getFirstName() { return  this.firstName; }
     public byte[] getLastName() { return this.lastName; }
     public byte[] getPhone() { return this.phone; }
@@ -49,5 +54,8 @@ public class User {
     public short getPoint() {
         return point;
     }
+    public short getId() {
+		return id;
+	}
    
 }
