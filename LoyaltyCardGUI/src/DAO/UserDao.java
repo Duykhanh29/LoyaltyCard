@@ -21,6 +21,10 @@ public class UserDao {
 
     private static final String INSERT_USER_SQL = "INSERT INTO users (firstname, last_name, phone_number, identification, birthday, gender, point, public_key, avatar) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+     private static final String UPDATE_PUBLIC_KEY_USER_SQL = "UPDATE users "
+            + "SET public_key = ? "
+            + "WHERE id = ?";
 
     private static final String UPDATE_USER_SQL = "UPDATE users "
             + "SET firstname = ?, last_name = ?, phone_number = ?, identification = ?, "
@@ -56,7 +60,7 @@ public class UserDao {
                 user.setBirthday(resultSet.getString("birthday"));
                 user.setGender(resultSet.getInt("gender"));
                 user.setPoints((short)resultSet.getInt("point"));
-                user.setPublicKey(resultSet.getString("public_key"));
+                user.setPublicKey(resultSet.getBytes("public_key"));
                 user.setImagePath(resultSet.getString("avatar"));
                 user.setCreatedAt(resultSet.getTimestamp("created_at"));
                 user.setUpdatedAt(resultSet.getTimestamp("updated_at"));
@@ -90,7 +94,7 @@ public class UserDao {
                 user.setBirthday(resultSet.getString("birthday"));
                 user.setGender(resultSet.getInt("gender"));
                 user.setPoints((short) resultSet.getInt("point"));
-                user.setPublicKey(resultSet.getString("public_key"));
+                user.setPublicKey(resultSet.getBytes("public_key"));
                 user.setImagePath(resultSet.getString("avatar"));
                 user.setCreatedAt(resultSet.getTimestamp("created_at"));
                 user.setUpdatedAt(resultSet.getTimestamp("updated_at"));
@@ -115,7 +119,7 @@ public class UserDao {
             preparedStatement.setString(5, user.getBirthday());
             preparedStatement.setInt(6, user.getGender());
             preparedStatement.setInt(7, user.getPoints());
-            preparedStatement.setString(8, user.getPublicKey());
+            preparedStatement.setBytes(8, user.getPublicKey());
             
             // image
 //            if(user.getImage()!=null)
@@ -153,9 +157,26 @@ public class UserDao {
             preparedStatement.setString(5, user.getBirthday());
             preparedStatement.setInt(6, user.getGender());
             preparedStatement.setInt(7, user.getPoints());
-            preparedStatement.setString(8, user.getPublicKey());
+            preparedStatement.setBytes(8, user.getPublicKey());
             preparedStatement.setString(9, user.getImagePath()); 
             preparedStatement.setInt(10, user.getId()); // Điều kiện WHERE
+
+            // Thực hiện câu lệnh SQL
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0; // Trả về true nếu cập nhật thành công
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu xảy ra lỗi
+    }
+    
+    public boolean updatePublicKey(UserData user) throws ClassNotFoundException {
+        try (Connection con = JDBCUtil.getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(UPDATE_PUBLIC_KEY_USER_SQL)) {
+
+            // Set giá trị vào PreparedStatement
+            preparedStatement.setBytes(1, user.getPublicKey());
+            preparedStatement.setInt(2, user.getId()); // Điều kiện WHERE
 
             // Thực hiện câu lệnh SQL
             int rowsAffected = preparedStatement.executeUpdate();

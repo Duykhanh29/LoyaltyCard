@@ -75,6 +75,10 @@ public class loyaltycard extends Applet {
 			case AppletInsConstants.INS_UNLOCK_PIN:
 				unlockPIN(apdu);
 				break;
+				
+			case AppletInsConstants.INS_RESET_CARD_DATA:
+				resetCardData(apdu);
+				break;
 	
 		case AppletInsConstants.INS_UPDATE_POINT:
 			updatePoints(apdu);
@@ -732,6 +736,19 @@ public class loyaltycard extends Applet {
         }
 
     } 
+    
+    private void resetCardData(APDU apdu)
+    {
+    	byte[] buffer = apdu.getBuffer();
+        short bytesRead = apdu.setIncomingAndReceive();
+	    user = new User();
+	    byte[] pinArr = AppletConstants.DEFAUL_PIN;
+		pin.update(pinArr, (short) 0, (byte) pinArr.length);
+
+		cipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_ECB_NOPAD, false);
+		digest = MessageDigest.getInstance(MessageDigest.ALG_SHA, false); // ALG_SHA returns with 20 byte
+		
+    }
 	
 	
 	

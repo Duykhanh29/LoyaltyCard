@@ -219,7 +219,7 @@ public class RegisterCard extends javax.swing.JFrame {
                     return;
                 }
                 byte[] img = baos.toByteArray();
-                
+
                 if (img.length > 1280000) {
                     JOptionPane.showMessageDialog(this, "Ảnh bạn chọn lớn hơn kích thước tối đa");
                 } else {
@@ -320,12 +320,22 @@ public class RegisterCard extends javax.swing.JFrame {
                 user.setImagePath(imagePath);
                 int newUserId = userDao.insertUser(user);
                 if (newUserId != -1) {
-                    boolean isSuccess = userDataController.writeUserData(newUserId, firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), pin);
+                    user.setId(newUserId);
+                    boolean isSuccess = userDataController.writeUserData(user.getId(), firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), pin);
                     if (isSuccess) {
-                        JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
-                        this.dispose();
-                        HomeView mainView = new HomeView();
-                        mainView.setVisible(true);
+                        byte[] publicKey = userDataController.readPublicKey();
+                        user.setPublicKey(publicKey);
+                        boolean isUpdatedSuccess = userDao.updatePublicKey(user);
+                        if (isUpdatedSuccess) {
+                            JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
+                            HomeView mainView = new HomeView();
+                            this.dispose();
+                            mainView.setVisible(true);
+                        }else{
+                            JOptionPane.showMessageDialog(this, "Khởi tạo không thành công");
+                            userDataController.resetCardData();
+                        }
+
                     } else {
                         JOptionPane.showMessageDialog(this, "Khởi tạo không thành công");
                     }

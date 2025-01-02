@@ -153,7 +153,7 @@ public class InitView extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
           try {
             RSAController rsaController = new RSAController(userDataController);
-            boolean isVerifyRSA = rsaController.verifyRSA(this);
+            boolean isVerifyRSA = rsaController.verifyRSA(this,null);
             if (isVerifyRSA) {
                 boolean isSuccess = pinController.unlockPIN();
 

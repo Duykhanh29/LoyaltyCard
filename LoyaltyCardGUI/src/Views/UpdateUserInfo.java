@@ -179,8 +179,8 @@ public class UpdateUserInfo extends javax.swing.JFrame {
                         }
                         if (isSucess) {
                             JOptionPane.showMessageDialog(null, "Cập nhật thành công");
-                            this.dispose();
                             UserInfo userInfoView = new UserInfo();
+                            this.dispose();
                             userInfoView.setVisible(true);
                         }
                     } else {

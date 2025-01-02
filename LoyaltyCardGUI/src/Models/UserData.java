@@ -24,10 +24,11 @@ public class UserData {
     private byte[] image;
     private short points;
     private int gender;
-    private String publicKey;
+//    private String publicKey;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private String imagePath;
+    private byte[] publicKey;
 
     public UserData() {
     }
@@ -119,9 +120,6 @@ public class UserData {
         this.gender = gender;
     }
 
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-    }
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
@@ -135,9 +133,6 @@ public class UserData {
         return gender;
     }
 
-    public String getPublicKey() {
-        return publicKey;
-    }
 
     public Timestamp getCreatedAt() {
         return createdAt;
@@ -154,7 +149,14 @@ public class UserData {
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
-    
-    
 
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    
 }
