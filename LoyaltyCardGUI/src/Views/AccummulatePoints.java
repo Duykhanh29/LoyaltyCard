@@ -17,6 +17,7 @@ import javax.swing.JPasswordField;
 import utils.ErrorHandleUtils;
 import utils.NumberUtils;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JTable;
@@ -73,31 +74,13 @@ public class AccummulatePoints extends javax.swing.JFrame {
                     {8, "xà bông", 1, 2000, 2000},
                     {9, "xúc xích", 6, 2000, 8000},
                     {10, "sữa tươi", 2, 2000, 5000},
-//                    {5, "xà bông", 1, 2000, 2000},
-//                    {6, "xúc xích", 6, 2000, 7000},
-//                    {7, "sữa tươi", 2, 2000, 2000},
-//                    {5, "xà bông", 1, 2000, 2000},
-//                    {6, "xúc xích", 6, 2000, 2000},
-//                    {7, "sữa tươi", 2, 2000, 2000},
-//                    {5, "xà bông", 1, 2000, 2000},
-//                    {6, "xúc xích", 6, 2000, 2000},
-//                    {7, "sữa tươi", 2, 2000, 2000},
-//                    {5, "xà bông", 1, 2000, 2000},
-//                    {6, "xúc xích", 6, 2000, 2000},
-//                    {7, "sữa tươi", 2, 2000, 2000},
-//                    {8, "thịt gà", 4, 2000, 2000}
+
                 },
                 new String[]{
                     "STT", "Tên Mặt Hàng", "Số Lượng", "Đơn Giá", "Thành Tiền"
                 }
         ));
 
-//        jTable1.setModel(new DefaultTableModel() {
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                return false;
-//            }
-//        });
 
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
         headerRenderer.setBackground(new Color(204, 255, 255));
@@ -120,7 +103,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        accumulatePointField = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -199,7 +182,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jLabel8.setText("Thông tin hóa đơn");
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 160, -1, -1));
 
-        jLabel14.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
         jLabel14.setText("Tổng tiền");
         getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 380, -1, -1));
 
@@ -321,27 +304,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AccummulatePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AccummulatePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AccummulatePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AccummulatePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        FlatLightLaf.setup();
         //</editor-fold>
 
         /* Create and display the form */
@@ -353,7 +316,6 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel accumulatePointField;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
