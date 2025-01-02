@@ -12,6 +12,7 @@ import Models.UserData;
 import constants.AppletConstants;
 import constants.AppletInsConstants;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import utils.StringUtils;
@@ -29,13 +30,19 @@ public class UserDataController {
     }
 
     // Ghép thông tin người dùng thành một mảng byte để lưu vào thẻ
-    public byte[] buildUserData(String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
+    public byte[] buildUserData(int userId,String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 //        if (imageData != null && imageData.length > 0) {
 //            baos.write(imageData);
 //        }
 //        baos.write('|');
+        
+        // user id
+        short convertedUserId = (short) userId; // Convert int to short
+        baos.write(ByteBuffer.allocate(2).putShort(convertedUserId).array());
+        baos.write('|');
+        
         // firstName 
         baos.write(firstName.getBytes(StandardCharsets.UTF_8));
         baos.write('|');
@@ -78,8 +85,8 @@ public class UserDataController {
         return isSuccess(response.getBytes());
     }
 
-    public boolean writeUserData(String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
-        byte[] userData = buildUserData(firstName, lastName, phone, cccd, birthday, isMale, pin);
+    public boolean writeUserData(int userId,String firstName, String lastName, String phone, String cccd, String birthday, boolean isMale, String pin) throws Exception {
+        byte[] userData = buildUserData(userId , firstName, lastName, phone, cccd, birthday, isMale, pin);
         byte[] command = buildWriteAPDU(userData);
         ResponseAPDU response = smartCardConnection.getChannel().transmit(new CommandAPDU(command));
         if (!isSuccess(response.getBytes())) {
@@ -229,9 +236,12 @@ public class UserDataController {
 
     // Parse user data from byte[] (including name, age, photo, PIN)
     public UserData parseUserData(byte[] userData) throws Exception {
-
-        byte[] pointBytes = Arrays.copyOfRange(userData, userData.length - 2, userData.length);
-        byte[] userWihoutPoint = Arrays.copyOfRange(userData, 0, userData.length - 2);
+        
+        byte[] userIdBytes = Arrays.copyOfRange(userData, 0, 2);
+        byte[] userWihoutId = Arrays.copyOfRange(userData, 2, userData.length);
+        
+        byte[] pointBytes = Arrays.copyOfRange(userWihoutId, userWihoutId.length - 2, userWihoutId.length);
+        byte[] userWihoutPoint = Arrays.copyOfRange(userWihoutId, 0, userWihoutId.length - 2);
         // Convert byte[] to string and split by separator '|'
         String dataString = new String(userWihoutPoint, StandardCharsets.UTF_8);
         String[] fields = dataString.split("\\|");
@@ -257,7 +267,15 @@ public class UserDataController {
 
 //        byte[] imageData = Arrays.copyOfRange(userData, dataString.indexOf(fields[2]), dataString.lastIndexOf(fields[2]));
 //        String pin = fields[3];
-        return new UserData(firstName, lastName, phone, identification, birthday, isMale, point);
+
+        short id = 0;
+        if (pointBytes.length == 2) {
+            id = (short) ((userIdBytes[0] << 8) | (userIdBytes[1] & 0xFF));
+        }
+        int userId = (int) id;
+        UserData user = new UserData(firstName, lastName, phone, identification, birthday, isMale, point);
+        user.setId(userId);
+        return user;
     }
 
     // Function to find the position of the first delimiter '|' in the byte array

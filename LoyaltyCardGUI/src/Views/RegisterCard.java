@@ -7,6 +7,8 @@ package Views;
 import Controllers.PinController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.UserDao;
+import Models.UserData;
 import constants.AppletConstants;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -25,6 +27,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import utils.AppUtils;
 import utils.DateTimeUtils;
 import utils.ErrorHandleUtils;
+import utils.ImageUtils;
 import utils.TextUtils;
 
 /**
@@ -40,6 +43,9 @@ public class RegisterCard extends javax.swing.JFrame {
     UserDataController userDataController;
     SmartCardConnection smartCardConnection;
     byte[] imageData;
+    UserDao userDao;
+    UserData user;
+    String imagePath;
 
     public RegisterCard() {
         initComponents();
@@ -47,6 +53,7 @@ public class RegisterCard extends javax.swing.JFrame {
         smartCardConnection = SmartCardConnection.getInstance();
         pinController = new PinController(smartCardConnection);
         userDataController = new UserDataController(smartCardConnection);
+        userDao = UserDao.getInstance();
     }
 
     /**
@@ -191,18 +198,29 @@ public class RegisterCard extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "Image Files (JPG)", "jpg");
+                "Image Files (JPG, PNG)", "jpg", "png");
         fileChooser.setFileFilter(filter);
         int value = fileChooser.showOpenDialog(this);
         if (value == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+            String fileName = file.getName(); // Chỉ lấy tên file (ví dụ: "example.jpg")
+            String filePath = file.getAbsolutePath();
             BufferedImage bimage;
             try {
                 bimage = ImageIO.read(file);
+                if (bimage == null) {
+                    JOptionPane.showMessageDialog(this, "Không thể đọc ảnh từ file", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(bimage, "jpg", baos);
+                boolean isWritten = ImageIO.write(bimage, "jpg", baos);
+                if (!isWritten) {
+                    JOptionPane.showMessageDialog(this, "Lỗi khi ghi ảnh vào bộ nhớ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 byte[] img = baos.toByteArray();
-                if (img.length > 128000) {
+                
+                if (img.length > 1280000) {
                     JOptionPane.showMessageDialog(this, "Ảnh bạn chọn lớn hơn kích thước tối đa");
                 } else {
                     imageData = new byte[img.length];
@@ -211,6 +229,7 @@ public class RegisterCard extends javax.swing.JFrame {
                             avatarImage.getWidth(), avatarImage.getHeight(), java.awt.Image.SCALE_SMOOTH));
                     avatarImage.setIcon(imageIcon);
                     JOptionPane.showMessageDialog(this, "Ảnh chọn thành công");
+                    imagePath = ImageUtils.saveImage(imageData, fileName);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
@@ -240,7 +259,7 @@ public class RegisterCard extends javax.swing.JFrame {
             String phone = "0987654321";
             String birthday = "02-09-2002";
             String identification = "12345678";
-            boolean isSuccess = userDataController.writeUserData(firstName, lastName, phone, identification, birthday, true, "123456");
+            boolean isSuccess = userDataController.writeUserData(1, firstName, lastName, phone, identification, birthday, true, "123456");
             if (isSuccess) {
                 JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
                 this.dispose();
@@ -272,19 +291,7 @@ public class RegisterCard extends javax.swing.JFrame {
             boolean isValid = validation(firstName, lastName, phone, identification, date, pin, confirmPin);
 
             if (isValid) {
-                if (!pin.equals(confirmPin)) {
-                    JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
-                } else {
-                    boolean isSuccess = userDataController.writeUserData(firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), pin);
-                    if (isSuccess) {
-                        JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
-                        this.dispose();
-                        HomeView mainView = new HomeView();
-                        mainView.setVisible(true);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Khởi tạo không thành công thành công");
-                    }
-                }
+                onHandleRegister(pin, confirmPin, firstName, lastName, phone, identification, birthday);
             }
 
         } catch (Exception e) {
@@ -292,7 +299,44 @@ public class RegisterCard extends javax.swing.JFrame {
         } finally {
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
+    private void onHandleRegister(String pin, String confirmPin, String firstName, String lastName, String phone, String identification, String birthday) {
+        try {
+            if (!pin.equals(confirmPin)) {
+                JOptionPane.showMessageDialog(this, "Mã pin không trùng khớp");
+            } else {
+                UserData checkUserData = userDao.checkExistUser(phone, identification);
+                if (checkUserData != null) {
+                    if (checkUserData.getPhone().equals(phone)) {
+                        JOptionPane.showMessageDialog(this, "Số điện thoại đã tồn tại trong hệ thống");
+                    } else if (checkUserData.getIdentification().equals(identification)) {
+                        JOptionPane.showMessageDialog(this, "Căn cước công dân này đã tồn tại trong hệ thống");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Lỗi không khởi tạo được thẻ");
+                    }
+                    return;
+                }
+                user = new UserData(firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), (short) 0);
+                user.setImage(imageData);
+                user.setImagePath(imagePath);
+                int newUserId = userDao.insertUser(user);
+                if (newUserId != -1) {
+                    boolean isSuccess = userDataController.writeUserData(newUserId, firstName, lastName, phone, identification, birthday, maleRadioButton.isSelected(), pin);
+                    if (isSuccess) {
+                        JOptionPane.showMessageDialog(this, "Khởi tạo thành công");
+                        this.dispose();
+                        HomeView mainView = new HomeView();
+                        mainView.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Khởi tạo không thành công");
+                    }
+                }
 
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Khởi tạo không thành công");
+        } finally {
+        }
+    }
     private void pinTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pinTextFieldActionPerformed
@@ -313,13 +357,13 @@ public class RegisterCard extends javax.swing.JFrame {
             phoneTextField.requestFocus();
             return false;
         }
-        
+
         if (!TextUtils.isValidPhone(phone)) {
             JOptionPane.showMessageDialog(null, "Số điện thoại không đúng định dạng");
             phoneTextField.requestFocus();
             return false;
         }
-        
+
         if (identification.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Trường căn cước công dân không được để trống");
             identifierTextField.requestFocus();
@@ -361,20 +405,19 @@ public class RegisterCard extends javax.swing.JFrame {
             pinTextField.requestFocus();
             return false;
         }
-        
+
         String defaultPIN = AppUtils.byteArrayToText(AppletConstants.DEFAUL_PIN);
-        if(pin.equals(defaultPIN))
-        {
+        if (pin.equals(defaultPIN)) {
             JOptionPane.showMessageDialog(this, "Mã PIN không được trùng với mã mặc định");
             pinTextField.requestFocus();
             return false;
         }
 
         // image
-//            if (imageData == null || imageData.length == 0) {
-//                JOptionPane.showMessageDialog(this, "Bạn cần phải chọn ảnh");
-//                return;
-//            }
+        if (imageData == null || imageData.length == 0 || imagePath == null) {
+            JOptionPane.showMessageDialog(this, "Bạn cần phải chọn ảnh");
+            return false;
+        }
         return true;
     }
 

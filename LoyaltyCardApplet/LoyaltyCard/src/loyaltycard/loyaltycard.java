@@ -365,7 +365,15 @@ public class loyaltycard extends Applet {
 	private void parseUserData(byte[] buffer, short bytesRead) {
 		short pos = 0;
 		byte[] name = { 1, 2, 3, 4 };
+		
+		// Parse userId (short)
+		short userId = Util.getShort(buffer, pos);
+		user.setID(userId);
+		pos += 2; // short takes 2 bytes
 
+		// Ignore the '|' separator
+		pos += 1;
+		
 		byte[] firstName = parseByteArrayUntilDelimiter(buffer, pos);
 		byte[] firstNAME = encryptField(firstName);
 		user.setFirstName(firstNAME);
@@ -456,7 +464,11 @@ public class loyaltycard extends Applet {
 	private void sendUserData(APDU apdu) {
 		byte[] tempData = new byte[1024];
 		short bytesSent = (short) 0;
-
+		
+		short id = user.getId();
+		Util.setShort(tempData, bytesSent, id);
+		bytesSent += 2; 
+		
 		bytesSent = safeSendFieldData(user.getFirstName(), tempData, bytesSent);
 		bytesSent = safeSendFieldData(user.getLastName(), tempData, bytesSent);
 		bytesSent = safeSendFieldData(user.getPhone(), tempData, bytesSent);
@@ -469,8 +481,8 @@ public class loyaltycard extends Applet {
 		tempData[bytesSent++] = (byte) '|';
 		
 		short point = user.getPoint();
-    Util.setShort(tempData, bytesSent, point);
-    bytesSent += 2; 
+		Util.setShort(tempData, bytesSent, point);
+		bytesSent += 2; 
 		
 		if (bytesSent > tempData.length) {
 			ISOException.throwIt(ISO7816.SW_DATA_INVALID);

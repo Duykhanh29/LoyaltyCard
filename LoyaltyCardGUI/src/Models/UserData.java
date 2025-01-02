@@ -18,7 +18,6 @@ public class UserData {
     private String lastName;
     private boolean isMale;
     private String identification;
-//    private byte[] imageData;
 //    private String pin;
     private String birthday;
     private String phone;
@@ -28,6 +27,7 @@ public class UserData {
     private String publicKey;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String imagePath;
 
     public UserData() {
     }
@@ -146,5 +146,15 @@ public class UserData {
     public Timestamp getUpdatedAt() {
         return updatedAt;
     }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
     
+    
+
 }

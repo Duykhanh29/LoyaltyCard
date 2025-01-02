@@ -24,7 +24,7 @@ public class UserDao {
 
     private static final String UPDATE_USER_SQL = "UPDATE users "
             + "SET firstname = ?, last_name = ?, phone_number = ?, identification = ?, "
-            + "birthday = ?, gender = ?, point = ?, public_key = ?, avatar = ?"
+            + "birthday = ?, gender = ?, point = ?, public_key = ?, avatar = ? "
             + "WHERE id = ?";
 
     private static final String GET_USER_BY_ID_SQL = "SELECT * "
@@ -57,9 +57,9 @@ public class UserDao {
                 user.setGender(resultSet.getInt("gender"));
                 user.setPoints((short)resultSet.getInt("point"));
                 user.setPublicKey(resultSet.getString("public_key"));
-//                user.setAvatar(resultSet.getString("avatar"));
+                user.setImagePath(resultSet.getString("avatar"));
                 user.setCreatedAt(resultSet.getTimestamp("created_at"));
-                user.setUpdatedAt(resultSet.getTimestamp("update_at"));
+                user.setUpdatedAt(resultSet.getTimestamp("updated_at"));
             }
 
         } catch (SQLException e) {
@@ -91,7 +91,7 @@ public class UserDao {
                 user.setGender(resultSet.getInt("gender"));
                 user.setPoints((short) resultSet.getInt("point"));
                 user.setPublicKey(resultSet.getString("public_key"));
-                // user.setAvatar(resultSet.getString("avatar"));
+                user.setImagePath(resultSet.getString("avatar"));
                 user.setCreatedAt(resultSet.getTimestamp("created_at"));
                 user.setUpdatedAt(resultSet.getTimestamp("updated_at"));
                 return user;
@@ -116,8 +116,17 @@ public class UserDao {
             preparedStatement.setInt(6, user.getGender());
             preparedStatement.setInt(7, user.getPoints());
             preparedStatement.setString(8, user.getPublicKey());
-            preparedStatement.setString(9, null);
+            
+            // image
+//            if(user.getImage()!=null)
+//            {
+//                preparedStatement.setBytes(9, user.getImage());
+//            }else{
+//                preparedStatement.setNull(9, java.sql.Types.BLOB); 
+//            }
 
+             preparedStatement.setString(9, user.getImagePath());
+            
             // Thực hiện câu lệnh SQL
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -145,7 +154,7 @@ public class UserDao {
             preparedStatement.setInt(6, user.getGender());
             preparedStatement.setInt(7, user.getPoints());
             preparedStatement.setString(8, user.getPublicKey());
-            preparedStatement.setString(9, null);
+            preparedStatement.setString(9, user.getImagePath()); 
             preparedStatement.setInt(10, user.getId()); // Điều kiện WHERE
 
             // Thực hiện câu lệnh SQL
