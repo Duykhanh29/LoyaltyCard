@@ -4,6 +4,7 @@
  */
 package Views;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import constants.AppletConstants;
 import utils.AppUtils;
 
@@ -45,7 +46,8 @@ public class ExchangePoints extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         noticeText = new javax.swing.JLabel();
-        noticeText1 = new javax.swing.JLabel();
+        jScrollPane1 = new scroll.win11.ScrollPaneWin11();
+        jPanel1 = new javax.swing.JPanel();
         jLable_img_1K = new javax.swing.JLabel();
         jLabelTile_1K = new javax.swing.JLabel();
         jLabelPoint_1K = new javax.swing.JLabel();
@@ -53,6 +55,12 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabelDetail_1K = new javax.swing.JLabel();
         jLabel_gift_1K = new javax.swing.JLabel();
         lbbg_1 = new javax.swing.JLabel();
+        jLable_img_3 = new javax.swing.JLabel();
+        jLabelTile_3 = new javax.swing.JLabel();
+        jLabelPoint_3 = new javax.swing.JLabel();
+        jLabelDate_3 = new javax.swing.JLabel();
+        jLabelDetail_3 = new javax.swing.JLabel();
+        jLabel_gift_3 = new javax.swing.JLabel();
         jLable_img_2K = new javax.swing.JLabel();
         jLabelTile_2K = new javax.swing.JLabel();
         jLabelPoint_2K = new javax.swing.JLabel();
@@ -60,13 +68,6 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabelDetail_2K = new javax.swing.JLabel();
         jLabel_gift_2K = new javax.swing.JLabel();
         lbbg_2 = new javax.swing.JLabel();
-        jLable_img_3 = new javax.swing.JLabel();
-        jLabelTile_3 = new javax.swing.JLabel();
-        jLabelPoint_3 = new javax.swing.JLabel();
-        jLabelDate_3 = new javax.swing.JLabel();
-        jLabelDetail_3 = new javax.swing.JLabel();
-        jLabel_gift_3 = new javax.swing.JLabel();
-        lbbg_3 = new javax.swing.JLabel();
         jLable_img_4 = new javax.swing.JLabel();
         jLabelTile_4 = new javax.swing.JLabel();
         jLabelPoint_4 = new javax.swing.JLabel();
@@ -74,6 +75,21 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabelDetail_4 = new javax.swing.JLabel();
         jLabel_gift_4 = new javax.swing.JLabel();
         lbbg_4 = new javax.swing.JLabel();
+        jLable_img_1K1 = new javax.swing.JLabel();
+        jLabelTile_1K1 = new javax.swing.JLabel();
+        jLabelPoint_1K1 = new javax.swing.JLabel();
+        jLabelDate_1K1 = new javax.swing.JLabel();
+        jLabelDetail_1K1 = new javax.swing.JLabel();
+        jLabel_gift_1K1 = new javax.swing.JLabel();
+        lbbg_3 = new javax.swing.JLabel();
+        jLable_img_2K1 = new javax.swing.JLabel();
+        jLabelTile_2K1 = new javax.swing.JLabel();
+        jLabelPoint_2K1 = new javax.swing.JLabel();
+        jLabelDate_2K1 = new javax.swing.JLabel();
+        jLabelDetail_2K1 = new javax.swing.JLabel();
+        jLabel_gift_2K1 = new javax.swing.JLabel();
+        lbbg_5 = new javax.swing.JLabel();
+        lbbg_6 = new javax.swing.JLabel();
         jbbackground = new javax.swing.JLabel();
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
@@ -99,7 +115,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabel3.setBackground(new java.awt.Color(255, 0, 0));
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel3.setText("Tổng điểm hiện có: ");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 370, -1, -1));
 
         jButton1.setBackground(new java.awt.Color(204, 255, 255));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -109,11 +125,11 @@ public class ExchangePoints extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 360, 160, 40));
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 420, 160, 40));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("2002");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 310, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 370, -1, -1));
 
         jButton3.setBackground(new java.awt.Color(204, 204, 255));
         jButton3.setForeground(new java.awt.Color(0, 0, 51));
@@ -133,28 +149,29 @@ public class ExchangePoints extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 0, 90, -1));
+        getContentPane().add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 0, 90, -1));
 
         noticeText.setForeground(new java.awt.Color(255, 51, 51));
         noticeText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(noticeText, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 280, 430, 24));
+        getContentPane().add(noticeText, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 340, 430, 24));
 
-        noticeText1.setForeground(new java.awt.Color(255, 51, 51));
-        noticeText1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(noticeText1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 450, 24));
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLable_img_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png"))); // NOI18N
-        getContentPane().add(jLable_img_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 60, 60));
+        jPanel1.add(jLable_img_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
 
         jLabelTile_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelTile_1K.setText("VOUCHER GIẢM 20K");
-        getContentPane().add(jLabelTile_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 130, -1, -1));
+        jPanel1.add(jLabelTile_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, -1, -1));
 
         jLabelPoint_1K.setText("Cần 10.000 điểm để quy đổi");
-        getContentPane().add(jLabelPoint_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
+        jPanel1.add(jLabelPoint_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, -1, -1));
 
         jLabelDate_1K.setText("Date: 15/01/2025 ");
-        getContentPane().add(jLabelDate_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, -1, -1));
+        jPanel1.add(jLabelDate_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, -1, -1));
 
         jLabelDetail_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K.setForeground(new java.awt.Color(255, 51, 51));
@@ -164,88 +181,145 @@ public class ExchangePoints extends javax.swing.JFrame {
                 moveDetail(evt);
             }
         });
-        getContentPane().add(jLabelDetail_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 170, 40, -1));
+        jPanel1.add(jLabelDetail_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 40, -1));
 
         jLabel_gift_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
-        getContentPane().add(jLabel_gift_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 130, 50, 40));
+        jPanel1.add(jLabel_gift_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 10, -1, 40));
 
         lbbg_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
-        getContentPane().add(lbbg_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 290, 60));
-
-        jLable_img_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_50K_60x60.png"))); // NOI18N
-        getContentPane().add(jLable_img_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 130, 60, 60));
-
-        jLabelTile_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabelTile_2K.setText("VOUCHER GIẢM 50K");
-        getContentPane().add(jLabelTile_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 130, -1, -1));
-
-        jLabelPoint_2K.setText("Cần 10.000 điểm để quy đổi");
-        getContentPane().add(jLabelPoint_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 150, -1, -1));
-
-        jLabelDate_2K.setText("Date: 15/01/2025 ");
-        getContentPane().add(jLabelDate_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 170, -1, -1));
-
-        jLabelDetail_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabelDetail_2K.setForeground(new java.awt.Color(255, 51, 51));
-        jLabelDetail_2K.setText("Detail");
-        getContentPane().add(jLabelDetail_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 170, 40, -1));
-
-        jLabel_gift_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
-        getContentPane().add(jLabel_gift_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 130, 50, 40));
-
-        lbbg_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
-        getContentPane().add(lbbg_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 130, 290, 60));
+        jPanel1.add(lbbg_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 290, 60));
 
         jLable_img_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_100K_60x60.png"))); // NOI18N
-        getContentPane().add(jLable_img_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 60, 60));
+        jPanel1.add(jLable_img_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
 
         jLabelTile_3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelTile_3.setText("VOUCHER GIẢM 100K");
-        getContentPane().add(jLabelTile_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 210, -1, -1));
+        jPanel1.add(jLabelTile_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
 
         jLabelPoint_3.setText("Cần 10.000 điểm để quy đổi");
-        getContentPane().add(jLabelPoint_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 230, -1, -1));
+        jPanel1.add(jLabelPoint_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, -1));
 
         jLabelDate_3.setText("Date: 15/01/2025 ");
-        getContentPane().add(jLabelDate_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 250, -1, -1));
+        jPanel1.add(jLabelDate_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 130, -1, -1));
 
         jLabelDetail_3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_3.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_3.setText("Detail");
-        getContentPane().add(jLabelDetail_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 250, 40, -1));
+        jPanel1.add(jLabelDetail_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 130, 40, -1));
 
         jLabel_gift_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
-        getContentPane().add(jLabel_gift_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 210, 50, 40));
+        jPanel1.add(jLabel_gift_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 90, -1, 40));
 
-        lbbg_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
-        getContentPane().add(lbbg_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 290, 60));
+        jLable_img_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_50K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, -1, -1));
+
+        jLabelTile_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_2K.setText("VOUCHER GIẢM 50K");
+        jPanel1.add(jLabelTile_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 10, -1, -1));
+
+        jLabelPoint_2K.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 30, -1, -1));
+
+        jLabelDate_2K.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 50, -1, -1));
+
+        jLabelDetail_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_2K.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_2K.setText("Detail");
+        jPanel1.add(jLabelDetail_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 50, 40, -1));
+
+        jLabel_gift_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 10, -1, 40));
+
+        lbbg_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        jPanel1.add(lbbg_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, 290, 60));
 
         jLable_img_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_200K_60x60.png"))); // NOI18N
-        getContentPane().add(jLable_img_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 210, 60, 60));
+        jPanel1.add(jLable_img_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, -1, -1));
 
         jLabelTile_4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelTile_4.setText("VOUCHER GIẢM 200K");
-        getContentPane().add(jLabelTile_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 210, -1, -1));
+        jPanel1.add(jLabelTile_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, -1, -1));
 
         jLabelPoint_4.setText("Cần 10.000 điểm để quy đổi");
-        getContentPane().add(jLabelPoint_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 230, -1, -1));
+        jPanel1.add(jLabelPoint_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 110, -1, -1));
 
         jLabelDate_4.setText("Date: 15/01/2025 ");
-        getContentPane().add(jLabelDate_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 250, -1, -1));
+        jPanel1.add(jLabelDate_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 130, -1, -1));
 
         jLabelDetail_4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_4.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_4.setText("Detail");
-        getContentPane().add(jLabelDetail_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 250, 40, -1));
+        jPanel1.add(jLabelDetail_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 130, 40, -1));
 
         jLabel_gift_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
-        getContentPane().add(jLabel_gift_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 210, 50, 40));
+        jPanel1.add(jLabel_gift_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 90, -1, 40));
 
         lbbg_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
-        getContentPane().add(lbbg_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 210, 290, 60));
+        jPanel1.add(lbbg_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, 290, 60));
+
+        jLable_img_1K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
+
+        jLabelTile_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_1K1.setText("VOUCHER GIẢM 20K");
+        jPanel1.add(jLabelTile_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
+
+        jLabelPoint_1K1.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, -1, -1));
+
+        jLabelDate_1K1.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 210, -1, -1));
+
+        jLabelDetail_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_1K1.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_1K1.setText("Detail");
+        jLabelDetail_1K1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabelDetail_1K1moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 210, 40, -1));
+
+        jLabel_gift_1K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 170, -1, 40));
+
+        lbbg_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        jPanel1.add(lbbg_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, 290, 60));
+
+        jLable_img_2K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_50K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, -1, -1));
+
+        jLabelTile_2K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_2K1.setText("VOUCHER GIẢM 50K");
+        jPanel1.add(jLabelTile_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 170, -1, -1));
+
+        jLabelPoint_2K1.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 190, -1, -1));
+
+        jLabelDate_2K1.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 210, -1, -1));
+
+        jLabelDetail_2K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_2K1.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_2K1.setText("Detail");
+        jPanel1.add(jLabelDetail_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 210, 40, -1));
+
+        jLabel_gift_2K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 170, -1, 40));
+
+        lbbg_5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        jPanel1.add(lbbg_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, 290, 60));
+
+        lbbg_6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        jPanel1.add(lbbg_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 290, 60));
+
+        jScrollPane1.setViewportView(jPanel1);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, 700, 190));
 
         jbbackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_800x533.jpg"))); // NOI18N
-        getContentPane().add(jbbackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 760, 470));
+        getContentPane().add(jbbackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 800, 470));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -282,31 +356,15 @@ public class ExchangePoints extends javax.swing.JFrame {
         detailVoucher.setVisible(true);
     }//GEN-LAST:event_moveDetail
 
+    private void jLabelDetail_1K1moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelDetail_1K1moveDetail
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabelDetail_1K1moveDetail
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        FlatLightLaf.setup();
         //</editor-fold>
 
         /* Create and display the form */
@@ -327,35 +385,50 @@ public class ExchangePoints extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelDate_1K;
+    private javax.swing.JLabel jLabelDate_1K1;
     private javax.swing.JLabel jLabelDate_2K;
+    private javax.swing.JLabel jLabelDate_2K1;
     private javax.swing.JLabel jLabelDate_3;
     private javax.swing.JLabel jLabelDate_4;
     private javax.swing.JLabel jLabelDetail_1K;
+    private javax.swing.JLabel jLabelDetail_1K1;
     private javax.swing.JLabel jLabelDetail_2K;
+    private javax.swing.JLabel jLabelDetail_2K1;
     private javax.swing.JLabel jLabelDetail_3;
     private javax.swing.JLabel jLabelDetail_4;
     private javax.swing.JLabel jLabelPoint_1K;
+    private javax.swing.JLabel jLabelPoint_1K1;
     private javax.swing.JLabel jLabelPoint_2K;
+    private javax.swing.JLabel jLabelPoint_2K1;
     private javax.swing.JLabel jLabelPoint_3;
     private javax.swing.JLabel jLabelPoint_4;
     private javax.swing.JLabel jLabelTile_1K;
+    private javax.swing.JLabel jLabelTile_1K1;
     private javax.swing.JLabel jLabelTile_2K;
+    private javax.swing.JLabel jLabelTile_2K1;
     private javax.swing.JLabel jLabelTile_3;
     private javax.swing.JLabel jLabelTile_4;
     private javax.swing.JLabel jLabel_gift_1K;
+    private javax.swing.JLabel jLabel_gift_1K1;
     private javax.swing.JLabel jLabel_gift_2K;
+    private javax.swing.JLabel jLabel_gift_2K1;
     private javax.swing.JLabel jLabel_gift_3;
     private javax.swing.JLabel jLabel_gift_4;
     private javax.swing.JLabel jLable_img_1K;
+    private javax.swing.JLabel jLable_img_1K1;
     private javax.swing.JLabel jLable_img_2K;
+    private javax.swing.JLabel jLable_img_2K1;
     private javax.swing.JLabel jLable_img_3;
     private javax.swing.JLabel jLable_img_4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jbbackground;
     private javax.swing.JLabel lbbg_1;
     private javax.swing.JLabel lbbg_2;
     private javax.swing.JLabel lbbg_3;
     private javax.swing.JLabel lbbg_4;
+    private javax.swing.JLabel lbbg_5;
+    private javax.swing.JLabel lbbg_6;
     private javax.swing.JLabel noticeText;
-    private javax.swing.JLabel noticeText1;
     // End of variables declaration//GEN-END:variables
 }
