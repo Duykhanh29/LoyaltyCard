@@ -4,6 +4,7 @@
  */
 package Views;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Font;
@@ -29,6 +30,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jTable1.getTableHeader().setBackground(new Color(204, 255, 255));
         jTable1.getTableHeader().setForeground(new Color(255, 255, 255));
         jTable1.setRowHeight(25);
+        jTextField1.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập mã hóa đơn để tìm kiếm");
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
