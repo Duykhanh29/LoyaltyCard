@@ -10,8 +10,10 @@ import utils.JDBCUtil;
 public class PointTransactionDao {
 
     // SQL query để lấy danh sách giao dịch điểm theo user_id
-    private static final String GET_TRANSACTIONS_BY_USER_SQL = 
-            "SELECT * FROM point_transactions WHERE user_id = ?";
+    private static final String GET_TRANSACTIONS_BY_USER_SQL = "SELECT * FROM point_transactions WHERE user_id = ?";
+
+    private static final String INSERT_POINT_TRANSACTION_SQL = "INSERT INTO point_transactions (user_id, transaction_type, points, description, resource_id, resource_type, created_at) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     // Hàm lấy danh sách giao dịch điểm theo user_id
     public List<PointsTransaction> getTransactionsByUserId(int userId) throws SQLException, ClassNotFoundException {
@@ -19,7 +21,7 @@ public class PointTransactionDao {
 
         // Kết nối cơ sở dữ liệu
         try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement preparedStatement = con.prepareStatement(GET_TRANSACTIONS_BY_USER_SQL)) {
+                PreparedStatement preparedStatement = con.prepareStatement(GET_TRANSACTIONS_BY_USER_SQL)) {
 
             // Set giá trị user_id vào PreparedStatement
             preparedStatement.setInt(1, userId);
@@ -37,7 +39,7 @@ public class PointTransactionDao {
                     Timestamp createdAt = resultSet.getTimestamp("created_at");
 
                     // Tạo đối tượng PointTransaction và thêm vào danh sách
-                    PointsTransaction transaction = new PointsTransaction(id, userId, transactionType, points, 
+                    PointsTransaction transaction = new PointsTransaction(id, userId, transactionType, points,
                             description, resourceId, resourceType, createdAt);
                     transactions.add(transaction);
                 }
@@ -46,5 +48,24 @@ public class PointTransactionDao {
 
         return transactions;
     }
-}
 
+    public boolean insertPointTransaction(PointsTransaction pointTransaction) throws ClassNotFoundException {
+        try (Connection connection = JDBCUtil.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POINT_TRANSACTION_SQL)) {
+
+            preparedStatement.setInt(1, pointTransaction.getUserId());
+            preparedStatement.setString(2, pointTransaction.getTransactionType());
+            preparedStatement.setInt(3, pointTransaction.getPoints());
+            preparedStatement.setString(4, pointTransaction.getDescription());
+            preparedStatement.setInt(5, pointTransaction.getResourceId());
+            preparedStatement.setString(6, pointTransaction.getResourceType());
+            preparedStatement.setTimestamp(7, pointTransaction.getCreatedAt());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
