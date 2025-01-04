@@ -17,6 +17,8 @@ public class VoucherList extends javax.swing.JFrame {
      */
     public VoucherList() {
         initComponents();
+        this.setLocationRelativeTo(null);
+
     }
 
     /**
@@ -99,6 +101,11 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K.setText("Detail");
+        jLabelDetail_1K.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
         jPanel1.add(jLabelDetail_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 40, -1));
 
         jLabel_gift_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
@@ -124,6 +131,11 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K1.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K1.setText("Detail");
+        jLabelDetail_1K1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
         jPanel1.add(jLabelDetail_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 110, 40, -1));
 
         jLabelPoint_1K1.setText("Cần 10.000 điểm để quy đổi");
@@ -148,6 +160,11 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K2.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K2.setText("Detail");
+        jLabelDetail_1K2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
         jPanel1.add(jLabelDetail_1K2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 40, -1));
 
         jLabel_gift_1K2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
@@ -172,6 +189,11 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K3.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K3.setText("Detail");
+        jLabelDetail_1K3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
         jPanel1.add(jLabelDetail_1K3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 250, 40, -1));
 
         jLabel_gift_1K3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
@@ -182,7 +204,7 @@ public class VoucherList extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(jPanel1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 310, 200));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 310, 210));
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
         jButton2.setForeground(new java.awt.Color(0, 0, 51));
@@ -206,6 +228,13 @@ public class VoucherList extends javax.swing.JFrame {
         ExchangePoints exchangePoints = new ExchangePoints();
         exchangePoints.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
+        this.dispose();
+        DetailVoucher detailVoucher = new DetailVoucher();
+        detailVoucher.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_moveDetail
 
     /**
      * @param args the command line arguments
