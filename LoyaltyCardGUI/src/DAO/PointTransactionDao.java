@@ -8,12 +8,16 @@ import Models.PointsTransaction;
 import utils.JDBCUtil;
 
 public class PointTransactionDao {
+    
+    public static PointTransactionDao getInstance() {
+        return new PointTransactionDao();
+    }
 
     // SQL query để lấy danh sách giao dịch điểm theo user_id
     private static final String GET_TRANSACTIONS_BY_USER_SQL = "SELECT * FROM point_transactions WHERE user_id = ?";
 
-    private static final String INSERT_POINT_TRANSACTION_SQL = "INSERT INTO point_transactions (user_id, transaction_type, points, description, resource_id, resource_type, created_at) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_POINT_TRANSACTION_SQL = "INSERT INTO point_transactions (user_id, transaction_type, points, description, resource_id, resource_type) "
+            + "VALUES (?, ?, ?, ?, ?, ?)";
 
     // Hàm lấy danh sách giao dịch điểm theo user_id
     public List<PointsTransaction> getTransactionsByUserId(int userId) throws SQLException, ClassNotFoundException {
@@ -59,7 +63,6 @@ public class PointTransactionDao {
             preparedStatement.setString(4, pointTransaction.getDescription());
             preparedStatement.setInt(5, pointTransaction.getResourceId());
             preparedStatement.setString(6, pointTransaction.getResourceType());
-            preparedStatement.setTimestamp(7, pointTransaction.getCreatedAt());
 
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;

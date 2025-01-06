@@ -22,6 +22,12 @@ import Controllers.PointController;
 import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.InvoiceDao;
+import DAO.PointTransactionDao;
+import DAO.UserDao;
+import Models.Invoice;
+import Models.Order;
+import Models.PointsTransaction;
 import Models.UserData;
 import constants.AppletConstants;
 import javax.swing.JFrame;
@@ -32,8 +38,15 @@ import utils.NumberUtils;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
+import constants.Constants;
 import java.awt.Color;
 import java.awt.Font;
+import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -53,6 +66,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
     PinController pinController;
     UserDataController userDataController;
     UserData userData;
+    private static Invoice invoice;
 
     public AccummulatePoints(UserData userData) {
         initComponents();
@@ -66,37 +80,25 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }
 
     private AccummulatePoints() {
-       
+
     }
-    private void initViews()
-    {
-        currentPointView.setText(userData.getPoints()+"");
+
+    private void initViews() {
+        currentPointView.setText(userData.getPoints() + "");
         jTable1.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         jTable1.getTableHeader().setOpaque(false);
         jTable1.getTableHeader().setBackground(new Color(204, 255, 255));
         jTable1.getTableHeader().setForeground(new Color(255, 255, 255));
         jTable1.setRowHeight(25);
         jTextField1.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập mã hóa đơn để tìm kiếm");
-
+        jLabel5.setText("");
+        currentPointView.setText("");
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                    {1, "xà bông", 1, 2000, 2000},
-                    {2, "xúc xích", 6, 2000, 3400},
-                    {3, "sữa tươi", 2, 2000, 4500},
-                    {4, "thịt gà", 4, 2000, 12000},
-                    {5, "xà bông", 1, 2000, 26000},
-                    {6, "xúc xích", 6, 2000, 24000},
-                    {7, "sữa tươi", 2, 2000, 6000},
-                    {8, "xà bông", 1, 2000, 2000},
-                    {9, "xúc xích", 6, 2000, 8000},
-                    {10, "sữa tươi", 2, 2000, 5000},
-
-                },
+                null,
                 new String[]{
                     "STT", "Tên Mặt Hàng", "Số Lượng", "Đơn Giá", "Thành Tiền"
                 }
         ));
-
 
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
         headerRenderer.setBackground(new Color(204, 255, 255));
@@ -105,6 +107,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -252,6 +255,13 @@ public class AccummulatePoints extends javax.swing.JFrame {
         try {
 //            String pointInString = pointTextField.getText();
 //            short number = NumberUtils.validateAndConvertToShort(pointInString);
+            String pointStr = currentPointView.getText();
+            if (pointStr == null || pointStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Điểm không hợp lệ");
+                jTextField1.requestFocus();
+                return;
+            }
+            short point = Short.valueOf(pointStr);
             JFrame frame = new JFrame("Nhập mã PIN");
             JPasswordField passwordField = new JPasswordField(10);
             int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -259,7 +269,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
                 char[] pin = passwordField.getPassword();
                 String pinStr = new String(pin);
                 System.out.println("Mã PIN bạn nhập là: " + pinStr);
-                onHandleAccummulatePoint(pinStr, (short)10);
+                onHandleAccummulatePoint(pinStr, point);
             }
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } catch (Exception e) {
@@ -272,22 +282,25 @@ public class AccummulatePoints extends javax.swing.JFrame {
         if (pin != null && !pin.isEmpty()) {
             try {
                 int pinTries = pinController.verifyPin(pin);
-                if ( pinTries  == AppletConstants.VERIFY_SUCCESS ) {
+                if (pinTries == AppletConstants.VERIFY_SUCCESS) {
                     RSAController rsaController = new RSAController(userDataController);
-                    boolean isVerifyRSA = rsaController.verifyRSA(this,userData.getPublicKey());
+                    boolean isVerifyRSA = rsaController.verifyRSA(this, userData.getPublicKey());
                     if (!isVerifyRSA) {
                         JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     boolean isSucess = pointController.updatePoint(number, true);
                     if (isSucess) {
+                        userData.setPoints((short) (userData.getPoints() + number));
+                        insertTrans(number);
+                        UserDao.getInstance().updateUser(userData);
                         JOptionPane.showMessageDialog(this, "Tích điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        onBackToHomeView();
+                        onBackToHomeView(userData);
                     } else {
                         JOptionPane.showMessageDialog(this, "Tích điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries +" lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries + " lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -296,24 +309,75 @@ public class AccummulatePoints extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Mã PIN không thể trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void insertTrans(short point) throws ClassNotFoundException {
+        PointsTransaction pointsTransaction = new PointsTransaction();
+        pointsTransaction.setPoints(point);
+        pointsTransaction.setResourceId(invoice.getId());
+        pointsTransaction.setTransactionType(Constants.TRANSACTION_TYPE.ADD);
+        pointsTransaction.setUserId(userData.getId());
+        pointsTransaction.setDescription("Add point by invoice.");
+        PointTransactionDao.getInstance().insertPointTransaction(pointsTransaction);
+    }
+
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         onBackToHomeView();
-    }                                        
-    
-    private void onBackToHomeView()
-    {
+    }
+
+    private void onBackToHomeView() {
         HomeView homeView = new HomeView();
         this.dispose();
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void onBackToHomeView(UserData user) {
+        HomeView homeView = new HomeView(user);
+        this.dispose();
+        homeView.setVisible(true);
+    }
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+        String invoiceCode = jTextField1.getText();
+        if (invoiceCode == null || invoiceCode.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mã hóa đơn không được để trống");
+            jTextField1.requestFocus();
+            return;
+        }
+        try {
+            Invoice invoice = InvoiceDao.getInstance().getInvoiceByCode(invoiceCode);
+            if (invoice == null) {
+                JOptionPane.showMessageDialog(this, "Hoá đơn không tồn tại");
+                return;
+            }
+            this.invoice = invoice;
+            List<Order> orders = invoice.getOrders();
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+            int stt = 1; // Bắt đầu từ 1
+            for (Order order : orders) {
+                model.addRow(new Object[]{
+                    stt, // Gán số thứ tự
+                    order.getProductName(),
+                    order.getQuantity(),
+                    numberFormat.format(Math.round(order.getPrice())) + "đ",
+                    numberFormat.format(Math.round(order.getQuantity() * order.getPrice())) + "đ"
+                });
+                stt++; // Tăng số thứ tự
+            }
+            long totalAmount = Math.round(invoice.getTotalAmount());
+            jLabel5.setText(numberFormat.format(totalAmount) + "đ");
+            long point = Math.round(invoice.getTotalAmount() / 1000);
+            currentPointView.setText(String.valueOf(point));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+            return;
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**

@@ -39,6 +39,17 @@ public class HomeView extends javax.swing.JFrame {
             Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public HomeView(UserData user) {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        smartCardConnection = SmartCardConnection.getInstance();
+        userDataController = new UserDataController(smartCardConnection);
+        userDao = UserDao.getInstance();
+        userData = user;
+        loyaltyPointsTextView.setText(String.valueOf(userData.getPoints()));
+    }
+    
      private void initUserData() throws Exception{
 //        userData = userDataController.readUserData();
         UserData cardUserData = userDataController.readUserData();

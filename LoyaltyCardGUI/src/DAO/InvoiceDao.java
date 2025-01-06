@@ -8,6 +8,10 @@ import java.util.List;
 import utils.JDBCUtil;
 
 public class InvoiceDao {
+    
+    public static InvoiceDao getInstance() {
+        return new InvoiceDao();
+    }
 
     // SQL query để lấy hóa đơn và danh sách đơn hàng theo invoice_code
     private static final String GET_INVOICE_BY_CODE_SQL = 
@@ -40,7 +44,7 @@ public class InvoiceDao {
                         String paymentMethod = resultSet.getString("payment_method");
                         String description = resultSet.getString("description");
                         Timestamp createdAt = resultSet.getTimestamp("created_at");
-                        Timestamp updatedAt = resultSet.getTimestamp("update_at");
+                        Timestamp updatedAt = resultSet.getTimestamp("updated_at");
 
                         // Tạo đối tượng Invoice
                         invoice = new Invoice(id, code, userId, totalAmount, paymentMethod, description, createdAt, updatedAt);
