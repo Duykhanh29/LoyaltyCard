@@ -10,16 +10,11 @@ import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
+import com.formdev.flatlaf.FlatLightLaf;
 import constants.AppletConstants;
-import constants.AppletInsConstants;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
-import utils.NumberUtils;
-import utils.RSASignature;
-import utils.StringUtils;
 
 /**
  *
@@ -52,7 +47,14 @@ public class ExchangePoints extends javax.swing.JFrame {
     }
 
     private void initViews() {
-        currentPointLabel.setText(String.valueOf(userData.getPoints()));
+        pointView.setText(String.valueOf(userData.getPoints()));
+        init();
+    }
+
+    private void init() {
+        noticeText.setText("* Chú ý: Khách hàng chỉ được chọn một trong các hạn mức trên");
+//        noticeText1.setText("Số điểm không được đổi sang số tiền ");
+
     }
 
     /**
@@ -64,69 +66,78 @@ public class ExchangePoints extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
-        textField = new javax.swing.JTextField();
-        currentPointLabel = new javax.swing.JLabel();
+        pointView = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
-
-        jButton2.setBackground(new java.awt.Color(204, 204, 255));
-        jButton2.setForeground(new java.awt.Color(0, 0, 51));
-        jButton2.setText("Quay lại");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        jButton4 = new javax.swing.JButton();
+        noticeText = new javax.swing.JLabel();
+        jScrollPane1 = new scroll.win11.ScrollPaneWin11();
+        jPanel1 = new javax.swing.JPanel();
+        jLable_img_1K = new javax.swing.JLabel();
+        jLabelTile_1K = new javax.swing.JLabel();
+        jLabelPoint_1K = new javax.swing.JLabel();
+        jLabelDate_1K = new javax.swing.JLabel();
+        jLabelDetail_1K = new javax.swing.JLabel();
+        jLabel_gift_1K = new javax.swing.JLabel();
+        lbbg_1 = new javax.swing.JLabel();
+        jLable_img_3 = new javax.swing.JLabel();
+        jLabelTile_3 = new javax.swing.JLabel();
+        jLabelPoint_3 = new javax.swing.JLabel();
+        jLabelDate_3 = new javax.swing.JLabel();
+        jLabelDetail_3 = new javax.swing.JLabel();
+        jLabel_gift_3 = new javax.swing.JLabel();
+        jLable_img_2K = new javax.swing.JLabel();
+        jLabelTile_2K = new javax.swing.JLabel();
+        jLabelPoint_2K = new javax.swing.JLabel();
+        jLabelDate_2K = new javax.swing.JLabel();
+        jLabelDetail_2K = new javax.swing.JLabel();
+        jLabel_gift_2K = new javax.swing.JLabel();
+        lbbg_2 = new javax.swing.JLabel();
+        jLable_img_4 = new javax.swing.JLabel();
+        jLabelTile_4 = new javax.swing.JLabel();
+        jLabelPoint_4 = new javax.swing.JLabel();
+        jLabelDate_4 = new javax.swing.JLabel();
+        jLabelDetail_4 = new javax.swing.JLabel();
+        jLabel_gift_4 = new javax.swing.JLabel();
+        lbbg_4 = new javax.swing.JLabel();
+        jLable_img_1K1 = new javax.swing.JLabel();
+        jLabelTile_1K1 = new javax.swing.JLabel();
+        jLabelPoint_1K1 = new javax.swing.JLabel();
+        jLabelDate_1K1 = new javax.swing.JLabel();
+        jLabelDetail_1K1 = new javax.swing.JLabel();
+        jLabel_gift_1K1 = new javax.swing.JLabel();
+        lbbg_3 = new javax.swing.JLabel();
+        jLable_img_2K1 = new javax.swing.JLabel();
+        jLabelTile_2K1 = new javax.swing.JLabel();
+        jLabelPoint_2K1 = new javax.swing.JLabel();
+        jLabelDate_2K1 = new javax.swing.JLabel();
+        jLabelDetail_2K1 = new javax.swing.JLabel();
+        jLabel_gift_2K1 = new javax.swing.JLabel();
+        lbbg_5 = new javax.swing.JLabel();
+        lbbg_6 = new javax.swing.JLabel();
+        jbbackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Cambria", 1, 28)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("ĐỔI ĐIỂM TÍCH LŨY");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setText("Thông tin quy đổi");
+        jLabel2.setText("Vui lòng chọn một trong các voucher sau");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
 
         jLabel3.setBackground(new java.awt.Color(255, 0, 0));
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel3.setText("Tổng điểm hiện có: ");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel4.setText("Số điểm muốn quy đổi: ");
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setText("-   Khách hàng có thể quy đổi 500 điểm thành Phiếu CKTM trị giá 100.000 đồng tại quầy DVKH, số điểm tối đa có thể quy đổi là 25 điểm (tương ứng với giá trị tối đa là 500.000 đồng);\n-  Hoặc khách hàng có thể quy đổi điểm thành tiền dùng để thanh toán hóa đơn trực tiếp tại quầy Thu ngân với hệ số quy đổi là cứ mỗi 500 điểm tương ứng 100.000 đồng.");
-        jTextArea1.setFocusable(false);
-        jScrollPane1.setViewportView(jTextArea1);
-
-        jButton1.setBackground(new java.awt.Color(0, 104, 56));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Quy đổi");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        textField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textFieldActionPerformed(evt);
-            }
-        });
-
-        currentPointLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        currentPointLabel.setText("2002");
+        pointView.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        pointView.setText("2002");
+        getContentPane().add(pointView, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 390, -1, -1));
 
         jButton3.setBackground(new java.awt.Color(204, 204, 255));
         jButton3.setForeground(new java.awt.Color(0, 0, 51));
@@ -136,69 +147,257 @@ public class ExchangePoints extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
+        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 56, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(currentPointLabel)
-                            .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel2)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(67, 67, 67))
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(176, 176, 176)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(252, 252, 252)
-                        .addComponent(jButton1))
-                    .addComponent(jButton3))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jButton3)
-                .addGap(12, 12, 12)
-                .addComponent(jLabel1)
-                .addGap(24, 24, 24)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(currentPointLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 36, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(22, 22, 22))
-        );
+        jButton4.setBackground(new java.awt.Color(204, 204, 255));
+        jButton4.setForeground(new java.awt.Color(0, 0, 51));
+        jButton4.setText("Voucher");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 0, 90, -1));
+
+        noticeText.setForeground(new java.awt.Color(255, 51, 51));
+        noticeText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(noticeText, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 350, 430, 24));
+
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLable_img_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
+
+        jLabelTile_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_1K.setText("VOUCHER GIẢM 20K");
+        jPanel1.add(jLabelTile_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, -1, -1));
+
+        jLabelPoint_1K.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, -1, -1));
+
+        jLabelDate_1K.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, -1, -1));
+
+        jLabelDetail_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_1K.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_1K.setText("Detail");
+        jLabelDetail_1K.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 40, -1));
+
+        jLabel_gift_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 10, -1, 40));
+
+        lbbg_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 290, 60));
+
+        jLable_img_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_100K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
+
+        jLabelTile_3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_3.setText("VOUCHER GIẢM 100K");
+        jPanel1.add(jLabelTile_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
+
+        jLabelPoint_3.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, -1));
+
+        jLabelDate_3.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 130, -1, -1));
+
+        jLabelDetail_3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_3.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_3.setText("Detail");
+        jLabelDetail_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 130, 40, -1));
+
+        jLabel_gift_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 90, -1, 40));
+
+        jLable_img_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_50K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, -1, -1));
+
+        jLabelTile_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_2K.setText("VOUCHER GIẢM 50K");
+        jPanel1.add(jLabelTile_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 10, -1, -1));
+
+        jLabelPoint_2K.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 30, -1, -1));
+
+        jLabelDate_2K.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 50, -1, -1));
+
+        jLabelDetail_2K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_2K.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_2K.setText("Detail");
+        jLabelDetail_2K.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 50, 40, -1));
+
+        jLabel_gift_2K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_2K, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 10, -1, 40));
+
+        lbbg_2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, 290, 60));
+
+        jLable_img_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_200K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, -1, -1));
+
+        jLabelTile_4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_4.setText("VOUCHER GIẢM 200K");
+        jPanel1.add(jLabelTile_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, -1, -1));
+
+        jLabelPoint_4.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 110, -1, -1));
+
+        jLabelDate_4.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 130, -1, -1));
+
+        jLabelDetail_4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_4.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_4.setText("Detail");
+        jLabelDetail_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 130, 40, -1));
+
+        jLabel_gift_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 90, -1, 40));
+
+        lbbg_4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, 290, 60));
+
+        jLable_img_1K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
+
+        jLabelTile_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_1K1.setText("VOUCHER GIẢM 20K");
+        jPanel1.add(jLabelTile_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
+
+        jLabelPoint_1K1.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, -1, -1));
+
+        jLabelDate_1K1.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 210, -1, -1));
+
+        jLabelDetail_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_1K1.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_1K1.setText("Detail");
+        jLabelDetail_1K1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 210, 40, -1));
+
+        jLabel_gift_1K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 170, -1, 40));
+
+        lbbg_3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, 290, 60));
+
+        jLable_img_2K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_50K_60x60.png"))); // NOI18N
+        jPanel1.add(jLable_img_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, -1, -1));
+
+        jLabelTile_2K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelTile_2K1.setText("VOUCHER GIẢM 50K");
+        jPanel1.add(jLabelTile_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 170, -1, -1));
+
+        jLabelPoint_2K1.setText("Cần 10.000 điểm để quy đổi");
+        jPanel1.add(jLabelPoint_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 190, -1, -1));
+
+        jLabelDate_2K1.setText("Date: 15/01/2025 ");
+        jPanel1.add(jLabelDate_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 210, -1, -1));
+
+        jLabelDetail_2K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabelDetail_2K1.setForeground(new java.awt.Color(255, 51, 51));
+        jLabelDetail_2K1.setText("Detail");
+        jLabelDetail_2K1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt);
+            }
+        });
+        jPanel1.add(jLabelDetail_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 210, 40, -1));
+
+        jLabel_gift_2K1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
+        jPanel1.add(jLabel_gift_2K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 170, -1, 40));
+
+        lbbg_5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, 290, 60));
+
+        lbbg_6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/white-background.png"))); // NOI18N
+        lbbg_6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt);
+            }
+        });
+        jPanel1.add(lbbg_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 290, 60));
+
+        jScrollPane1.setViewportView(jPanel1);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, 700, 200));
+
+        jbbackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_800x533.jpg"))); // NOI18N
+        getContentPane().add(jbbackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 800, 460));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        try {
-            String input = textField.getText();
-            short number = NumberUtils.validateAndConvertToShort(input);
-            JFrame frame = new JFrame("Nhập mã PIN");
-            JPasswordField passwordField = new JPasswordField(10);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        HomeView homeView = new HomeView();
+        homeView.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void exchangePoints(short number)
+    {
+         try {
+             JFrame frame = new JFrame("Nhập mã PIN");
+             JPasswordField passwordField = new JPasswordField(10);
             int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (option == JOptionPane.OK_OPTION) {
                 char[] pin = passwordField.getPassword();
@@ -211,10 +410,8 @@ public class ExchangePoints extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Điểm không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
         } finally {
         }
-
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void onHandleExchangePoint(String pin, short number) {
+    }
+     private void onHandleExchangePoint(String pin, short number) {
         if (pin != null && !pin.isEmpty()) {
             try {
                 int pinTries = pinController.verifyPin(pin);
@@ -242,16 +439,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         }
     }
 
-    private void textFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_textFieldActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        onBackToHomeView();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void onBackToHomeView() {
+     private void onBackToHomeView() {
         HomeView homeView = new HomeView();
         this.dispose();
         homeView.setVisible(true);
@@ -263,31 +451,41 @@ public class ExchangePoints extends javax.swing.JFrame {
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        this.dispose();
+        VoucherList vouchePage = new VoucherList(userData);
+        vouchePage.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
+        // TODO add your handling code here:
+        this.dispose();
+        DetailVoucher detailVoucher = new DetailVoucher(false,userData);
+        detailVoucher.setVisible(true);
+    }//GEN-LAST:event_moveDetail
+
+    private void chooseVoucher(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseVoucher
+        // TODO add your handling code here:
+        int point = 10;
+        int response = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc chắn muốn dùng " + point + " điểm để đổi phiếu giảm giá này ?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (response == JOptionPane.YES_OPTION) {
+//                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            exchangePoints((short)point);
+        } 
+    }//GEN-LAST:event_chooseVoucher
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ExchangePoints.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        FlatLightLaf.setup();
         //</editor-fold>
 
         /* Create and display the form */
@@ -299,16 +497,57 @@ public class ExchangePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel currentPointLabel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabelDate_1K;
+    private javax.swing.JLabel jLabelDate_1K1;
+    private javax.swing.JLabel jLabelDate_2K;
+    private javax.swing.JLabel jLabelDate_2K1;
+    private javax.swing.JLabel jLabelDate_3;
+    private javax.swing.JLabel jLabelDate_4;
+    private javax.swing.JLabel jLabelDetail_1K;
+    private javax.swing.JLabel jLabelDetail_1K1;
+    private javax.swing.JLabel jLabelDetail_2K;
+    private javax.swing.JLabel jLabelDetail_2K1;
+    private javax.swing.JLabel jLabelDetail_3;
+    private javax.swing.JLabel jLabelDetail_4;
+    private javax.swing.JLabel jLabelPoint_1K;
+    private javax.swing.JLabel jLabelPoint_1K1;
+    private javax.swing.JLabel jLabelPoint_2K;
+    private javax.swing.JLabel jLabelPoint_2K1;
+    private javax.swing.JLabel jLabelPoint_3;
+    private javax.swing.JLabel jLabelPoint_4;
+    private javax.swing.JLabel jLabelTile_1K;
+    private javax.swing.JLabel jLabelTile_1K1;
+    private javax.swing.JLabel jLabelTile_2K;
+    private javax.swing.JLabel jLabelTile_2K1;
+    private javax.swing.JLabel jLabelTile_3;
+    private javax.swing.JLabel jLabelTile_4;
+    private javax.swing.JLabel jLabel_gift_1K;
+    private javax.swing.JLabel jLabel_gift_1K1;
+    private javax.swing.JLabel jLabel_gift_2K;
+    private javax.swing.JLabel jLabel_gift_2K1;
+    private javax.swing.JLabel jLabel_gift_3;
+    private javax.swing.JLabel jLabel_gift_4;
+    private javax.swing.JLabel jLable_img_1K;
+    private javax.swing.JLabel jLable_img_1K1;
+    private javax.swing.JLabel jLable_img_2K;
+    private javax.swing.JLabel jLable_img_2K1;
+    private javax.swing.JLabel jLable_img_3;
+    private javax.swing.JLabel jLable_img_4;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField textField;
+    private javax.swing.JLabel jbbackground;
+    private javax.swing.JLabel lbbg_1;
+    private javax.swing.JLabel lbbg_2;
+    private javax.swing.JLabel lbbg_3;
+    private javax.swing.JLabel lbbg_4;
+    private javax.swing.JLabel lbbg_5;
+    private javax.swing.JLabel lbbg_6;
+    private javax.swing.JLabel noticeText;
+    private javax.swing.JLabel pointView;
     // End of variables declaration//GEN-END:variables
 }
