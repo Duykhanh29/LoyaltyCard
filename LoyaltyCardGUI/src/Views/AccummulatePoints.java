@@ -70,6 +70,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }
     private void initViews()
     {
+        currentPointView.setText(userData.getPoints()+"");
         jTable1.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         jTable1.getTableHeader().setOpaque(false);
         jTable1.getTableHeader().setBackground(new Color(204, 255, 255));
@@ -118,7 +119,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        currentPointView = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -158,9 +159,9 @@ public class AccummulatePoints extends javax.swing.JFrame {
         jLabel5.setText("2.002.000đ");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 380, -1, -1));
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setText("2002");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 450, -1, -1));
+        currentPointView.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        currentPointView.setText("2002");
+        getContentPane().add(currentPointView, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 450, -1, -1));
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
         jButton2.setForeground(new java.awt.Color(0, 0, 51));
@@ -249,8 +250,8 @@ public class AccummulatePoints extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            String pointInString = pointTextField.getText();
-            short number = NumberUtils.validateAndConvertToShort(pointInString);
+//            String pointInString = pointTextField.getText();
+//            short number = NumberUtils.validateAndConvertToShort(pointInString);
             JFrame frame = new JFrame("Nhập mã PIN");
             JPasswordField passwordField = new JPasswordField(10);
             int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -258,7 +259,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
                 char[] pin = passwordField.getPassword();
                 String pinStr = new String(pin);
                 System.out.println("Mã PIN bạn nhập là: " + pinStr);
-                onHandleAccummulatePoint(pinStr, number);
+                onHandleAccummulatePoint(pinStr, (short)10);
             }
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } catch (Exception e) {
@@ -298,7 +299,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         onBackToHomeView();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                        
     
     private void onBackToHomeView()
     {
@@ -331,6 +332,7 @@ public class AccummulatePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel currentPointView;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -339,7 +341,6 @@ public class AccummulatePoints extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;

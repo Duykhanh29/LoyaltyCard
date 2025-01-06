@@ -4,6 +4,8 @@
  */
 package Views;
 
+import Models.UserData;
+
 /**
  *
  * @author datlogarit
@@ -13,9 +15,17 @@ public class DetailVoucher extends javax.swing.JFrame {
     /**
      * Creates new form DetailVoucher
      */
-    public DetailVoucher() {
+    boolean isFromVoucherList;
+    UserData userData;
+    public DetailVoucher(boolean isFromVoucherList,UserData userData) {
+        this.isFromVoucherList = isFromVoucherList;
+        this.userData = userData;
         initComponents();
         this.setLocationRelativeTo(null);
+    }
+
+    private DetailVoucher() {
+      
     }
 
     /**
@@ -91,8 +101,15 @@ public class DetailVoucher extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        VoucherList voucherList = new VoucherList();
-        voucherList.setVisible(true);
+        if(isFromVoucherList)
+        {
+            VoucherList voucherList = new VoucherList(userData);
+            voucherList.setVisible(true);
+        }else{
+            ExchangePoints exchangePointsView = new ExchangePoints(userData);
+            exchangePointsView.setVisible(true);
+        }
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

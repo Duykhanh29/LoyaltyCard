@@ -10,39 +10,11 @@ import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
 import Models.UserData;
-import constants.AppletConstants;
-import constants.AppletInsConstants;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import utils.NumberUtils;
-import utils.RSASignature;
-import utils.StringUtils;
-
-import Controllers.PinController;
-import Controllers.PointController;
-import Controllers.RSAController;
-import Controllers.SmartCardConnection;
-import Controllers.UserDataController;
-import Models.UserData;
-import constants.AppletConstants;
-import constants.AppletInsConstants;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import utils.NumberUtils;
-import utils.RSASignature;
-import utils.StringUtils;
-
 import com.formdev.flatlaf.FlatLightLaf;
 import constants.AppletConstants;
-import java.awt.Frame;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import utils.AppUtils;
+import javax.swing.JPasswordField;
 
 /**
  *
@@ -75,7 +47,7 @@ public class ExchangePoints extends javax.swing.JFrame {
     }
 
     private void initViews() {
-        currentPointLabel.setText(String.valueOf(userData.getPoints()));
+        pointView.setText(String.valueOf(userData.getPoints()));
         init();
     }
 
@@ -97,7 +69,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        pointView = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         noticeText = new javax.swing.JLabel();
@@ -163,9 +135,9 @@ public class ExchangePoints extends javax.swing.JFrame {
         jLabel3.setText("Tổng điểm hiện có: ");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, -1, -1));
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel5.setText("2002");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 390, -1, -1));
+        pointView.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        pointView.setText("2002");
+        getContentPane().add(pointView, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 390, -1, -1));
 
         jButton3.setBackground(new java.awt.Color(204, 204, 255));
         jButton3.setForeground(new java.awt.Color(0, 0, 51));
@@ -421,13 +393,11 @@ public class ExchangePoints extends javax.swing.JFrame {
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void exchangePoints()
+    private void exchangePoints(short number)
     {
          try {
-            String input = textField.getText();
-            short number = NumberUtils.validateAndConvertToShort(input);
-            JFrame frame = new JFrame("Nhập mã PIN");
-            JPasswordField passwordField = new JPasswordField(10);
+             JFrame frame = new JFrame("Nhập mã PIN");
+             JPasswordField passwordField = new JPasswordField(10);
             int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (option == JOptionPane.OK_OPTION) {
                 char[] pin = passwordField.getPassword();
@@ -483,7 +453,7 @@ public class ExchangePoints extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         this.dispose();
-        VoucherList vouchePage = new VoucherList();
+        VoucherList vouchePage = new VoucherList(userData);
         vouchePage.setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
@@ -491,13 +461,13 @@ public class ExchangePoints extends javax.swing.JFrame {
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
         // TODO add your handling code here:
         this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher();
+        DetailVoucher detailVoucher = new DetailVoucher(false,userData);
         detailVoucher.setVisible(true);
     }//GEN-LAST:event_moveDetail
 
     private void chooseVoucher(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseVoucher
         // TODO add your handling code here:
-        int point = 1000;
+        int point = 10;
         int response = JOptionPane.showConfirmDialog(
                 this,
                 "Bạn có chắc chắn muốn dùng " + point + " điểm để đổi phiếu giảm giá này ?",
@@ -506,7 +476,8 @@ public class ExchangePoints extends javax.swing.JFrame {
                 JOptionPane.QUESTION_MESSAGE
         );
         if (response == JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+//                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            exchangePoints((short)point);
         } 
     }//GEN-LAST:event_chooseVoucher
 
@@ -526,14 +497,11 @@ public class ExchangePoints extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelDate_1K;
     private javax.swing.JLabel jLabelDate_1K1;
     private javax.swing.JLabel jLabelDate_2K;
@@ -580,5 +548,6 @@ public class ExchangePoints extends javax.swing.JFrame {
     private javax.swing.JLabel lbbg_5;
     private javax.swing.JLabel lbbg_6;
     private javax.swing.JLabel noticeText;
+    private javax.swing.JLabel pointView;
     // End of variables declaration//GEN-END:variables
 }

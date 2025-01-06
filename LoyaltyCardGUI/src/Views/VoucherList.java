@@ -4,6 +4,7 @@
  */
 package Views;
 
+import Models.UserData;
 import com.formdev.flatlaf.FlatLightLaf;
 
 /**
@@ -15,10 +16,15 @@ public class VoucherList extends javax.swing.JFrame {
     /**
      * Creates new form voucherPage
      */
-    public VoucherList() {
+    UserData userData;
+    public VoucherList(UserData userData) {
+        this.userData = userData;
         initComponents();
         this.setLocationRelativeTo(null);
 
+    }
+
+    private VoucherList() {
     }
 
     /**
@@ -225,13 +231,13 @@ public class VoucherList extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        ExchangePoints exchangePoints = new ExchangePoints();
+        ExchangePoints exchangePoints = new ExchangePoints(userData);
         exchangePoints.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
         this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher();
+        DetailVoucher detailVoucher = new DetailVoucher(true,userData);
         detailVoucher.setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_moveDetail
