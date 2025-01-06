@@ -206,7 +206,7 @@ public class HomeView extends javax.swing.JFrame {
 
     private void transactionHistoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transactionHistoryButtonActionPerformed
         this.dispose();
-        HistoryForm historyForm = new HistoryForm();
+        HistoryForm historyForm = new HistoryForm(userData.getId());
         historyForm.setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_transactionHistoryButtonActionPerformed

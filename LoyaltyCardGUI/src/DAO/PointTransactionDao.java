@@ -20,15 +20,23 @@ public class PointTransactionDao {
             + "VALUES (?, ?, ?, ?, ?, ?)";
 
     // Hàm lấy danh sách giao dịch điểm theo user_id
-    public List<PointsTransaction> getTransactionsByUserId(int userId) throws SQLException, ClassNotFoundException {
+    public List<PointsTransaction> getTransactionsByUserId(int userId,java.sql.Date date) throws SQLException, ClassNotFoundException {
         List<PointsTransaction> transactions = new ArrayList<>();
-
+        String sql = GET_TRANSACTIONS_BY_USER_SQL;
+        if(date!=null)
+        {
+            sql += " AND DATE(created_at) = ?";
+        }
         // Kết nối cơ sở dữ liệu
         try (Connection con = JDBCUtil.getConnection();
-                PreparedStatement preparedStatement = con.prepareStatement(GET_TRANSACTIONS_BY_USER_SQL)) {
+                PreparedStatement preparedStatement = con.prepareStatement(sql)) {
 
             // Set giá trị user_id vào PreparedStatement
             preparedStatement.setInt(1, userId);
+            if(date!=null)
+            {
+                 preparedStatement.setDate(2, date);
+            }
 
             // Thực thi câu lệnh SQL
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
