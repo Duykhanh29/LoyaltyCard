@@ -4,8 +4,30 @@
  */
 package Views;
 
+import DAO.VoucherDao;
 import Models.UserData;
+import Models.Voucher;
+import cache.VoucherCache;
 import com.formdev.flatlaf.FlatLightLaf;
+import constants.ComboBoxData;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.PopupMenu;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -17,11 +39,167 @@ public class VoucherList extends javax.swing.JFrame {
      * Creates new form voucherPage
      */
     UserData userData;
+    private static final String CACHE_LIST_ACTIVE_VOUCHER = "LIST_USER_VOUCHER";
+    private static final long CACHE_EXPIRY_TIME = 5 * 60 * 1000;
+
+    ComboBoxData comboBoxData = new ComboBoxData();
+    Integer selectType = null;
+    List<Voucher> listVoucher = new ArrayList<>();
     public VoucherList(UserData userData) {
         this.userData = userData;
         initComponents();
         this.setLocationRelativeTo(null);
+        initViews();
+    }
 
+    private void initViews() {
+        jPanel1.setLayout(new java.awt.GridLayout(0, 2, 10, 10));
+        for (String value : comboBoxData.getKeyValueMap().values()) {
+            jComboBox1.addItem(value);
+        }
+        jComboBox1.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                String selectedValue = (String) jComboBox1.getSelectedItem();
+                Integer selectedKey = comboBoxData.getKeyByValue(selectedValue);
+                selectType = selectedKey;
+                List<Voucher> vouchers = filterByOption(listVoucher, selectType);
+                displayListView(vouchers);
+            }
+        });
+        init();
+    }
+
+    private void init() {
+        try {
+            jPanel1.removeAll();
+            if (VoucherCache.getCache(CACHE_LIST_ACTIVE_VOUCHER) != null) {
+                System.out.println("Cache existed");
+                listVoucher = VoucherCache.getCache(CACHE_LIST_ACTIVE_VOUCHER);
+            } else {
+                System.out.println("Get voucher from DB");
+                listVoucher = filterByType();
+                if (listVoucher != null) {
+                    VoucherCache.setCache(CACHE_LIST_ACTIVE_VOUCHER, listVoucher, CACHE_EXPIRY_TIME); // Lưu cache
+                }
+            }
+            if (listVoucher == null) {
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+                return;
+            }
+            displayListView(listVoucher);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+        }
+    }
+
+    private void displayListView(List<Voucher> listVoucher) {
+        try {
+            jPanel1.removeAll();
+            for (Voucher voucher : listVoucher) {
+                JPanel voucherPanel = createVoucherPanel(voucher);
+                jPanel1.add(voucherPanel);
+            }
+            jPanel1.revalidate();
+            jPanel1.repaint();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+        }
+    }
+
+    private List<Voucher> filterByType() {
+        List<Voucher> listVoucher = new ArrayList<>();
+        try {
+            listVoucher = VoucherDao.getInstance().getVouchersByUserId(userData.getId(), selectType);   // set userId 35 for testing
+        } catch (SQLException ex) {
+            Logger.getLogger(VoucherList.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VoucherList.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listVoucher;
+    }
+
+    private List<Voucher> filterByOption(List<Voucher> listVoucher, Integer option) {
+        List<Voucher> filteredList = new ArrayList<>();
+
+        for (Voucher voucher : listVoucher) {
+            if (option == 1) {
+                filteredList.add(voucher); // Hiển thị tất cả
+            } else if (option == 2 && voucher.getStatus() == 1
+                    && !voucher.getStartTime().after(new java.sql.Date(System.currentTimeMillis()))
+                    && !voucher.getEndTime().before(new java.sql.Date(System.currentTimeMillis()))) {
+                filteredList.add(voucher); // Lọc active
+            } else if (option == 3 && voucher.getStatus() == 0) {
+                filteredList.add(voucher); // Lọc inactive
+            }
+        }
+
+        return filteredList;
+    }
+
+    private JPanel createVoucherPanel(Voucher voucher) {
+        // Panel chính với layout ngang
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout()); // Sử dụng BorderLayout để dễ căn chỉnh các thành phần
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 10));
+        panel.setBackground(Color.WHITE);
+        // Icon voucher
+        JLabel lblImage = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png")));
+
+        // Thông tin voucher: Tiêu đề, Điểm, Ngày
+        JPanel textPanel = new JPanel();
+        textPanel.setBackground(Color.WHITE);
+        textPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
+        textPanel.setLayout(new javax.swing.BoxLayout(textPanel, javax.swing.BoxLayout.Y_AXIS)); // Layout dọc
+        JLabel lblTitle = new JLabel(voucher.getName());
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        JLabel lblPoint = new JLabel("Cần " + voucher.getPointsValue() + " điểm để quy đổi");
+        JLabel lblDate = new JLabel("Date: " + voucher.getEndTime());
+
+        // Thêm các phần tử vào textPanel
+        textPanel.add(lblTitle);
+        textPanel.add(lblPoint);
+        textPanel.add(lblDate);
+
+        // Gift icon và Detail panel (phía bên phải)
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS)); // Layout dọc
+        rightPanel.setAlignmentX(Component.RIGHT_ALIGNMENT); // Đảm bảo nội dung trong rightPanel nằm bên phải
+        rightPanel.setBackground(Color.WHITE);
+
+        JLabel jlblGift = new JLabel();
+        jlblGift.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg")));
+
+        JLabel lblDetail = new JLabel("Detail");
+        lblDetail.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblDetail.setForeground(new java.awt.Color(255, 51, 51));
+        lblDetail.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt, voucher); // Hành động khi nhấp chuột
+            }
+        });
+
+        // Thêm icon gift và Detail vào rightPanel
+        rightPanel.add(jlblGift); // Gift icon nằm trên
+        rightPanel.add(lblDetail); // Detail nằm dưới
+
+        // Đảm bảo khoảng cách đều cho các thành phần
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Khoảng cách từ các phần tử tới biên phải
+
+        // Thêm các thành phần vào panel chính
+        panel.add(lblImage, BorderLayout.WEST); // Thêm ảnh voucher vào bên trái
+        panel.add(textPanel, BorderLayout.CENTER); // Thêm thông tin voucher vào giữa
+        panel.add(rightPanel, BorderLayout.EAST); // Thêm gift icon và Detail vào bên phải
+
+        // Thêm sự kiện click cho toàn bộ panel
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            }
+        });
+
+        return panel;
     }
 
     private VoucherList() {
@@ -70,6 +248,7 @@ public class VoucherList extends javax.swing.JFrame {
         jLabel_gift_1K3 = new javax.swing.JLabel();
         lbbg_4 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jbbackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -82,10 +261,9 @@ public class VoucherList extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Loại voucher");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, -1, -1));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Có thể dùng", "Sắp hết hạn", "Không khả dụng" }));
-        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 90, -1, -1));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, -1, -1));
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -107,11 +285,6 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K.setText("Detail");
-        jLabelDetail_1K.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                moveDetail(evt);
-            }
-        });
         jPanel1.add(jLabelDetail_1K, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 40, -1));
 
         jLabel_gift_1K.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
@@ -137,11 +310,6 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K1.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K1.setText("Detail");
-        jLabelDetail_1K1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                moveDetail(evt);
-            }
-        });
         jPanel1.add(jLabelDetail_1K1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 110, 40, -1));
 
         jLabelPoint_1K1.setText("Cần 10.000 điểm để quy đổi");
@@ -166,11 +334,6 @@ public class VoucherList extends javax.swing.JFrame {
         jLabelDetail_1K2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabelDetail_1K2.setForeground(new java.awt.Color(255, 51, 51));
         jLabelDetail_1K2.setText("Detail");
-        jLabelDetail_1K2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                moveDetail(evt);
-            }
-        });
         jPanel1.add(jLabelDetail_1K2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 40, -1));
 
         jLabel_gift_1K2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg"))); // NOI18N
@@ -210,7 +373,7 @@ public class VoucherList extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(jPanel1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 310, 210));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 650, 280));
 
         jButton2.setBackground(new java.awt.Color(204, 204, 255));
         jButton2.setForeground(new java.awt.Color(0, 0, 51));
@@ -222,8 +385,17 @@ public class VoucherList extends javax.swing.JFrame {
         });
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 90, -1));
 
-        jbbackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_600x400.jpg"))); // NOI18N
-        getContentPane().add(jbbackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 360));
+        jButton1.setBackground(new java.awt.Color(206, 206, 255));
+        jButton1.setText("Áp dụng");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 90, 90, -1));
+
+        jbbackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_900x600.jpg"))); // NOI18N
+        getContentPane().add(jbbackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 760, 450));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -236,11 +408,21 @@ public class VoucherList extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
-        this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher(true,userData, null);
-        detailVoucher.setVisible(true);
+
         // TODO add your handling code here:
     }//GEN-LAST:event_moveDetail
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void moveDetail(java.awt.event.MouseEvent evt, Voucher voucher) {
+        // TODO add your handling code here:
+        DetailVoucher detailVoucher = new DetailVoucher(true, userData, voucher);
+        this.dispose();
+        detailVoucher.setVisible(true);
+    }
 
     /**
      * @param args the command line arguments
@@ -261,6 +443,7 @@ public class VoucherList extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;

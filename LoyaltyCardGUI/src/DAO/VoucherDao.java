@@ -8,7 +8,7 @@ import Models.Voucher;
 import utils.JDBCUtil;
 
 public class VoucherDao {
-    
+
     public static VoucherDao getInstance() {
         return new VoucherDao();
     }
@@ -18,20 +18,18 @@ public class VoucherDao {
     private static final String GET_ACTIVE_VOUCHERS_SQL = "SELECT * FROM voucher WHERE start_time <= CURRENT_DATE AND end_time >= CURRENT_DATE AND status = 1";
 
     // SQL query để lấy danh sách voucher của người dùng theo user_id
-    private static final String GET_VOUCHERS_BY_USER_ID_SQL = 
-            "SELECT v.id, v.code, v.name, v.description, v.discount_value, v.discount_percent, v.start_time, v.end_time, v.points_value, v.status " +
-            "FROM users_voucher uv " +
-            "JOIN voucher v ON uv.voucher_id = v.id " +
-            "WHERE uv.user_id = ?";
+    private static final String GET_VOUCHERS_BY_USER_ID_SQL
+            = "SELECT DISTINCT v.id, v.code, v.name, v.description, v.discount_value, v.discount_percent, v.start_time, v.end_time, v.points_value, v.status, v.created_at, v.updated_at "
+            + "FROM users_voucher uv "
+            + "JOIN voucher v ON uv.voucher_id = v.id "
+            + "WHERE uv.user_id = ?";
 
     // Hàm lấy danh sách voucher chưa hết hạn
     public List<Voucher> getActiveVouchers() throws SQLException, ClassNotFoundException {
         List<Voucher> vouchers = new ArrayList<>();
 
         // Kết nối cơ sở dữ liệu
-        try (Connection con = JDBCUtil.getConnection();
-                PreparedStatement preparedStatement = con.prepareStatement(GET_ACTIVE_VOUCHERS_SQL);
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement preparedStatement = con.prepareStatement(GET_ACTIVE_VOUCHERS_SQL); ResultSet resultSet = preparedStatement.executeQuery()) {
 
             // Duyệt qua kết quả trả về và tạo danh sách voucher
             while (resultSet.next()) {
@@ -59,12 +57,18 @@ public class VoucherDao {
     }
 
     // Hàm lấy danh sách voucher của người dùng theo user_id
-    public List<Voucher> getVouchersByUserId(int userId) throws SQLException, ClassNotFoundException {
+    public List<Voucher> getVouchersByUserId(int userId, Integer option) throws SQLException, ClassNotFoundException {
         List<Voucher> vouchers = new ArrayList<>();
-
+        String sql = GET_VOUCHERS_BY_USER_ID_SQL;
+        if ( option != null && option != 1) {
+            if (option == 2) {
+                sql += " AND v.status = 1 AND v.start_time <= CURRENT_DATE AND v.end_time >= CURRENT_DATE";
+            } else if (option == 3) {
+                sql += " AND v.status = 0";
+            }
+        }
         // Kết nối cơ sở dữ liệu
-        try (Connection con = JDBCUtil.getConnection();
-             PreparedStatement preparedStatement = con.prepareStatement(GET_VOUCHERS_BY_USER_ID_SQL)) {
+        try (Connection con = JDBCUtil.getConnection(); PreparedStatement preparedStatement = con.prepareStatement(sql)) {
 
             // Set giá trị user_id vào PreparedStatement
             preparedStatement.setInt(1, userId);
@@ -91,6 +95,9 @@ public class VoucherDao {
                     vouchers.add(voucher);
                 }
             }
+        }catch(Exception e)
+        {
+            e.printStackTrace();
         }
 
         return vouchers;
