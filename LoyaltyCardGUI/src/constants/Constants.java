@@ -17,5 +17,14 @@ public class Constants {
 
         public static final String SUBTRACT = "SUBTRACT";
     }
+    
+     public final static class VOUCHER_ENUM {
+
+        public static final String ALL = "ALL";
+
+        public static final String ACTIVE = "ACTIVE";
+        
+        public static final String INACTIVE = "INACTIVE";
+    }
 
 }
