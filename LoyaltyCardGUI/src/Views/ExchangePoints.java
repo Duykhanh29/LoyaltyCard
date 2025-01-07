@@ -9,11 +9,26 @@ import Controllers.PointController;
 import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.VoucherDao;
 import Models.UserData;
+import Models.Voucher;
 import com.formdev.flatlaf.FlatLightLaf;
 import constants.AppletConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
 /**
@@ -48,13 +63,100 @@ public class ExchangePoints extends javax.swing.JFrame {
 
     private void initViews() {
         pointView.setText(String.valueOf(userData.getPoints()));
+        jPanel1.setLayout(new java.awt.GridLayout(0, 2, 10, 10));
         init();
     }
 
     private void init() {
         noticeText.setText("* Chú ý: Khách hàng chỉ được chọn một trong các hạn mức trên");
 //        noticeText1.setText("Số điểm không được đổi sang số tiền ");
+        try {
+            jPanel1.removeAll();
+            List<Voucher> listVoucher = VoucherDao.getInstance().getActiveVouchers();
+            if (listVoucher == null) {
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+                return;
+            }
+            for (Voucher voucher : listVoucher) {
+                JPanel voucherPanel = createVoucherPanel(
+                        voucher.getName(),
+                        "Cần " + voucher.getPointsValue() + " điểm để quy đổi",
+                        "Date: " + voucher.getEndTime()
+                );
 
+                jPanel1.add(voucherPanel);
+            }
+            jPanel1.revalidate();
+            jPanel1.repaint();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
+        }
+    }
+
+    private JPanel createVoucherPanel(String title, String pointText, String dateText) {
+        // Panel chính với layout ngang
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout()); // Sử dụng BorderLayout để dễ căn chỉnh các thành phần
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 10));
+        panel.setBackground(Color.WHITE);
+        // Icon voucher
+        JLabel lblImage = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/Res/voucher_20K_60x60.png")));
+
+        // Thông tin voucher: Tiêu đề, Điểm, Ngày
+        JPanel textPanel = new JPanel();
+        textPanel.setBackground(Color.WHITE);
+        textPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
+        textPanel.setLayout(new javax.swing.BoxLayout(textPanel, javax.swing.BoxLayout.Y_AXIS)); // Layout dọc
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        JLabel lblPoint = new JLabel(pointText);
+        JLabel lblDate = new JLabel(dateText);
+
+        // Thêm các phần tử vào textPanel
+        textPanel.add(lblTitle);
+        textPanel.add(lblPoint);
+        textPanel.add(lblDate);
+
+        // Gift icon và Detail panel (phía bên phải)
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS)); // Layout dọc
+        rightPanel.setAlignmentX(Component.RIGHT_ALIGNMENT); // Đảm bảo nội dung trong rightPanel nằm bên phải
+        rightPanel.setBackground(Color.WHITE);
+
+        JLabel jlblGift = new JLabel();
+        jlblGift.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/gitf_icon_50x50.jpg")));
+
+        JLabel lblDetail = new JLabel("Detail");
+        lblDetail.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblDetail.setForeground(new java.awt.Color(255, 51, 51));
+        lblDetail.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                moveDetail(evt); // Hành động khi nhấp chuột
+            }
+        });
+
+        // Thêm icon gift và Detail vào rightPanel
+        rightPanel.add(jlblGift); // Gift icon nằm trên
+        rightPanel.add(lblDetail); // Detail nằm dưới
+
+        // Đảm bảo khoảng cách đều cho các thành phần
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // Khoảng cách từ các phần tử tới biên phải
+
+        // Thêm các thành phần vào panel chính
+        panel.add(lblImage, BorderLayout.WEST); // Thêm ảnh voucher vào bên trái
+        panel.add(textPanel, BorderLayout.CENTER); // Thêm thông tin voucher vào giữa
+        panel.add(rightPanel, BorderLayout.EAST); // Thêm gift icon và Detail vào bên phải
+
+        // Thêm sự kiện click cho toàn bộ panel
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chooseVoucher(evt); // Gọi hàm xử lý click
+            }
+        });
+
+        return panel;
     }
 
     /**
@@ -393,11 +495,10 @@ public class ExchangePoints extends javax.swing.JFrame {
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void exchangePoints(short number)
-    {
-         try {
-             JFrame frame = new JFrame("Nhập mã PIN");
-             JPasswordField passwordField = new JPasswordField(10);
+    private void exchangePoints(short number) {
+        try {
+            JFrame frame = new JFrame("Nhập mã PIN");
+            JPasswordField passwordField = new JPasswordField(10);
             int option = JOptionPane.showConfirmDialog(frame, passwordField, "Nhập mã PIN", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (option == JOptionPane.OK_OPTION) {
                 char[] pin = passwordField.getPassword();
@@ -411,13 +512,14 @@ public class ExchangePoints extends javax.swing.JFrame {
         } finally {
         }
     }
-     private void onHandleExchangePoint(String pin, short number) {
+
+    private void onHandleExchangePoint(String pin, short number) {
         if (pin != null && !pin.isEmpty()) {
             try {
                 int pinTries = pinController.verifyPin(pin);
-                if ( pinTries  == AppletConstants.VERIFY_SUCCESS  ) {
+                if (pinTries == AppletConstants.VERIFY_SUCCESS) {
                     RSAController rsaController = new RSAController(userDataController);
-                    boolean isVerifyRSA = rsaController.verifyRSA(this,userData.getPublicKey());
+                    boolean isVerifyRSA = rsaController.verifyRSA(this, userData.getPublicKey());
                     if (!isVerifyRSA) {
                         JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
@@ -429,7 +531,7 @@ public class ExchangePoints extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(this, "Đổi điểm không thành công", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries +" lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries + " lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -439,7 +541,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         }
     }
 
-     private void onBackToHomeView() {
+    private void onBackToHomeView() {
         HomeView homeView = new HomeView();
         this.dispose();
         homeView.setVisible(true);
@@ -461,7 +563,7 @@ public class ExchangePoints extends javax.swing.JFrame {
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
         // TODO add your handling code here:
         this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher(false,userData);
+        DetailVoucher detailVoucher = new DetailVoucher(false, userData);
         detailVoucher.setVisible(true);
     }//GEN-LAST:event_moveDetail
 
@@ -477,8 +579,8 @@ public class ExchangePoints extends javax.swing.JFrame {
         );
         if (response == JOptionPane.YES_OPTION) {
 //                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            exchangePoints((short)point);
-        } 
+            exchangePoints((short) point);
+        }
     }//GEN-LAST:event_chooseVoucher
 
     /**

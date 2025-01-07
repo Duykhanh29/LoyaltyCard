@@ -8,10 +8,14 @@ import Models.Voucher;
 import utils.JDBCUtil;
 
 public class VoucherDao {
+    
+    public static VoucherDao getInstance() {
+        return new VoucherDao();
+    }
 
     // SQL query để lấy danh sách voucher có start_time >= CURRENT_DATE và end_time
     // >= CURRENT_DATE
-    private static final String GET_ACTIVE_VOUCHERS_SQL = "SELECT * FROM voucher WHERE start_time >= CURRENT_DATE AND end_time >= CURRENT_DATE AND status = 1";
+    private static final String GET_ACTIVE_VOUCHERS_SQL = "SELECT * FROM voucher WHERE start_time <= CURRENT_DATE AND end_time >= CURRENT_DATE AND status = 1";
 
     // SQL query để lấy danh sách voucher của người dùng theo user_id
     private static final String GET_VOUCHERS_BY_USER_ID_SQL = 
@@ -42,7 +46,7 @@ public class VoucherDao {
                 int pointsValue = resultSet.getInt("points_value");
                 int status = resultSet.getInt("status");
                 Timestamp createdAt = resultSet.getTimestamp("created_at");
-                Timestamp updatedAt = resultSet.getTimestamp("update_at");
+                Timestamp updatedAt = resultSet.getTimestamp("updated_at");
 
                 // Tạo đối tượng Voucher và thêm vào danh sách
                 Voucher voucher = new Voucher(id, code, name, description, discountValue, discountPercent,
