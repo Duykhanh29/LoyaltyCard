@@ -237,7 +237,7 @@ public class VoucherList extends javax.swing.JFrame {
 
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
         this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher(true,userData);
+        DetailVoucher detailVoucher = new DetailVoucher(true,userData, null);
         detailVoucher.setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_moveDetail

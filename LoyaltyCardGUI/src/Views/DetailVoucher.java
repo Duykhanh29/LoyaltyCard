@@ -5,6 +5,9 @@
 package Views;
 
 import Models.UserData;
+import Models.Voucher;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  *
@@ -17,15 +20,36 @@ public class DetailVoucher extends javax.swing.JFrame {
      */
     boolean isFromVoucherList;
     UserData userData;
-    public DetailVoucher(boolean isFromVoucherList,UserData userData) {
+    private Voucher voucher;
+
+    public DetailVoucher(boolean isFromVoucherList, UserData userData, Voucher voucher) {
         this.isFromVoucherList = isFromVoucherList;
         this.userData = userData;
+        this.voucher = voucher;
         initComponents();
+        init();
         this.setLocationRelativeTo(null);
     }
 
     private DetailVoucher() {
-      
+
+    }
+
+    private void init() {
+        if (voucher == null) {
+            return;
+        }
+        jLabel7.setText(voucher.getCode());
+        jTextArea2.setText(voucher.getDescription());
+        String voucherValue;
+        if (voucher.getDiscountValue() != 0) {
+            NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+            voucherValue = numberFormat.format(Math.round(voucher.getDiscountValue())) + "đ";
+        } else {
+            voucherValue = voucher.getDiscountPercent() + "%";
+        }
+        jLabel8.setText(voucherValue);
+        jLabel9.setText("" + voucher.getEndTime());
     }
 
     /**
@@ -42,10 +66,12 @@ public class DetailVoucher extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         jLBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -65,15 +91,11 @@ public class DetailVoucher extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setText("Giá trị  giảm giá:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(38, 220, -1, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 230, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setText("Hạn sử dụng mã: ");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(38, 248, -1, -1));
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setText("Trạng thái sử dụng");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(38, 276, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 260, -1, -1));
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -92,6 +114,19 @@ public class DetailVoucher extends javax.swing.JFrame {
         });
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 80, -1));
 
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel7.setText("ABCD");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 70, -1, -1));
+        jLabel7.getAccessibleContext().setAccessibleName("abc");
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel8.setText("10.000đ");
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 230, -1, -1));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel9.setText("2025-01-07");
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 260, -1, -1));
+
         jLBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_540x360.jpg"))); // NOI18N
         getContentPane().add(jLBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 440, 320));
 
@@ -100,16 +135,15 @@ public class DetailVoucher extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        this.dispose();
-        if(isFromVoucherList)
-        {
+        if (isFromVoucherList) {
             VoucherList voucherList = new VoucherList(userData);
             voucherList.setVisible(true);
-        }else{
+        } else {
             ExchangePoints exchangePointsView = new ExchangePoints(userData);
             exchangePointsView.setVisible(true);
         }
-        
+        this.dispose();
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -155,7 +189,9 @@ public class DetailVoucher extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables

@@ -6,6 +6,7 @@ package Views;
 
 import DAO.PointTransactionDao;
 import Models.PointsTransaction;
+import Models.UserData;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
@@ -27,14 +28,15 @@ public class HistoryForm extends javax.swing.JFrame {
     List<PointsTransaction> listTransactions;
     DefaultTableModel defaultTableModel;
     java.sql.Date selectedDate;
+    UserData userData;
 
-    public HistoryForm(int userId) {
+    public HistoryForm(UserData userData) {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.userId = userId;
+        this.userData = userData;
         pointTransactionDao = PointTransactionDao.getInstance();
         defaultTableModel = new DefaultTableModel(new Object[][]{},
-         new String[]{
+                new String[]{
                     "STT", "Loại giao dịch", "Số điểm", "Mô tả", "Loại", "Thời gian"
                 }
         );
@@ -53,7 +55,7 @@ public class HistoryForm extends javax.swing.JFrame {
     private void initListTransaction() {
 
         try {
-            listTransactions = pointTransactionDao.getTransactionsByUserId(userId, selectedDate);
+            listTransactions = pointTransactionDao.getTransactionsByUserId(userData.getId(), selectedDate);
         } catch (SQLException ex) {
 //            Logger.getLogger(HistoryForm.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -172,8 +174,8 @@ public class HistoryForm extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        this.dispose();
         HomeView homeView = new HomeView();
+        this.dispose();
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -184,14 +186,12 @@ public class HistoryForm extends javax.swing.JFrame {
         defaultTableModel.setNumRows(0);
         initListTransaction();
     }//GEN-LAST:event_resetButtonActionPerformed
-    
-    private void onListenDateChanges()
-    {
+
+    private void onListenDateChanges() {
         jDateChooser1.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if(jDateChooser1.getDate()!=null)
-                {
+                if (jDateChooser1.getDate() != null) {
                     defaultTableModel.setNumRows(0);
                     selectedDate = new java.sql.Date(jDateChooser1.getDate().getTime());
                     initListTransaction();
@@ -199,6 +199,7 @@ public class HistoryForm extends javax.swing.JFrame {
             }
         });
     }
+
     /**
      * @param args the command line arguments
      */

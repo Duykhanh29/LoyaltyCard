@@ -316,13 +316,13 @@ public class AccummulatePoints extends javax.swing.JFrame {
         pointsTransaction.setResourceId(invoice.getId());
         pointsTransaction.setTransactionType(Constants.TRANSACTION_TYPE.ADD);
         pointsTransaction.setUserId(userData.getId());
-        pointsTransaction.setDescription("Add point by invoice.");
+        pointsTransaction.setDescription("Cộng điểm từ hóa đơn.");
         PointTransactionDao.getInstance().insertPointTransaction(pointsTransaction);
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        onBackToHomeView();
+        onBackToHomeView(userData);
     }
 
     private void onBackToHomeView() {

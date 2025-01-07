@@ -9,11 +9,17 @@ import Controllers.PointController;
 import Controllers.RSAController;
 import Controllers.SmartCardConnection;
 import Controllers.UserDataController;
+import DAO.PointTransactionDao;
+import DAO.UserDao;
+import DAO.UserVoucherDao;
 import DAO.VoucherDao;
+import Models.PointsTransaction;
 import Models.UserData;
 import Models.Voucher;
+import cache.VoucherCache;
 import com.formdev.flatlaf.FlatLightLaf;
 import constants.AppletConstants;
+import constants.Constants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -45,6 +51,8 @@ public class ExchangePoints extends javax.swing.JFrame {
     SmartCardConnection smartCardConnection;
     PinController pinController;
     UserDataController userDataController;
+    private static final String CACHE_LIST_ACTIVE_VOUCHER = "LIST_ACTIVE_VOUCHER";
+    private static final long CACHE_EXPIRY_TIME = 5 * 60 * 1000;
 
     public ExchangePoints(UserData userData) {
         initComponents();
@@ -72,14 +80,23 @@ public class ExchangePoints extends javax.swing.JFrame {
 //        noticeText1.setText("Số điểm không được đổi sang số tiền ");
         try {
             jPanel1.removeAll();
-            List<Voucher> listVoucher = VoucherDao.getInstance().getActiveVouchers();
+            List<Voucher> listVoucher = null;
+            if (VoucherCache.getCache(CACHE_LIST_ACTIVE_VOUCHER) != null) {
+                System.out.println("Cache existed");
+                listVoucher = VoucherCache.getCache(CACHE_LIST_ACTIVE_VOUCHER);
+            } else {
+                System.out.println("Get voucher from DB");
+                listVoucher = VoucherDao.getInstance().getActiveVouchers();
+                if (listVoucher != null) {
+                    VoucherCache.setCache(CACHE_LIST_ACTIVE_VOUCHER, listVoucher, CACHE_EXPIRY_TIME); // Lưu cache
+                }
+            }
             if (listVoucher == null) {
                 JOptionPane.showMessageDialog(this, "Có lỗi xảy ra");
                 return;
             }
             for (Voucher voucher : listVoucher) {
                 JPanel voucherPanel = createVoucherPanel(voucher);
-
                 jPanel1.add(voucherPanel);
             }
             jPanel1.revalidate();
@@ -129,7 +146,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         lblDetail.setForeground(new java.awt.Color(255, 51, 51));
         lblDetail.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                moveDetail(evt); // Hành động khi nhấp chuột
+                moveDetail(evt, voucher); // Hành động khi nhấp chuột
             }
         });
 
@@ -158,6 +175,10 @@ public class ExchangePoints extends javax.swing.JFrame {
     private void chooseVoucher(java.awt.event.MouseEvent evt, Voucher voucher) {
         // TODO add your handling code here:
         int point = voucher.getPointsValue();
+        if (point > userData.getPoints()) {
+            JOptionPane.showMessageDialog(this, "Bạn không đủ điểm để đổi voucher này", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         int response = JOptionPane.showConfirmDialog(
                 this,
                 "Bạn có chắc chắn muốn dùng " + point + " điểm để đổi phiếu giảm giá này ?",
@@ -167,7 +188,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         );
         if (response == JOptionPane.YES_OPTION) {
 //                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            exchangePoints((short) point);
+            exchangePoints(voucher);
         }
     }
 
@@ -507,7 +528,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void exchangePoints(short number) {
+    private void exchangePoints(Voucher voucher) {
         try {
             JFrame frame = new JFrame("Nhập mã PIN");
             JPasswordField passwordField = new JPasswordField(10);
@@ -516,7 +537,7 @@ public class ExchangePoints extends javax.swing.JFrame {
                 char[] pin = passwordField.getPassword();
                 String pinStr = new String(pin);
                 System.out.println("Mã PIN bạn nhập là: " + pinStr);
-                onHandleExchangePoint(pinStr, number);
+                onHandleExchangePoint(pinStr, voucher);
             }
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } catch (Exception e) {
@@ -525,7 +546,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         }
     }
 
-    private void onHandleExchangePoint(String pin, short number) {
+    private void onHandleExchangePoint(String pin, Voucher voucher) {
         if (pin != null && !pin.isEmpty()) {
             try {
                 int pinTries = pinController.verifyPin(pin);
@@ -535,7 +556,11 @@ public class ExchangePoints extends javax.swing.JFrame {
                     if (!isVerifyRSA) {
                         JOptionPane.showMessageDialog(this, "Xác thực RSA thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
-                    boolean isSucess = pointController.updatePoint(number, false);
+                    UserVoucherDao.getInstance().insertUserVoucher(userData.getId(), voucher.getId(), 1);
+                    userData.setPoints((short) (userData.getPoints() - voucher.getPointsValue()));
+                    UserDao.getInstance().updateUser(userData);
+                    insertTrans(voucher);
+                    boolean isSucess = pointController.updatePoint((short) voucher.getPointsValue(), false);
                     if (isSucess) {
                         JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         onBackToHomeView();
@@ -546,21 +571,38 @@ public class ExchangePoints extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại. Bạn còn " + pinTries + " lần", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Mã PIN sai. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Mã PIN không thể trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    private void insertTrans(Voucher voucher) throws ClassNotFoundException {
+        PointsTransaction pointsTransaction = new PointsTransaction();
+        pointsTransaction.setPoints(voucher.getPointsValue());
+        pointsTransaction.setResourceId(voucher.getId());
+        pointsTransaction.setTransactionType(Constants.TRANSACTION_TYPE.SUBTRACT);
+        pointsTransaction.setUserId(userData.getId());
+        pointsTransaction.setDescription("Trừ điểm do đổi voucher.");
+        PointTransactionDao.getInstance().insertPointTransaction(pointsTransaction);
+    }
+
     private void onBackToHomeView() {
-        HomeView homeView = new HomeView();
+        HomeView homeView = new HomeView(userData);
         this.dispose();
         homeView.setVisible(true);
     }
+
+    private void moveDetail(java.awt.event.MouseEvent evt, Voucher voucher) {
+        // TODO add your handling code here:
+        DetailVoucher detailVoucher = new DetailVoucher(false, userData, voucher);
+        this.dispose();
+        detailVoucher.setVisible(true);
+    }
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        HomeView homeView = new HomeView();
+        HomeView homeView = new HomeView(userData);
         this.dispose();
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -574,9 +616,6 @@ public class ExchangePoints extends javax.swing.JFrame {
 
     private void moveDetail(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveDetail
         // TODO add your handling code here:
-        this.dispose();
-        DetailVoucher detailVoucher = new DetailVoucher(false, userData);
-        detailVoucher.setVisible(true);
     }//GEN-LAST:event_moveDetail
 
     private void chooseVoucher(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chooseVoucher
@@ -591,7 +630,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         );
         if (response == JOptionPane.YES_OPTION) {
 //                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            exchangePoints((short) point);
+//            exchangePoints(vou);
         }
     }//GEN-LAST:event_chooseVoucher
 

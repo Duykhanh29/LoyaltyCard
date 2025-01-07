@@ -22,24 +22,24 @@ public class HomeView extends javax.swing.JFrame {
     /**
      * Creates new form HomeView
      */
-    
     UserDataController userDataController;
     SmartCardConnection smartCardConnection;
     UserData userData;
     UserDao userDao;
+
     public HomeView() {
         initComponents();
         this.setLocationRelativeTo(null);
         smartCardConnection = SmartCardConnection.getInstance();
         userDataController = new UserDataController(smartCardConnection);
         userDao = UserDao.getInstance();
-          try {
+        try {
             initUserData();
         } catch (Exception ex) {
             Logger.getLogger(UserInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public HomeView(UserData user) {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -49,8 +49,8 @@ public class HomeView extends javax.swing.JFrame {
         userData = user;
         loyaltyPointsTextView.setText(String.valueOf(userData.getPoints()));
     }
-    
-     private void initUserData() throws Exception{
+
+    private void initUserData() throws Exception {
 //        userData = userDataController.readUserData();
         UserData cardUserData = userDataController.readUserData();
         userData = userDao.getUserById(cardUserData.getId());
@@ -198,15 +198,16 @@ public class HomeView extends javax.swing.JFrame {
 
     private void changePINButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changePINButtonActionPerformed
         // TODO add your handling code here:
-        this.dispose();
         ChangePINCode changePinView = new ChangePINCode();
+
+        this.dispose();
         changePinView.setVisible(true);
-        
+
     }//GEN-LAST:event_changePINButtonActionPerformed
 
     private void transactionHistoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transactionHistoryButtonActionPerformed
+        HistoryForm historyForm = new HistoryForm(userData);
         this.dispose();
-        HistoryForm historyForm = new HistoryForm(userData.getId());
         historyForm.setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_transactionHistoryButtonActionPerformed
@@ -218,7 +219,7 @@ public class HomeView extends javax.swing.JFrame {
             UserInfo userInfoView = new UserInfo();
             this.dispose();
             userInfoView.setVisible(true);
-           
+
         } catch (Exception e) {
             ErrorHandleUtils.handleErrorWithException(this, e, "Lỗi ko đọc được thông tin 1");
         } finally {
