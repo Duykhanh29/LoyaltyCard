@@ -78,11 +78,7 @@ public class ExchangePoints extends javax.swing.JFrame {
                 return;
             }
             for (Voucher voucher : listVoucher) {
-                JPanel voucherPanel = createVoucherPanel(
-                        voucher.getName(),
-                        "Cần " + voucher.getPointsValue() + " điểm để quy đổi",
-                        "Date: " + voucher.getEndTime()
-                );
+                JPanel voucherPanel = createVoucherPanel(voucher);
 
                 jPanel1.add(voucherPanel);
             }
@@ -95,7 +91,7 @@ public class ExchangePoints extends javax.swing.JFrame {
         }
     }
 
-    private JPanel createVoucherPanel(String title, String pointText, String dateText) {
+    private JPanel createVoucherPanel(Voucher voucher) {
         // Panel chính với layout ngang
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout()); // Sử dụng BorderLayout để dễ căn chỉnh các thành phần
@@ -109,10 +105,10 @@ public class ExchangePoints extends javax.swing.JFrame {
         textPanel.setBackground(Color.WHITE);
         textPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
         textPanel.setLayout(new javax.swing.BoxLayout(textPanel, javax.swing.BoxLayout.Y_AXIS)); // Layout dọc
-        JLabel lblTitle = new JLabel(title);
+        JLabel lblTitle = new JLabel(voucher.getName());
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 12));
-        JLabel lblPoint = new JLabel(pointText);
-        JLabel lblDate = new JLabel(dateText);
+        JLabel lblPoint = new JLabel("Cần " + voucher.getPointsValue() + " điểm để quy đổi");
+        JLabel lblDate = new JLabel("Date: " + voucher.getEndTime());
 
         // Thêm các phần tử vào textPanel
         textPanel.add(lblTitle);
@@ -152,11 +148,27 @@ public class ExchangePoints extends javax.swing.JFrame {
         // Thêm sự kiện click cho toàn bộ panel
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                chooseVoucher(evt); // Gọi hàm xử lý click
+                chooseVoucher(evt, voucher); // Gọi hàm xử lý click
             }
         });
 
         return panel;
+    }
+
+    private void chooseVoucher(java.awt.event.MouseEvent evt, Voucher voucher) {
+        // TODO add your handling code here:
+        int point = voucher.getPointsValue();
+        int response = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc chắn muốn dùng " + point + " điểm để đổi phiếu giảm giá này ?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (response == JOptionPane.YES_OPTION) {
+//                    JOptionPane.showMessageDialog(this, "Đổi điểm thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            exchangePoints((short) point);
+        }
     }
 
     /**
