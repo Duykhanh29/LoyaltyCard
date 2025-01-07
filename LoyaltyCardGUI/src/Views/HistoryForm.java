@@ -4,6 +4,15 @@
  */
 package Views;
 
+import DAO.PointTransactionDao;
+import Models.PointsTransaction;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Admin
@@ -13,9 +22,73 @@ public class HistoryForm extends javax.swing.JFrame {
     /**
      * Creates new form HistoryForm
      */
-    public HistoryForm() {
+    PointTransactionDao pointTransactionDao;
+    int userId;
+    List<PointsTransaction> listTransactions;
+    DefaultTableModel defaultTableModel;
+    java.sql.Date selectedDate;
+
+    public HistoryForm(int userId) {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.userId = userId;
+        pointTransactionDao = PointTransactionDao.getInstance();
+        defaultTableModel = new DefaultTableModel(new Object[][]{},
+         new String[]{
+                    "STT", "Loại giao dịch", "Số điểm", "Mô tả", "Loại", "Thời gian"
+                }
+        );
+        transactionTable.setModel(defaultTableModel);
+        selectedDate = null;
+        listTransactions = new ArrayList<>();
+        initViews();
+        initListTransaction();
+        onListenDateChanges();
+
+    }
+
+    private HistoryForm() {
+    }
+
+    private void initListTransaction() {
+
+        try {
+            listTransactions = pointTransactionDao.getTransactionsByUserId(userId, selectedDate);
+        } catch (SQLException ex) {
+//            Logger.getLogger(HistoryForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(HistoryForm.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            display();
+        }
+    }
+
+    private void initViews() {
+//        transactionTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+//        transactionTable.getTableHeader().setOpaque(false);
+//        transactionTable.getTableHeader().setBackground(new Color(204, 255, 255));
+//        transactionTable.getTableHeader().setForeground(new Color(255, 255, 255));
+//        transactionTable.setRowHeight(25);
+        // Khởi tạo JTable với dữ liệu trống và tiêu đề cột
+//        transactionTable.setModel(new javax.swing.table.DefaultTableModel(
+//                new Object[][]{}, // Dữ liệu trống
+//                new String[]{
+//                    "STT", "Loại giao dịch", "Số điểm", "Mô tả", "Loại", "Thời gian"
+//                }
+//        ));
+//        transactionTable.set
+    }
+
+    public void display() {
+        for (int i = 0; i < listTransactions.size(); i++) {
+            showTable((i + 1), listTransactions.get(i));
+        }
+    }
+
+    public void showTable(int index, PointsTransaction h) {
+        defaultTableModel.addRow(new Object[]{
+            index, h.getTransactionType(), h.getPoints(), h.getDescription(), h.getResourceType(), h.getCreatedAt()
+        });
     }
 
     /**
@@ -31,11 +104,12 @@ public class HistoryForm extends javax.swing.JFrame {
         menu1 = new java.awt.Menu();
         menu2 = new java.awt.Menu();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        listHistory = new javax.swing.JList<>();
         jLabel2 = new javax.swing.JLabel();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jButton3 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        transactionTable = new javax.swing.JTable();
+        resetButton = new javax.swing.JButton();
         jLabelBackground = new javax.swing.JLabel();
 
         menu1.setLabel("File");
@@ -52,15 +126,6 @@ public class HistoryForm extends javax.swing.JFrame {
         jLabel1.setText("Lịch sử giao dịch");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(229, 17, 227, 37));
 
-        listHistory.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(listHistory);
-
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(86, 114, 530, 310));
-
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Lọc theo ngày");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, -1, 30));
@@ -76,6 +141,29 @@ public class HistoryForm extends javax.swing.JFrame {
         });
         getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
+        transactionTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(transactionTable);
+
+        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 620, 280));
+
+        resetButton.setText("Đặt lại");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(resetButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 70, 110, 30));
+
         jLabelBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Res/background_900x600.jpg"))); // NOI18N
         getContentPane().add(jLabelBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 690, 460));
 
@@ -89,6 +177,28 @@ public class HistoryForm extends javax.swing.JFrame {
         homeView.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        // TODO add your handling code here:
+        jDateChooser1.setDate(null);
+        selectedDate = null;
+        defaultTableModel.setNumRows(0);
+        initListTransaction();
+    }//GEN-LAST:event_resetButtonActionPerformed
+    
+    private void onListenDateChanges()
+    {
+        jDateChooser1.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if(jDateChooser1.getDate()!=null)
+                {
+                    defaultTableModel.setNumRows(0);
+                    selectedDate = new java.sql.Date(jDateChooser1.getDate().getTime());
+                    initListTransaction();
+                }
+            }
+        });
+    }
     /**
      * @param args the command line arguments
      */
@@ -130,10 +240,11 @@ public class HistoryForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabelBackground;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList<String> listHistory;
+    private javax.swing.JScrollPane jScrollPane2;
     private java.awt.Menu menu1;
     private java.awt.Menu menu2;
     private java.awt.MenuBar menuBar1;
+    private javax.swing.JButton resetButton;
+    private javax.swing.JTable transactionTable;
     // End of variables declaration//GEN-END:variables
 }
